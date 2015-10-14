@@ -13,7 +13,7 @@
  *
  * You may elect to redistribute this code under either of these licenses.
  */
-package org.eclipse.moquette.spi.impl;
+package org.eclipse.moquette.spi.persistence;
 
 import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.spi.impl.subscriptions.Subscription;
@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.moquette.commons.Constants.DEFAULT_PERSISTENT_PATH;
 import static org.junit.Assert.*;
@@ -96,10 +97,20 @@ public class MapDBPersistentStoreTest {
         assertEquals(1, packetId);
 
         //release the ID
-        m_storageService.cleanInFlight("CLIENT", packetId);
+        m_storageService.cleanTemporaryPublish("CLIENT", packetId);
 
         //request a second packetID, counter restarts from 0
         packetId = m_storageService.nextPacketID("CLIENT");
         assertEquals(1, packetId);
+    }
+
+    @Test
+    public void testCloseShutdownCommitTask() throws InterruptedException {
+        m_storageService.close();
+
+        //verify the executor is shutdown
+        assertTrue("Storage service scheduler can't be stopped in 3 seconds",
+                m_storageService.m_scheduler.awaitTermination(3, TimeUnit.SECONDS));
+        assertTrue(m_storageService.m_scheduler.isTerminated());
     }
 }

@@ -15,13 +15,9 @@
  */
 package org.eclipse.moquette.spi.impl;
 
-import com.lmax.disruptor.EventHandler;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.dsl.Disruptor;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.moquette.server.netty.NettyChannel;
 import org.eclipse.moquette.spi.IMatchingCondition;
@@ -61,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrea
  */
-class ProtocolProcessor implements EventHandler<ValueEvent> {
+public class ProtocolProcessor {
 
     static final class WillMessage {
         private final String topic;
@@ -96,7 +92,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
     
     private static final Logger LOG = LoggerFactory.getLogger(ProtocolProcessor.class);
     
-    private Map<String, ConnectionDescriptor> m_clientIDs = new HashMap<>();
+    private Map<String, ConnectionDescriptor> m_clientIDs = new ConcurrentHashMap<>();
     private SubscriptionsStore subscriptions;
     private boolean allowAnonymous;
     private IAuthorizator m_authorizator;
@@ -106,12 +102,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
     private BrokerInterceptor m_interceptor;
 
     //maps clientID to Will testament, if specified on CONNECT
-    private Map<String, WillMessage> m_willStore = new HashMap<>();
+    private Map<String, WillMessage> m_willStore = new ConcurrentHashMap<>();
     
-    private ExecutorService m_executor;
-    private RingBuffer<ValueEvent> m_ringBuffer;
-    private Disruptor<ValueEvent> m_disruptor;
-
     ProtocolProcessor() {}
 
     /**
@@ -138,25 +130,9 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         m_authenticator = authenticator;
         m_messagesStore = storageService;
         m_sessionsStore = sessionsStore;
-        
-        //init the output ringbuffer
-        m_executor = Executors.newFixedThreadPool(1);
-
-        /*Disruptor<ValueEvent>*/ m_disruptor = new Disruptor<>(ValueEvent.EVENT_FACTORY, 1024 * 32, m_executor);
-        m_disruptor.handleEventsWith(this);
-        m_disruptor.start();
-
-        // Get the ring buffer from the Disruptor to be used for publishing.
-        m_ringBuffer = m_disruptor.getRingBuffer();
     }
 
-    void stop() {
-        m_executor.shutdown();
-        m_disruptor.shutdown();
-    }
-
-    @MQTTMessage(message = ConnectMessage.class)
-    void processConnect(ServerChannel session, ConnectMessage msg) {
+    public void processConnect(ServerChannel session, ConnectMessage msg) {
         LOG.debug("CONNECT for client <{}>", msg.getClientID());
         if (msg.getProtocolVersion() != VERSION_3_1 && msg.getProtocolVersion() != VERSION_3_1_1) {
             ConnAckMessage badProto = new ConnAckMessage();
@@ -224,7 +200,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
 
         //Handle will flag
         if (msg.isWillFlag()) {
-            AbstractMessage.QOSType willQos = AbstractMessage.QOSType.values()[msg.getWillQos()];
+            AbstractMessage.QOSType willQos = AbstractMessage.QOSType.valueOf(msg.getWillQos());
             byte[] willPayload = msg.getWillMessage();
             ByteBuffer bb = (ByteBuffer) ByteBuffer.allocate(willPayload.length).put(willPayload).flip();
             //save the will testament in the clientID store
@@ -243,14 +219,17 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
 
         ConnAckMessage okResp = new ConnAckMessage();
         okResp.setReturnCode(ConnAckMessage.CONNECTION_ACCEPTED);
-        if (!msg.isCleanSession() && m_sessionsStore.contains(msg.getClientID())) {
+        boolean isSessionAlreadyStored = m_sessionsStore.contains(msg.getClientID());
+        if (!msg.isCleanSession() && isSessionAlreadyStored) {
             okResp.setSessionPresent(true);
         }
         session.write(okResp);
         m_interceptor.notifyClientConnected(msg);
 
-        LOG.info("Create persistent session for clientID <{}>", msg.getClientID());
-        m_sessionsStore.addNewSubscription(Subscription.createEmptySubscription(msg.getClientID(), true)); //null means EmptySubscription
+        if (!isSessionAlreadyStored) {
+            LOG.info("Create persistent session for clientID <{}>", msg.getClientID());
+            m_sessionsStore.createNewSession(msg.getClientID());
+        }
         LOG.info("Connected client ID <{}> with clean session {}", msg.getClientID(), msg.isCleanSession());
         if (!msg.isCleanSession()) {
             //force the republish of stored QoS1 and QoS2
@@ -284,8 +263,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
     }
     
-    @MQTTMessage(message = PubAckMessage.class)
-    void processPubAck(ServerChannel session, PubAckMessage msg) {
+    public void processPubAck(ServerChannel session, PubAckMessage msg) {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         int messageID = msg.getMessageID();
         //Remove the message from message store
@@ -301,9 +279,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         //remove also the messages stored of type QoS1/2
         m_messagesStore.dropMessagesInSession(clientID);
     }
-    
-    @MQTTMessage(message = PublishMessage.class)
-    void processPublish(ServerChannel session, PublishMessage msg) {
+
+    public void processPublish(ServerChannel session, PublishMessage msg) {
         LOG.trace("PUB --PUBLISH--> SRV executePublish invoked with {}", msg);
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         final String topic = msg.getTopicName();
@@ -329,10 +306,10 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         if (qos == AbstractMessage.QOSType.MOST_ONE) { //QoS0
             forward2Subscribers(publishEvt);
         } else if (qos == AbstractMessage.QOSType.LEAST_ONE) { //QoS1
-            //TODO use a message store for TO PUBLISH MESSAGES it has nothing to do with inFlight!!
-            m_messagesStore.addInFlight(publishEvt, clientID, messageID);
+            //TODO implement inFlight!!
+            m_messagesStore.storeTemporaryPublish(publishEvt, clientID, messageID);
             forward2Subscribers(publishEvt);
-            m_messagesStore.cleanInFlight(clientID, messageID);
+            m_messagesStore.cleanTemporaryPublish(clientID, messageID);
             //NB the PUB_ACK could be sent also after the addInFlight
             sendPubAck(new PubAckEvent(messageID, clientID));
             LOG.debug("replying with PubAck to MSG ID {}", messageID);
@@ -388,7 +365,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
         for (final Subscription sub : subscriptions.matches(topic)) {
             AbstractMessage.QOSType qos = publishingQos;
-            if (qos.ordinal() > sub.getRequestedQos().ordinal()) {
+            if (qos.byteValue() > sub.getRequestedQos().byteValue()) {
                 qos = sub.getRequestedQos();
             }
 
@@ -411,7 +388,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
                     //if QoS 2 then store it in temp memory
                     if (qos == AbstractMessage.QOSType.EXACTLY_ONCE) {
                         PublishEvent newPublishEvt = new PublishEvent(topic, qos, message, retain, sub.getClientId(), messageID != null ? messageID : 0);
-                        m_messagesStore.addInFlight(newPublishEvt, sub.getClientId(), messageID);
+                        m_messagesStore.storeTemporaryPublish(newPublishEvt, sub.getClientId(), messageID);
                     }
                     //publish
                     if (sub.isActive()) {
@@ -449,6 +426,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
         LOG.debug("clientIDs are {}", m_clientIDs);
         if (m_clientIDs.get(clientId) == null) {
+            //TODO while we were publishing to the target client, that client disconnected,
+            // could happen is not an error HANDLE IT
             throw new RuntimeException(String.format("Can't find a ConnectionDescriptor for client <%s> in cache <%s>", clientId, m_clientIDs));
         }
         ServerChannel session = m_clientIDs.get(clientId).getSession();
@@ -459,24 +438,19 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
             LOG.debug("topic {} doesn't have read credentials", topic);
             return;
         }
-
-        disruptorPublish(new OutputMessagingEvent(session, pubMessage));
+        session.write(pubMessage);
     }
     
     private void sendPubRec(String clientID, int messageID) {
         LOG.trace("PUB <--PUBREC-- SRV sendPubRec invoked for clientID {} with messageID {}", clientID, messageID);
         PubRecMessage pubRecMessage = new PubRecMessage();
         pubRecMessage.setMessageID(messageID);
-
-//        m_clientIDs.get(clientID).getSession().write(pubRecMessage);
-        disruptorPublish(new OutputMessagingEvent(m_clientIDs.get(clientID).getSession(), pubRecMessage));
+        m_clientIDs.get(clientID).getSession().write(pubRecMessage);
     }
     
     private void sendPubAck(PubAckEvent evt) {
         LOG.trace("sendPubAck invoked");
-
         String clientId = evt.getClientID();
-
         PubAckMessage pubAckMessage = new PubAckMessage();
         pubAckMessage.setMessageID(evt.getMessageId());
 
@@ -489,8 +463,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
                 throw new RuntimeException(String.format("Can't find a ConnectionDescriptor for client %s in cache %s", clientId, m_clientIDs));
             }
 //            LOG.debug("Session for clientId " + clientId + " is " + m_clientIDs.get(clientId).getSession());
-//            m_clientIDs.get(clientId).getSession().write(pubAckMessage);
-            disruptorPublish(new OutputMessagingEvent(m_clientIDs.get(clientId).getSession(), pubAckMessage));
+            m_clientIDs.get(clientId).getSession().write(pubAckMessage);
         }catch(Throwable t) {
             LOG.error(null, t);
         }
@@ -500,8 +473,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
      * Second phase of a publish QoS2 protocol, sent by publisher to the broker. Search the stored message and publish
      * to all interested subscribers.
      * */
-    @MQTTMessage(message = PubRelMessage.class)
-    void processPubRel(ServerChannel session, PubRelMessage msg) {
+    public void processPubRel(ServerChannel session, PubRelMessage msg) {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         int messageID = msg.getMessageID();
         LOG.debug("PUB --PUBREL--> SRV processPubRel invoked for clientID {} ad messageID {}", clientID, messageID);
@@ -524,12 +496,10 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         PubCompMessage pubCompMessage = new PubCompMessage();
         pubCompMessage.setMessageID(messageID);
 
-//        m_clientIDs.get(clientID).getSession().write(pubCompMessage);
-        disruptorPublish(new OutputMessagingEvent(m_clientIDs.get(clientID).getSession(), pubCompMessage));
+        m_clientIDs.get(clientID).getSession().write(pubCompMessage);
     }
     
-    @MQTTMessage(message = PubRecMessage.class)
-    void processPubRec(ServerChannel session, PubRecMessage msg) {
+    public void processPubRec(ServerChannel session, PubRecMessage msg) {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         int messageID = msg.getMessageID();
         //once received a PUBREC reply with a PUBREL(messageID)
@@ -542,18 +512,16 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         //disruptorPublish(new OutputMessagingEvent(m_clientIDs.get(clientID).getSession(), pubRelMessage));
         session.write(pubRelMessage);
     }
-    
-    @MQTTMessage(message = PubCompMessage.class)
-    void processPubComp(ServerChannel session, PubCompMessage msg) {
+
+    public void processPubComp(ServerChannel session, PubCompMessage msg) {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         int messageID = msg.getMessageID();
         LOG.debug("\t\tSRV <--PUBCOMP-- SUB processPubComp invoked for clientID {} ad messageID {}", clientID, messageID);
         //once received the PUBCOMP then remove the message from the temp memory
-        m_messagesStore.cleanInFlight(clientID, messageID);
+        m_messagesStore.cleanTemporaryPublish(clientID, messageID);
     }
     
-    @MQTTMessage(message = DisconnectMessage.class)
-    void processDisconnect(ServerChannel session, DisconnectMessage msg) throws InterruptedException {
+    public void processDisconnect(ServerChannel session, DisconnectMessage msg) throws InterruptedException {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         boolean cleanSession = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_CLEANSESSION);
         if (cleanSession) {
@@ -572,8 +540,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         LOG.info("DISCONNECT client <{}> with clean session {}", clientID, cleanSession);
         m_interceptor.notifyClientDisconnected(clientID);
     }
-    
-    void processConnectionLost(LostConnectionEvent evt) {
+
+    public void processConnectionLost(LostConnectionEvent evt) {
         String clientID = evt.clientID;
         //If already removed a disconnect message was already processed for this clientID
         if (m_clientIDs.remove(clientID) != null) {
@@ -594,8 +562,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
      * Remove the clientID from topic subscription, if not previously subscribed,
      * doesn't reply any error
      */
-    @MQTTMessage(message = UnsubscribeMessage.class)
-    void processUnsubscribe(ServerChannel session, UnsubscribeMessage msg) {
+    public void processUnsubscribe(ServerChannel session, UnsubscribeMessage msg) {
         List<String> topics = msg.topicFilters();
         int messageID = msg.getMessageID();
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
@@ -622,9 +589,8 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         LOG.info("replying with UnsubAck to MSG ID {}", messageID);
         session.write(ackMessage);
     }
-    
-    @MQTTMessage(message = SubscribeMessage.class)
-    void processSubscribe(ServerChannel session, SubscribeMessage msg) {
+
+    public void processSubscribe(ServerChannel session, SubscribeMessage msg) {
         String clientID = (String) session.getAttribute(NettyChannel.ATTR_KEY_CLIENTID);
         boolean cleanSession = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_CLEANSESSION);
         LOG.debug("SUBSCRIBE client <{}> packetID {}", clientID, msg.getMessageID());
@@ -634,7 +600,7 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         ackMessage.setMessageID(msg.getMessageID());
 
         for (SubscribeMessage.Couple req : msg.subscriptions()) {
-            AbstractMessage.QOSType qos = AbstractMessage.QOSType.values()[req.getQos()];
+            AbstractMessage.QOSType qos = AbstractMessage.QOSType.valueOf(req.getQos());
             Subscription newSubscription = new Subscription(clientID, req.getTopicFilter(), qos, cleanSession);
             boolean valid = subscribeSingleTopic(newSubscription, req.getTopicFilter());
             ackMessage.addType(valid ? qos : AbstractMessage.QOSType.FAILURE);
@@ -676,27 +642,4 @@ class ProtocolProcessor implements EventHandler<ValueEvent> {
         }
         return true;
     }
-    
-    private void disruptorPublish(OutputMessagingEvent msgEvent) {
-        LOG.debug("disruptorPublish publishing event on output {}", msgEvent);
-        long sequence = m_ringBuffer.next();
-        ValueEvent event = m_ringBuffer.get(sequence);
-
-        event.setEvent(msgEvent);
-        
-        m_ringBuffer.publish(sequence); 
-    }
-
-    public void onEvent(ValueEvent t, long l, boolean bln) throws Exception {
-        try {
-            MessagingEvent evt = t.getEvent();
-            //It's always of type OutputMessagingEvent
-            OutputMessagingEvent outEvent = (OutputMessagingEvent) evt;
-            LOG.debug("Output event, sending {}", outEvent.getMessage());
-            outEvent.getChannel().write(outEvent.getMessage());
-        } finally {
-            t.setEvent(null); //free the reference to all Netty stuff
-        }
-    }
-
 }

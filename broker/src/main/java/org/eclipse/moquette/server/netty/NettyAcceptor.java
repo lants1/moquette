@@ -19,6 +19,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -54,6 +55,8 @@ import org.eclipse.moquette.parser.netty.MQTTDecoder;
 import org.eclipse.moquette.parser.netty.MQTTEncoder;
 import org.eclipse.moquette.server.ServerAcceptor;
 import org.eclipse.moquette.server.netty.metrics.*;
+import org.eclipse.moquette.spi.impl.ProtocolProcessor;
+import org.eclipse.moquette.spi.impl.SimpleMessaging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,22 +103,23 @@ public class NettyAcceptor implements ServerAcceptor {
     MessageMetricsCollector m_metricsCollector = new MessageMetricsCollector();
 
     @Override
-    public void initialize(IMessaging messaging, IConfig props) throws IOException {
+    public void initialize(ProtocolProcessor processor, IConfig props) throws IOException {
         m_bossGroup = new NioEventLoopGroup();
         m_workerGroup = new NioEventLoopGroup();
+        final NettyMQTTHandler handler = new NettyMQTTHandler(processor);
         
-        initializePlainTCPTransport(messaging, props);
-        initializeWebSocketTransport(messaging, props);
+        initializePlainTCPTransport(handler, props);
+        initializeWebSocketTransport(handler, props);
         String sslTcpPortProp = props.getProperty(Constants.SSL_PORT_PROPERTY_NAME);
         String wssPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
         if (sslTcpPortProp != null || wssPortProp != null) {
-            SslHandler sslHandler = initSSLHandler(props);
-            if (sslHandler == null) {
+            SslHandlerFactory sslHandlerFactory = initSSLHandlerFactory(props);
+            if (!sslHandlerFactory.canCreate()) {
                 LOG.error("Can't initialize SSLHandler layer! Exiting, check your configuration of jks");
                 return;
             }
-            initializeSSLTCPTransport(messaging, props, sslHandler);
-            initializeWSSTransport(messaging, props, sslHandler);
+            initializeSSLTCPTransport(handler, props, sslHandlerFactory);
+            initializeWSSTransport(handler, props, sslHandlerFactory);
         }
     }
 
@@ -149,16 +153,15 @@ public class NettyAcceptor implements ServerAcceptor {
         }
     }
     
-    private void initializePlainTCPTransport(IMessaging messaging, IConfig props) throws IOException {
-        final NettyMQTTHandler handler = new NettyMQTTHandler();
-        handler.setMessaging(messaging);
+    private void initializePlainTCPTransport(final NettyMQTTHandler handler, IConfig props) throws IOException {
+        final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         int port = Integer.parseInt(props.getProperty(Constants.PORT_PROPERTY_NAME));
         initFactory(host, port, new PipelineInitializer() {
             @Override
             void init(ChannelPipeline pipeline) {
                 pipeline.addFirst("idleStateHandler", new IdleStateHandler(0, 0, Constants.DEFAULT_CONNECT_TIMEOUT));
-                pipeline.addAfter("idleStateHandler", "idleEventHandler", new MoquetteIdleTimoutHandler());
+                pipeline.addAfter("idleStateHandler", "idleEventHandler", timeoutHandler);
                 //pipeline.addLast("logger", new LoggingHandler("Netty", LogLevel.ERROR));
                 pipeline.addFirst("bytemetrics", new BytesMetricsHandler(m_bytesMetricsCollector));
                 pipeline.addLast("decoder", new MQTTDecoder());
@@ -169,7 +172,7 @@ public class NettyAcceptor implements ServerAcceptor {
         });
     }
     
-    private void initializeWebSocketTransport(IMessaging messaging, IConfig props) throws IOException {
+    private void initializeWebSocketTransport(final NettyMQTTHandler handler, IConfig props) throws IOException {
         String webSocketPortProp = props.getProperty(Constants.WEB_SOCKET_PORT_PROPERTY_NAME);
         if (webSocketPortProp == null) {
             //Do nothing no WebSocket configured
@@ -178,8 +181,7 @@ public class NettyAcceptor implements ServerAcceptor {
         }
         int port = Integer.parseInt(webSocketPortProp);
         
-        final NettyMQTTHandler handler = new NettyMQTTHandler();
-        handler.setMessaging(messaging);
+        final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
 
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         initFactory(host, port, new PipelineInitializer() {
@@ -188,12 +190,11 @@ public class NettyAcceptor implements ServerAcceptor {
                 pipeline.addLast("httpEncoder", new HttpResponseEncoder());
                 pipeline.addLast("httpDecoder", new HttpRequestDecoder());
                 pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
-                pipeline.addLast("webSocketHandler", new WebSocketServerProtocolHandler("/mqtt"/*"/mqtt"*/, "mqttv3.1, mqttv3.1.1"));
-                //pipeline.addLast("webSocketHandler", new WebSocketServerProtocolHandler(null, "mqtt"));
+                pipeline.addLast("webSocketHandler", new WebSocketServerProtocolHandler("/mqtt", "mqtt, mqttv3.1, mqttv3.1.1"));
                 pipeline.addLast("ws2bytebufDecoder", new WebSocketFrameToByteBufDecoder());
                 pipeline.addLast("bytebuf2wsEncoder", new ByteBufToWebSocketFrameEncoder());
                 pipeline.addFirst("idleStateHandler", new IdleStateHandler(0, 0, Constants.DEFAULT_CONNECT_TIMEOUT));
-                pipeline.addAfter("idleStateHandler", "idleEventHandler", new MoquetteIdleTimoutHandler());
+                pipeline.addAfter("idleStateHandler", "idleEventHandler", timeoutHandler);
                 pipeline.addFirst("bytemetrics", new BytesMetricsHandler(m_bytesMetricsCollector));
                 pipeline.addLast("decoder", new MQTTDecoder());
                 pipeline.addLast("encoder", new MQTTEncoder());
@@ -203,7 +204,7 @@ public class NettyAcceptor implements ServerAcceptor {
         });
     }
     
-    private void initializeSSLTCPTransport(IMessaging messaging, IConfig props, final SslHandler sslHandler) throws IOException {
+    private void initializeSSLTCPTransport(final NettyMQTTHandler handler, IConfig props, final SslHandlerFactory sslHandlerFactory) throws IOException {
         String sslPortProp = props.getProperty(Constants.SSL_PORT_PROPERTY_NAME);
         if (sslPortProp == null) {
             //Do nothing no SSL configured
@@ -214,15 +215,14 @@ public class NettyAcceptor implements ServerAcceptor {
         int sslPort = Integer.parseInt(sslPortProp);
         LOG.info("Starting SSL on port {}", sslPort);
 
-        final NettyMQTTHandler handler = new NettyMQTTHandler();
-        handler.setMessaging(messaging);
+        final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         initFactory(host, sslPort, new PipelineInitializer() {
             @Override
             void init(ChannelPipeline pipeline) throws Exception {
-                pipeline.addLast("ssl", sslHandler);
+                pipeline.addLast("ssl", sslHandlerFactory.create());
                 pipeline.addFirst("idleStateHandler", new IdleStateHandler(0, 0, Constants.DEFAULT_CONNECT_TIMEOUT));
-                pipeline.addAfter("idleStateHandler", "idleEventHandler", new MoquetteIdleTimoutHandler());
+                pipeline.addAfter("idleStateHandler", "idleEventHandler", timeoutHandler);
                 //pipeline.addLast("logger", new LoggingHandler("Netty", LogLevel.ERROR));
                 pipeline.addFirst("bytemetrics", new BytesMetricsHandler(m_bytesMetricsCollector));
                 pipeline.addLast("decoder", new MQTTDecoder());
@@ -233,7 +233,7 @@ public class NettyAcceptor implements ServerAcceptor {
         });
     }
 
-    private void initializeWSSTransport(IMessaging messaging, IConfig props, final SslHandler sslHandler) throws IOException {
+    private void initializeWSSTransport(final NettyMQTTHandler handler, IConfig props, final SslHandlerFactory sslHandlerFactory) throws IOException {
         String sslPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
         if (sslPortProp == null) {
             //Do nothing no SSL configured
@@ -241,21 +241,20 @@ public class NettyAcceptor implements ServerAcceptor {
             return;
         }
         int sslPort = Integer.parseInt(sslPortProp);
-        final NettyMQTTHandler handler = new NettyMQTTHandler();
-        handler.setMessaging(messaging);
+        final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         initFactory(host, sslPort, new PipelineInitializer() {
             @Override
             void init(ChannelPipeline pipeline) throws Exception {
-                pipeline.addLast("ssl", sslHandler);
+                pipeline.addLast("ssl", sslHandlerFactory.create());
                 pipeline.addLast("httpEncoder", new HttpResponseEncoder());
                 pipeline.addLast("httpDecoder", new HttpRequestDecoder());
                 pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
-                pipeline.addLast("webSocketHandler", new WebSocketServerProtocolHandler("/mqtt", "mqttv3.1, mqttv3.1.1"));
+                pipeline.addLast("webSocketHandler", new WebSocketServerProtocolHandler("/mqtt", "mqtt mqttv3.1, mqttv3.1.1"));
                 pipeline.addLast("ws2bytebufDecoder", new WebSocketFrameToByteBufDecoder());
                 pipeline.addLast("bytebuf2wsEncoder", new ByteBufToWebSocketFrameEncoder());
                 pipeline.addFirst("idleStateHandler", new IdleStateHandler(0, 0, Constants.DEFAULT_CONNECT_TIMEOUT));
-                pipeline.addAfter("idleStateHandler", "idleEventHandler", new MoquetteIdleTimoutHandler());
+                pipeline.addAfter("idleStateHandler", "idleEventHandler", timeoutHandler);
                 pipeline.addFirst("bytemetrics", new BytesMetricsHandler(m_bytesMetricsCollector));
                 pipeline.addLast("decoder", new MQTTDecoder());
                 pipeline.addLast("encoder", new MQTTEncoder());
@@ -295,63 +294,83 @@ public class NettyAcceptor implements ServerAcceptor {
     }
 
 
-    private SslHandler initSSLHandler(IConfig props) {
-        final String jksPath = props.getProperty(Constants.JKS_PATH_PROPERTY_NAME);
-        LOG.info("Starting SSL using keystore at {}", jksPath);
-        if (jksPath == null || jksPath.isEmpty()) {
-            //key_store_password or key_manager_password are empty
-            LOG.warn("You have configured the SSL port but not the jks_path, SSL not started");
-            return null;
-        }
-
-        //if we have the port also the jks then keyStorePassword and keyManagerPassword
-        //has to be defined
-        final String keyStorePassword = props.getProperty(Constants.KEY_STORE_PASSWORD_PROPERTY_NAME);
-        final String keyManagerPassword = props.getProperty(Constants.KEY_MANAGER_PASSWORD_PROPERTY_NAME);
-        if (keyStorePassword == null || keyStorePassword.isEmpty()) {
-            //key_store_password or key_manager_password are empty
-            LOG.warn("You have configured the SSL port but not the key_store_password, SSL not started");
-            return null;
-        }
-        if (keyManagerPassword == null || keyManagerPassword.isEmpty()) {
-            //key_manager_password or key_manager_password are empty
-            LOG.warn("You have configured the SSL port but not the key_manager_password, SSL not started");
-            return null;
-        }
-
-        try {
-            InputStream jksInputStream = jksDatastore(jksPath);
-            SSLContext serverContext = SSLContext.getInstance("TLS");
-            final KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(jksInputStream, keyStorePassword.toCharArray());
-            final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(ks, keyManagerPassword.toCharArray());
-            serverContext.init(kmf.getKeyManagers(), null, null);
-
-            SSLEngine engine = serverContext.createSSLEngine();
-            engine.setUseClientMode(false);
-            return new SslHandler(engine);
-        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | CertificateException | KeyStoreException
-                | KeyManagementException | IOException ex) {
-            LOG.error("Can't start SSL layer!", ex);
-            return null;
-        }
+    private SslHandlerFactory initSSLHandlerFactory(IConfig props) {
+        SslHandlerFactory factory = new SslHandlerFactory(props);
+        return factory.canCreate() ? factory : null;
     }
 
-    private InputStream jksDatastore(String jksPath) throws FileNotFoundException {
-        URL jksUrl = getClass().getClassLoader().getResource(jksPath);
-        if (jksUrl != null) {
-            LOG.info("Starting with jks at {}, jks normal {}", jksUrl.toExternalForm(), jksUrl);
-            return getClass().getClassLoader().getResourceAsStream(jksPath);
+    private static class SslHandlerFactory {
+        
+        private SSLContext sslContext;
+
+        public SslHandlerFactory(IConfig props) {
+            this.sslContext = initSSLContext(props);
         }
-        LOG.info("jks not found in bundled resources, try on the filesystem");
-        File jksFile = new File(jksPath);
-        if (jksFile.exists()) {
-            LOG.info("Using {} ", jksFile.getAbsolutePath());
-            return new FileInputStream(jksFile);
+        
+        public boolean canCreate() {
+            return this.sslContext != null;
         }
-        LOG.warn("File {} doesn't exists", jksFile.getAbsolutePath());
-        return null;
+        private SSLContext initSSLContext(IConfig props) {
+            final String jksPath = props.getProperty(Constants.JKS_PATH_PROPERTY_NAME);
+            LOG.info("Starting SSL using keystore at {}", jksPath);
+            if (jksPath == null || jksPath.isEmpty()) {
+                //key_store_password or key_manager_password are empty
+                LOG.warn("You have configured the SSL port but not the jks_path, SSL not started");
+                return null;
+            }
+
+            //if we have the port also the jks then keyStorePassword and keyManagerPassword
+            //has to be defined
+            final String keyStorePassword = props.getProperty(Constants.KEY_STORE_PASSWORD_PROPERTY_NAME);
+            final String keyManagerPassword = props.getProperty(Constants.KEY_MANAGER_PASSWORD_PROPERTY_NAME);
+            if (keyStorePassword == null || keyStorePassword.isEmpty()) {
+                //key_store_password or key_manager_password are empty
+                LOG.warn("You have configured the SSL port but not the key_store_password, SSL not started");
+                return null;
+            }
+            if (keyManagerPassword == null || keyManagerPassword.isEmpty()) {
+                //key_manager_password or key_manager_password are empty
+                LOG.warn("You have configured the SSL port but not the key_manager_password, SSL not started");
+                return null;
+            }
+
+            try {
+                InputStream jksInputStream = jksDatastore(jksPath);
+                SSLContext serverContext = SSLContext.getInstance("TLS");
+                final KeyStore ks = KeyStore.getInstance("JKS");
+                ks.load(jksInputStream, keyStorePassword.toCharArray());
+                final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                kmf.init(ks, keyManagerPassword.toCharArray());
+                serverContext.init(kmf.getKeyManagers(), null, null);
+                return serverContext;
+            } catch (NoSuchAlgorithmException | UnrecoverableKeyException | CertificateException | KeyStoreException
+                    | KeyManagementException | IOException ex) {
+                LOG.error("Can't start SSL layer!", ex);
+                return null;
+            }
+        }
+        
+        private InputStream jksDatastore(String jksPath) throws FileNotFoundException {
+            URL jksUrl = getClass().getClassLoader().getResource(jksPath);
+            if (jksUrl != null) {
+                LOG.info("Starting with jks at {}, jks normal {}", jksUrl.toExternalForm(), jksUrl);
+                return getClass().getClassLoader().getResourceAsStream(jksPath);
+            }
+            LOG.info("jks not found in bundled resources, try on the filesystem");
+            File jksFile = new File(jksPath);
+            if (jksFile.exists()) {
+                LOG.info("Using {} ", jksFile.getAbsolutePath());
+                return new FileInputStream(jksFile);
+            }
+            LOG.warn("File {} doesn't exists", jksFile.getAbsolutePath());
+            return null;
+        }
+
+        public ChannelHandler create() {
+            SSLEngine sslEngine = sslContext.createSSLEngine();
+            sslEngine.setUseClientMode(false);
+            return new SslHandler(sslEngine);
+        }
+        
     }
-    
 }
