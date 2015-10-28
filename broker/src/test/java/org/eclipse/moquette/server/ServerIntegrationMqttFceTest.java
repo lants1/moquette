@@ -129,8 +129,7 @@ public class ServerIntegrationMqttFceTest {
         subscriberA.disconnect();
     }
     
-    @Ignore
-    @Test(expected=MqttException.class)
+    @Test
     public void testFirstPublishOnTopicWithCredentialsWithManagedInitialisation() throws Exception {
         LOG.info("*** testSubscribe ***");
         MqttConnectOptions options = new MqttConnectOptions();
@@ -138,28 +137,50 @@ public class ServerIntegrationMqttFceTest {
         options.setPassword("pw".toCharArray());
         m_client.connect(options);
         
+        JSONObject confInit=new JSONObject();
+        confInit.put("init","true");
+        confInit.put("permissions", "rw");
         
-        String secretstring = "{ \"secret\": \"pw\" }";
-        JSONObject secretjson = new JSONObject(secretstring);
-        
-        MqttMessage initialManagedMessage = new MqttMessage(secretjson.toString().getBytes());
+        MqttMessage initialManagedMessage = new MqttMessage(confInit.toString().getBytes());
         initialManagedMessage.setQos(0);
         initialManagedMessage.setRetained(false);
         
-        m_client.publish("/managed", initialManagedMessage);
+        m_client.publish("/readonlytopic", initialManagedMessage);
         
         String tmpDir = System.getProperty("java.io.tmpdir");
 
         MqttClientPersistence dsSubscriberA = new MqttDefaultFilePersistence(tmpDir + File.separator + "subscriberA");
-
+        MqttClientPersistence dsSubscriberB = new MqttDefaultFilePersistence(tmpDir + File.separator + "subscriberB");
+        
         MqttClient subscriberAwithoutCredentials = new MqttClient("tcp://localhost:1883", "SubscriberA", dsSubscriberA);
         TestCallback cbSubscriberAwithoutCredentials = new TestCallback();
         subscriberAwithoutCredentials.setCallback(cbSubscriberAwithoutCredentials);
         subscriberAwithoutCredentials.connect();
         
+        MqttClient subscriberWithCredentials = new MqttClient("tcp://localhost:1883", "SubscriberB", dsSubscriberB);
+        TestCallback cbSubscriberWithCredentials = new TestCallback();
+        subscriberWithCredentials.setCallback(cbSubscriberWithCredentials);
+        subscriberWithCredentials.connect(options);
         
-        // Should fail: Subscription to a managed topic without permissions is not possible.
-        subscriberAwithoutCredentials.subscribe("/managed", 1);
+        subscriberAwithoutCredentials.subscribe("/readonlytopic", 1);
+        subscriberWithCredentials.subscribe("/readonlytopic", 1);
+        
+        JSONObject blaJson=new JSONObject();
+        confInit.put("bla","bla");
+        
+        MqttMessage bla = new MqttMessage(blaJson.toString().getBytes());
+        initialManagedMessage.setQos(0);
+        initialManagedMessage.setRetained(false);
+        m_client.publish("/readonlytopic", bla);
+        
+        MqttMessage messageOnA = cbSubscriberAwithoutCredentials.getMessage(false);
+        assertNull(messageOnA);
+        subscriberAwithoutCredentials.disconnect();
+        
+        MqttMessage messageOnB = cbSubscriberWithCredentials.getMessage(true);
+        assertNotNull(messageOnB);
+        assertEquals(1, messageOnB.getQos());
+        subscriberWithCredentials.disconnect();
     }
     
 }
