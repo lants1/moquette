@@ -181,6 +181,7 @@ public class ProtocolProcessor {
                 cleanSession(msg.getClientID());
             }
 
+            oldSession.setAttribute(NettyChannel.ATTR_KEY_SESSION_STOLEN, true);
             oldSession.close(false);
             LOG.debug("Existing connection with same client ID <{}>, forced to close", msg.getClientID());
         }
@@ -273,7 +274,6 @@ public class ProtocolProcessor {
     private void cleanSession(String clientID) {
         LOG.info("cleaning old saved subscriptions for client <{}>", clientID);
         //remove from log all subscriptions
-        //m_sessionsStore.wipeSubscriptions(clientID);
         subscriptions.removeForClient(clientID);
 
         //remove also the messages stored of type QoS1/2
@@ -544,14 +544,13 @@ public class ProtocolProcessor {
     public void processConnectionLost(LostConnectionEvent evt) {
         String clientID = evt.clientID;
         //If already removed a disconnect message was already processed for this clientID
-        if (m_clientIDs.remove(clientID) != null) {
-
+        if (evt.sessionStolen && m_clientIDs.remove(clientID) != null) {
             //de-activate the subscriptions for this ClientID
             subscriptions.deactivate(clientID);
             LOG.info("Lost connection with client <{}>", clientID);
         }
         //publish the Will message (if any) for the clientID
-        if (m_willStore.containsKey(clientID)) {
+        if (!evt.sessionStolen && m_willStore.containsKey(clientID)) {
             WillMessage will = m_willStore.get(clientID);
             forwardPublishWill(will, clientID);
             m_willStore.remove(clientID);
@@ -578,7 +577,6 @@ public class ProtocolProcessor {
             }
 
             subscriptions.removeSubscription(topic, clientID);
-            m_sessionsStore.removeSubscription(topic, clientID);
             m_interceptor.notifyTopicUnsubscribed(topic, clientID);
         }
 
@@ -619,7 +617,6 @@ public class ProtocolProcessor {
             //send SUBACK with 0x80 for this topic filter
             return false;
         }
-        m_sessionsStore.addNewSubscription(newSubscription);
         subscriptions.add(newSubscription);
 
         //notify the Observables

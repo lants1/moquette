@@ -90,21 +90,6 @@ public class SubscriptionsStore {
         }
     }
     
-    private class SubscriptionTreeCollector implements IVisitor<List<Subscription>> {
-        
-        private List<Subscription> m_allSubscriptions = new ArrayList<>();
-
-        @Override
-        public void visit(TreeNode node, int deep) {
-            m_allSubscriptions.addAll(node.subscriptions());
-        }
-
-        @Override
-        public List<Subscription> getResult() {
-            return m_allSubscriptions;
-        }
-    }
-
     private AtomicReference<TreeNode> subscriptions = new AtomicReference<>(new TreeNode(null));
     private ISessionsStore m_sessionsStore;
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionsStore.class);
@@ -179,6 +164,7 @@ public class SubscriptionsStore {
     }
 
     public void add(Subscription newSubscription) {
+        m_sessionsStore.addNewSubscription(newSubscription);
         addDirect(newSubscription);
     }
 
@@ -205,21 +191,9 @@ public class SubscriptionsStore {
             }
             //spin lock repeating till we can, swap root, if can't swap just re-do the operation
         } while(!subscriptions.compareAndSet(oldRoot, couple.root));
+        m_sessionsStore.removeSubscription(topic, clientID);
     }
     
-    /**
-     * It's public because needed in tests :-( bleah
-     */
-    public void clearAllSubscriptions() {
-        SubscriptionTreeCollector subsCollector = new SubscriptionTreeCollector();
-        bfsVisit(subscriptions.get(), subsCollector, 0);
-        
-        List<Subscription> allSubscriptions = subsCollector.getResult();
-        for (Subscription subscription : allSubscriptions) {
-            removeSubscription(subscription.getTopicFilter(), subscription.getClientId());
-        }
-    }
-
     /**
      * Visit the topics tree to remove matching subscriptions with clientID.
      * It's a mutating structure operation so create a new subscription tree (partial or total).
