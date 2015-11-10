@@ -18,6 +18,18 @@
         <bintray.package>org.dna.mqtt.moquette-fce</bintray.package>
     </properties>
 
+    <developers>
+        <developer>
+            <id>lants1</id>
+            <name>Swen Lanthemann</name>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
