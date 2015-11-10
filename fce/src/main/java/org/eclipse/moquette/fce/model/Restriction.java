@@ -12,6 +12,13 @@ public abstract class Restriction {
 	private int maxMessageSizeKb;
 	private int totalMessageSizeKb;
 	
+	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb) {
+		super();
+		this.messageCount = messageCount;
+		this.maxMessageSizeKb = maxMessageSizeKb;
+		this.totalMessageSizeKb = totalMessageSizeKb;
+	}
+	
 	public int getMessageCount() {
 		return messageCount;
 	}

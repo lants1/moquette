@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Define all type of ManagedCycles.
  * 
@@ -7,5 +9,26 @@ package org.eclipse.moquette.fce.model;
  *
  */
 public enum ManagedCycle {
-	HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY
+	@SerializedName("HOURLY")
+	HOURLY("HOURLY"),
+	@SerializedName("DAILY")
+	DAILY("DAILY"),
+	@SerializedName("WEEKLY")
+	WEEKLY("WEEKLY"),
+	@SerializedName("MONTHLY")
+	MONTHLY("MONTHLY"), 
+	@SerializedName("YEARLY")
+	YEARLY("YEARLY");
+	
+	private String value;
+
+    private ManagedCycle(String value)
+    {
+        this.value=value;
+    }
+
+    public String getValue()
+    {
+        return(value);
+    }
 }
