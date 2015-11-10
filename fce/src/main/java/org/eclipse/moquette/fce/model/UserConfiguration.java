@@ -15,25 +15,26 @@ public class UserConfiguration {
 	private static final String EVERYONE = "";
 	
 	private String identifier;
-	private ManagedPermission managePermissionType;
+	private ManagedPermission managedPermissionType;
 	private List<Restriction> publishRestrictions;
 	private List<Restriction> subscribeRestrictions;
 	
 	public UserConfiguration(){
 		this.identifier = EVERYONE;
-		this.managePermissionType = ManagedPermission.EVERYONE;
+		this.managedPermissionType = ManagedPermission.EVERYONE;
 		this.publishRestrictions = new ArrayList<Restriction>();
 		this.subscribeRestrictions = new ArrayList<Restriction>();
 	}
 	
-	public UserConfiguration(String identifier, ManagedPermission managePermissionType, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
-		this.managePermissionType = managePermissionType;
+	public UserConfiguration(String identifier, ManagedPermission managedPermissionType, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
+		this.identifier = identifier;
+		this.managedPermissionType = managedPermissionType;
 		this.publishRestrictions = publishRestrictions;
 		this.subscribeRestrictions = subscribeRestrictions;
 	}
 	
-	public ManagedPermission getManagePermissionType() {
-		return managePermissionType;
+	public ManagedPermission getManagedPermissionType() {
+		return managedPermissionType;
 	}
 	
 	public List<Restriction> getPublishRestrictions() {
@@ -60,8 +61,8 @@ public class UserConfiguration {
 		this.subscribeRestrictions.add(subscribeRestriction);
 	}
 	
-	public void setManagePermissionType(ManagedPermission hasManagePermission) {
-		this.managePermissionType = hasManagePermission;
+	public void setManagedPermissionType(ManagedPermission hasManagedPermission) {
+		this.managedPermissionType = hasManagedPermission;
 	}
 	
 	public String getIdentifier() {

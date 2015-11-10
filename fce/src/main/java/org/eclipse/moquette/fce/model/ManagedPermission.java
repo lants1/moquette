@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Defines Manage possibility's.
  * 
@@ -7,5 +9,22 @@ package org.eclipse.moquette.fce.model;
  *
  */
 public enum ManagedPermission {
-	NONE, MYSELF, EVERYONE
+	@SerializedName("NONE")
+	NONE("NONE"), 
+	@SerializedName("MYSELF")
+	MYSELF("MYSELF"),
+	@SerializedName("EVERYONE")
+	EVERYONE("EVERYONE");
+	
+	private String value;
+
+    private ManagedPermission(String value)
+    {
+        this.value=value;
+    }
+
+    public String getValue()
+    {
+        return(value);
+    }
 }

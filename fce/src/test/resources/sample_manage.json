@@ -1,0 +1,46 @@
+{
+  "identifier": "swen",
+  "managedPermissionType": "NONE",
+  "publishRestrictions": [
+    {
+      "type": "SpecificRestriction",
+      "properties": {
+        "from": "Jan 18, 2015 12:00:00 AM",
+        "to": "Jan 18, 2015 12:00:00 AM",
+        "messageCount": 11,
+        "maxMessageSizeKb": 1024,
+        "totalMessageSizeKb": 2048
+      }
+    },
+    {
+      "type": "PeriodicRestriction",
+      "properties": {
+        "cyle": "DAILY",
+        "messageCount": 11,
+        "maxMessageSizeKb": 1024,
+        "totalMessageSizeKb": 2048
+      }
+    }
+  ],
+  "subscribeRestrictions": [
+    {
+      "type": "SpecificRestriction",
+      "properties": {
+        "from": "Jan 18, 2015 12:00:00 AM",
+        "to": "Jan 18, 2015 12:00:00 AM",
+        "messageCount": 11,
+        "maxMessageSizeKb": 1024,
+        "totalMessageSizeKb": 2048
+      }
+    },
+    {
+      "type": "PeriodicRestriction",
+      "properties": {
+        "cyle": "DAILY",
+        "messageCount": 11,
+        "maxMessageSizeKb": 1024,
+        "totalMessageSizeKb": 2048
+      }
+    }
+  ]
+}

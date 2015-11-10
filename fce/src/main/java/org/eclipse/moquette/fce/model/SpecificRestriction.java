@@ -10,8 +10,14 @@ import java.util.Date;
  */
 public class SpecificRestriction extends Restriction {
 
-	public Date from;
-	public Date to;
+	private Date from;
+	private Date to;
+
+	public SpecificRestriction(Date from, Date to, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb) {
+		super(messageCount, maxMessageSizeKb, totalMessageSizeKb);
+		this.from = from;
+		this.to = to;
+	}
 
 	public Date getFrom() {
 		return from;
