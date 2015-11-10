@@ -7,6 +7,8 @@ package org.eclipse.moquette.plugin;
  * @author lants1
  *
  */
-public interface MoquetteOperator {
+public interface BrokerOperator {
+	
+	public void subscribe(String identifier);
 
 }
