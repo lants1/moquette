@@ -9,6 +9,4 @@ package org.eclipse.moquette.plugin;
  */
 public interface BrokerOperator {
 	
-	public void subscribe(String identifier);
-
 }

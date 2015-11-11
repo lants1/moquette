@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
  * @author Wagner Macedo
  */
 final class BrokerInterceptor implements Interceptor {
-    private final List<InterceptHandler> handlers;
+    private List<InterceptHandler> handlers;
     private final ExecutorService executor;
 
     BrokerInterceptor(List<InterceptHandler> handlers) {
@@ -105,5 +105,13 @@ final class BrokerInterceptor implements Interceptor {
                 }
             });
         }
+    }
+    
+    public void addInterceptionHandler(InterceptHandler handler){
+    	handlers.add(handler);
+    }
+    
+    public void removeInterceptionHandler(InterceptHandler handler){
+    	handlers.remove(handler);
     }
 }

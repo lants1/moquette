@@ -63,6 +63,7 @@
         <module>embedding_moquette</module>
         <module>plugin</module>
         <module>fce</module>
+        <module>reporting</module>
     </modules>
     
     <reporting>
