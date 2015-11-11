@@ -16,7 +16,10 @@
 package org.eclipse.moquette.server;
 
 import org.eclipse.moquette.plugin.BrokerAuthorizationPlugin;
+import org.eclipse.moquette.plugin.BrokerInterceptionPlugin;
+import org.eclipse.moquette.plugin.BrokerPlugin;
 import org.eclipse.moquette.plugin.MoquetteOperator;
+import org.eclipse.moquette.plugin.MoquettePluginInterceptionHandlerAdapter;
 import org.eclipse.moquette.server.config.FilesystemConfig;
 import org.eclipse.moquette.server.config.IConfig;
 import org.eclipse.moquette.server.config.MemoryConfig;
@@ -45,15 +48,6 @@ public class Server {
 	private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
 	private ServerAcceptor m_acceptor;
-	private List<BrokerAuthorizationPlugin> registeredPlugins = new ArrayList<>();
-
-	public List<BrokerAuthorizationPlugin> getRegisteredPlugins() {
-		return registeredPlugins;
-	}
-
-	public void addRegisteredPlugin(BrokerAuthorizationPlugin registeredPlugin) {
-		registeredPlugins.add(registeredPlugin);
-	}
 
 	public static void main(String[] args) throws IOException {
 		final Server server = new Server();
@@ -98,12 +92,6 @@ public class Server {
     public void startServer(Properties configProps) throws IOException {
         final IConfig config = new MemoryConfig(configProps);
         
-        ServiceLoader<BrokerAuthorizationPlugin> loader = ServiceLoader.load(BrokerAuthorizationPlugin.class);
-        		for (BrokerAuthorizationPlugin p : loader) {
-        			addRegisteredPlugin(p);
-        		    p.load(new MoquetteOperator());
-        		}
-        
         startServer(config);
     }
 
@@ -119,6 +107,19 @@ public class Server {
 		LOG.info("Persistent store file: " + config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
 		final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config);
 
+        ServiceLoader<BrokerPlugin> loader = ServiceLoader.load(BrokerPlugin.class);
+		for (BrokerPlugin p : loader) {
+			if(p instanceof BrokerAuthorizationPlugin){
+				processor.setBrokerAuthorizationPlugin((BrokerAuthorizationPlugin) p);
+			}
+			if(p instanceof BrokerInterceptionPlugin){
+				p.load((Properties) config, new MoquetteOperator());
+				processor.addInterceptionHandler(new MoquettePluginInterceptionHandlerAdapter((BrokerInterceptionPlugin) p)); 
+			}
+		}
+		processor.getBrokerAuthorizationPlugin().load((Properties) config,  new MoquetteOperator());
+		
+		
 		m_acceptor = new NettyAcceptor();
 		m_acceptor.initialize(processor, config);
 	}

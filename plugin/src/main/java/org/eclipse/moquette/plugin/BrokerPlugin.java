@@ -1,5 +1,7 @@
 package org.eclipse.moquette.plugin;
 
+import java.util.Properties;
+
 /**
  * General Interface for broker-plugins.
  * 
@@ -8,9 +10,7 @@ package org.eclipse.moquette.plugin;
  */
 public interface BrokerPlugin {
 	
-	public void load(BrokerOperator brokerOperator);
+	public void load(Properties config, BrokerOperator brokerOperator);
 	
 	public void unload();
-	
-	public void onEvent();
 }

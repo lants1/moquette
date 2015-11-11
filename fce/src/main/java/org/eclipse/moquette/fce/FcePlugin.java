@@ -1,15 +1,19 @@
 package org.eclipse.moquette.fce;
 
+import java.util.Properties;
+
+import org.eclipse.moquette.fce.service.MqttDataStore;
 import org.eclipse.moquette.plugin.BrokerAuthorizationPlugin;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class FcePlugin implements BrokerAuthorizationPlugin {
 
+	MqttDataStore dataStore;
+	
 	@Override
-	public void load(BrokerOperator brokerOperator) {
-		brokerOperator.subscribe("/MANAGED_INTENT/#");
-		// TODO Auto-generated method stub
-		
+	public void load(Properties config, BrokerOperator brokerOperator) {
+		dataStore = new MqttDataStore(config);
+		dataStore.initializeDataStore();
 	}
 
 	@Override
@@ -19,15 +23,14 @@ public class FcePlugin implements BrokerAuthorizationPlugin {
 	}
 
 	@Override
-	public boolean isAuthorized() {
+	public boolean canWrite(String topic, String user, String client) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void onEvent() {
+	public boolean canRead(String topic, String user, String client) {
 		// TODO Auto-generated method stub
-		
+		return false;
 	}
-
 }

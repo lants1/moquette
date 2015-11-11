@@ -9,13 +9,13 @@
 		<version>0.8-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>moquette-fce</artifactId>
+	<artifactId>moquette-reporting</artifactId>
 	<packaging>jar</packaging>
-	<name>Moquette - fce</name>
+	<name>Moquette - reporting</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<bintray.package>org.dna.mqtt.moquette-fce</bintray.package>
+		<bintray.package>org.dna.mqtt.moquette-reporting</bintray.package>
 	</properties>
 
 	<developers>
@@ -55,12 +55,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.4</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.eclipse.paho</groupId>
-			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-			<version>1.0.2</version>
-		</dependency>
 
 		<!-- Test dependencies -->
 		<dependency>
@@ -82,6 +76,27 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fusesource.mqtt-client</groupId>
+			<artifactId>mqtt-client</artifactId>
+			<version>1.9</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.paho</groupId>
+			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+			<version>1.0.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>websocket-client</artifactId>
+			<version>9.2.0.M1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
