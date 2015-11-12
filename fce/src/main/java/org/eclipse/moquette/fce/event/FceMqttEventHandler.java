@@ -1,6 +1,6 @@
 package org.eclipse.moquette.fce.event;
 
-import org.eclipse.moquette.fce.service.MqttDataStore;
+import org.eclipse.moquette.fce.service.MqttDataStoreService;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -8,9 +8,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class FceMqttEventHandler implements MqttCallback{
 
-	MqttDataStore mqttDataStore;
+	MqttDataStoreService mqttDataStore;
 	
-	public FceMqttEventHandler(MqttDataStore mqttDataStore) {
+	public FceMqttEventHandler(MqttDataStoreService mqttDataStore) {
 		this.mqttDataStore = mqttDataStore;
 	}
 

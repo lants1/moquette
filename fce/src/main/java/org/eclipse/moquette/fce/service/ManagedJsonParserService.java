@@ -6,7 +6,7 @@ import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
 import com.google.gson.GsonBuilder;
 
-public class ManagedJsonParser {
+public class ManagedJsonParserService {
 
 	public String serializeUserConfiguration(UserConfiguration userConfig) {
 		GsonBuilder gson = new GsonBuilder();
