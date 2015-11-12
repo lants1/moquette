@@ -10,6 +10,8 @@ import java.util.Properties;
  */
 public interface BrokerPlugin {
 	
+	public String getPluginIdentifier();
+	
 	public void load(Properties config, BrokerOperator brokerOperator);
 	
 	public void unload();

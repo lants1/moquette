@@ -8,16 +8,21 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.job.ManagedZoneGarbageCollector;
 import org.eclipse.moquette.fce.job.PeriodicQuotaCleaner;
 import org.eclipse.moquette.fce.service.FceAuthorizationService;
 import org.eclipse.moquette.fce.service.MqttDataStoreService;
-import org.eclipse.moquette.plugin.BrokerAuthorizationPlugin;
+import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
-public class FcePlugin implements BrokerAuthorizationPlugin {
+public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
+	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
+
+	private final static Logger log = Logger.getLogger(FcePlugin.class.getName()); 
+	
 	MqttDataStoreService dataStore;
 	FceAuthorizationService authorizationService;
 
@@ -28,10 +33,10 @@ public class FcePlugin implements BrokerAuthorizationPlugin {
 
 		this.authorizationService = new FceAuthorizationService();
 		
-		ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(4);
+		ScheduledExecutorService scheduledPool = Executors.newScheduledThreadPool(2);
 		scheduledPool.scheduleAtFixedRate(new PeriodicQuotaCleaner(), computeNextDelay(0, 0), 1, TimeUnit.HOURS);
 		scheduledPool.scheduleAtFixedRate(new ManagedZoneGarbageCollector(), 7, 7, TimeUnit.DAYS);
-
+		log.info("plugin loaded and scheduler started....");
 	}
 
 	@Override
@@ -41,6 +46,12 @@ public class FcePlugin implements BrokerAuthorizationPlugin {
 	}
 
 	@Override
+	public boolean checkValid(String username, byte[] password) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
+	@Override
 	public boolean canWrite(String topic, String user, String client) {
 		return authorizationService.getBasicPermission(topic).isWriteable();
 	}
@@ -48,6 +59,11 @@ public class FcePlugin implements BrokerAuthorizationPlugin {
 	@Override
 	public boolean canRead(String topic, String user, String client) {
 		return authorizationService.getBasicPermission(topic).isReadable();
+	}
+	
+	@Override
+	public String getPluginIdentifier() {
+		return PLUGIN_IDENTIFIER;
 	}
 
 	private long computeNextDelay(int targetMin, int targetSec) {
