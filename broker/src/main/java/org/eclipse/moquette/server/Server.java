@@ -15,11 +15,12 @@
  */
 package org.eclipse.moquette.server;
 
-import org.eclipse.moquette.plugin.BrokerAuthorizationPlugin;
-import org.eclipse.moquette.plugin.BrokerInterceptionPlugin;
+import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
+import org.eclipse.moquette.plugin.InterceptionPlugin;
 import org.eclipse.moquette.plugin.BrokerPlugin;
 import org.eclipse.moquette.plugin.MoquetteOperator;
-import org.eclipse.moquette.plugin.MoquettePluginInterceptionHandlerAdapter;
+import org.eclipse.moquette.plugin.PluginAuthenticationAndAuthorizationAdapter;
+import org.eclipse.moquette.plugin.PluginInterceptionHandlerAdapter;
 import org.eclipse.moquette.server.config.FilesystemConfig;
 import org.eclipse.moquette.server.config.IConfig;
 import org.eclipse.moquette.server.config.MemoryConfig;
@@ -49,10 +50,12 @@ public class Server {
 
 	private ServerAcceptor m_acceptor;
 
+	private List<BrokerPlugin> loadedPlugins = new ArrayList<>();
+
 	public static void main(String[] args) throws IOException {
 		final Server server = new Server();
 		server.startServer();
-		System.out.println("Server started, version 0.8-SNAPSHOT");
+
 		// Bind a shutdown hook
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -81,25 +84,26 @@ public class Server {
 	}
 
 	/**
-     * Starts the server with the given properties.
-     * 
-     * Its suggested to at least have the following properties:
-     * <ul>
-     *  <li>port</li>
-     *  <li>password_file</li>
-     * </ul>
-     */
-    public void startServer(Properties configProps) throws IOException {
-        final IConfig config = new MemoryConfig(configProps);
-        
-        startServer(config);
-    }
+	 * Starts the server with the given properties.
+	 * 
+	 * Its suggested to at least have the following properties:
+	 * <ul>
+	 * <li>port</li>
+	 * <li>password_file</li>
+	 * </ul>
+	 */
+	public void startServer(Properties configProps) throws IOException {
+		final IConfig config = new MemoryConfig(configProps);
+
+		startServer(config);
+	}
 
 	/**
 	 * Starts Moquette bringing the configuration files from the given Config
 	 * implementation.
 	 */
 	public void startServer(IConfig config) throws IOException {
+		LOG.info("Server starting...");
 		final String handlerProp = System.getProperty("intercept.handler");
 		if (handlerProp != null) {
 			config.setProperty("intercept.handler", handlerProp);
@@ -107,27 +111,57 @@ public class Server {
 		LOG.info("Persistent store file: " + config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
 		final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config);
 
-        ServiceLoader<BrokerPlugin> loader = ServiceLoader.load(BrokerPlugin.class);
-		for (BrokerPlugin p : loader) {
-			if(p instanceof BrokerAuthorizationPlugin){
-				processor.setBrokerAuthorizationPlugin((BrokerAuthorizationPlugin) p);
-			}
-			if(p instanceof BrokerInterceptionPlugin){
-				p.load((Properties) config, new MoquetteOperator());
-				processor.addInterceptionHandler(new MoquettePluginInterceptionHandlerAdapter((BrokerInterceptionPlugin) p)); 
-			}
-		}
-		processor.getBrokerAuthorizationPlugin().load((Properties) config,  new MoquetteOperator());
-		
-		
+		loadPlugins(config, processor);
+
 		m_acceptor = new NettyAcceptor();
 		m_acceptor.initialize(processor, config);
+		LOG.info("Server started.");
 	}
 
 	public void stopServer() {
 		LOG.info("Server stopping...");
 		m_acceptor.close();
 		SimpleMessaging.getInstance().shutdown();
+		unloadPlugins();
 		LOG.info("Server stopped");
+	}
+
+	private void loadPlugins(IConfig config, final ProtocolProcessor processor) {
+		ServiceLoader<BrokerPlugin> loader = ServiceLoader.load(BrokerPlugin.class);
+
+		boolean alreadyLoadedAuthenticationAndAuthorizationPlugin = false;
+
+		for (BrokerPlugin p : loader) {
+			if (p instanceof AuthenticationAndAuthorizationPlugin) {
+				// Only one Authentication and Authorization Plugin allowed.
+				if (!alreadyLoadedAuthenticationAndAuthorizationPlugin) {
+					AuthenticationAndAuthorizationPlugin currentPlugin = (AuthenticationAndAuthorizationPlugin) p;
+					currentPlugin.load((Properties) config, new MoquetteOperator());
+					PluginAuthenticationAndAuthorizationAdapter pluginAdapter = new PluginAuthenticationAndAuthorizationAdapter(
+							currentPlugin);
+					// plugin replaces already defined Authenticator and Authorizator
+					processor.setAuthenticator(pluginAdapter);
+					processor.setAuthorizator(pluginAdapter);
+					loadedPlugins.add(currentPlugin);
+					LOG.info("Loaded AuthenticationAndAuthorizationPlugin: " + currentPlugin.getPluginIdentifier());
+				}
+				alreadyLoadedAuthenticationAndAuthorizationPlugin = true;
+			}
+			if (p instanceof InterceptionPlugin) {
+				InterceptionPlugin currentPlugin = (InterceptionPlugin) p;
+				currentPlugin.load((Properties) config, new MoquetteOperator());
+				processor.addInterceptionHandler(new PluginInterceptionHandlerAdapter(currentPlugin));
+				loadedPlugins.add(currentPlugin);
+				LOG.info("Loaded BrokerInterceptionPlugin: " + currentPlugin.getPluginIdentifier());
+			}
+		}
+	}
+
+	private void unloadPlugins() {
+		for (BrokerPlugin plugin : loadedPlugins) {
+			plugin.unload();
+			loadedPlugins.remove(plugin);
+			LOG.info("Unloaded Broker Plugin: " + plugin.getPluginIdentifier());
+		}
 	}
 }

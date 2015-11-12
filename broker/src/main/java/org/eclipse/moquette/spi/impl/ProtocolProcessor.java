@@ -31,7 +31,6 @@ import static org.eclipse.moquette.parser.netty.Utils.VERSION_3_1;
 import static org.eclipse.moquette.parser.netty.Utils.VERSION_3_1_1;
 
 import org.eclipse.moquette.interception.InterceptHandler;
-import org.eclipse.moquette.plugin.BrokerAuthorizationPlugin;
 import org.eclipse.moquette.proto.messages.AbstractMessage;
 import org.eclipse.moquette.proto.messages.AbstractMessage.QOSType;
 import org.eclipse.moquette.proto.messages.ConnAckMessage;
@@ -102,9 +101,8 @@ public class ProtocolProcessor {
     private IMessagesStore m_messagesStore;
     private ISessionsStore m_sessionsStore;
     private IAuthenticator m_authenticator;
-    private BrokerInterceptor m_interceptor;
-
-    private BrokerAuthorizationPlugin brokerAuthorizationPlugin;
+    
+	private BrokerInterceptor m_interceptor;
  
 	//maps clientID to Will testament, if specified on CONNECT
     private Map<String, WillMessage> m_willStore = new ConcurrentHashMap<>();
@@ -612,21 +610,17 @@ public class ProtocolProcessor {
         LOG.debug("SUBACK for packetID {}", msg.getMessageID());
         session.write(ackMessage);
     }
-    
-    public BrokerAuthorizationPlugin getBrokerAuthorizationPlugin() {
-		return brokerAuthorizationPlugin;
-	}
 
-	public void setBrokerAuthorizationPlugin(BrokerAuthorizationPlugin brokerAuthorizationPlugin) {
-		this.brokerAuthorizationPlugin = brokerAuthorizationPlugin;
+	public void setAuthenticator(IAuthenticator authenticator) {
+		m_authenticator = authenticator;
+	}
+	
+	public void setAuthorizator(IAuthorizator authorizator) {
+		m_authorizator = authorizator;
 	}
 	
     public void addInterceptionHandler(InterceptHandler handler){
     	m_interceptor.addInterceptionHandler(handler);
-    }
-    
-    public void removeInterceptionHandler(InterceptHandler handler){
-    	m_interceptor.removeInterceptionHandler(handler);
     }
     
     private boolean subscribeSingleTopic(Subscription newSubscription, final String topic) {

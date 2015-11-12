@@ -1,5 +1,4 @@
 package org.eclipse.moquette.plugin;
-
 import org.eclipse.moquette.interception.InterceptHandler;
 import org.eclipse.moquette.interception.messages.InterceptConnectMessage;
 import org.eclipse.moquette.interception.messages.InterceptDisconnectMessage;
@@ -7,11 +6,11 @@ import org.eclipse.moquette.interception.messages.InterceptPublishMessage;
 import org.eclipse.moquette.interception.messages.InterceptSubscribeMessage;
 import org.eclipse.moquette.interception.messages.InterceptUnsubscribeMessage;
 
-public class MoquettePluginInterceptionHandlerAdapter implements InterceptHandler {
+public class PluginInterceptionHandlerAdapter implements InterceptHandler {
 
-	BrokerInterceptionPlugin plugin;
+	InterceptionPlugin plugin;
 	
-	public MoquettePluginInterceptionHandlerAdapter(BrokerInterceptionPlugin p){
+	public PluginInterceptionHandlerAdapter(InterceptionPlugin p){
 		this.plugin = p;
 	}
 	
