@@ -20,7 +20,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.eclipse.moquette.fce.event.FceMqttEventHandler;
+import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -35,10 +35,11 @@ public class MqttDataStoreService {
 
 	MqttClient client;
 	Properties config;
-	FceMqttEventHandler eventHandler;
+	MqttEventHandler eventHandler;
 
-	public MqttDataStoreService(Properties config) {
+	public MqttDataStoreService(Properties config, MqttEventHandler eventHandler) {
 		this.config = config;
+		this.eventHandler = eventHandler;
 	}
 
 	public void initializeDataStore() {
@@ -55,7 +56,6 @@ public class MqttDataStoreService {
 			options.setSocketFactory(ssf);
 
 			client.connect();
-			eventHandler = new FceMqttEventHandler(this);
 			client.setCallback(eventHandler);
 
 		} catch (Exception e) {
