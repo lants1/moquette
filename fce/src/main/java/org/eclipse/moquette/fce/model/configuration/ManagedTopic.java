@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.model;
+package org.eclipse.moquette.fce.model.configuration;
 
 import java.util.ArrayList;
 import java.util.List;

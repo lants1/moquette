@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.commons;
+package org.eclipse.moquette.fce.common;
 
 public enum ManagedZone {
 

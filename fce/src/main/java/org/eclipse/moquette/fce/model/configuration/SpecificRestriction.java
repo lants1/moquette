@@ -1,6 +1,8 @@
-package org.eclipse.moquette.fce.model;
+package org.eclipse.moquette.fce.model.configuration;
 
 import java.util.Date;
+
+import org.eclipse.moquette.fce.common.SizeUnit;
 
 /**
  * Timebased restriction from date to a date.
@@ -13,8 +15,8 @@ public class SpecificRestriction extends Restriction {
 	private Date from;
 	private Date to;
 
-	public SpecificRestriction(Date from, Date to, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb) {
-		super(messageCount, maxMessageSizeKb, totalMessageSizeKb);
+	public SpecificRestriction(Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, SizeUnit sizeUnit) {
+		super(messageCount, maxMessageSize, totalMessageSize, sizeUnit);
 		this.from = from;
 		this.to = to;
 	}
