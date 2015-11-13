@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.model.common;
+package org.eclipse.moquette.fce.model;
 
 import com.google.gson.annotations.SerializedName;
 

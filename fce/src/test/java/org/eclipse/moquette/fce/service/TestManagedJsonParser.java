@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce.service;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -16,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
-import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
 import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
 import org.eclipse.moquette.fce.model.configuration.Restriction;

@@ -1,23 +1,24 @@
 package org.eclipse.moquette.fce.event;
 
-import org.eclipse.moquette.fce.service.MqttDataStoreService;
+import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-public class FceMqttEventHandler implements MqttCallback{
+public class MqttEventHandler implements MqttCallback{
 
-	MqttDataStoreService mqttDataStore;
+	FceServiceFactory services;
 	
-	public FceMqttEventHandler(MqttDataStoreService mqttDataStore) {
-		this.mqttDataStore = mqttDataStore;
+	public MqttEventHandler(FceServiceFactory services) {
+		this.services = services;
 	}
 
 	@Override
 	public void connectionLost(Throwable arg0) {
 		try {
-			mqttDataStore.connect();
+			services.getMqttDataStore().connect();
 		} catch (MqttException e) {
 			// TODO Auto-generated catch block
 			throw new RuntimeException(e);
@@ -31,8 +32,10 @@ public class FceMqttEventHandler implements MqttCallback{
 	}
 
 	@Override
-	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
-		// TODO Auto-generated method stub
+	public void messageArrived(String topic, MqttMessage message) throws Exception {
+		if(topic.startsWith(ManagedZone.MANAGED_INTENT.getTopicPrefix())){
+			
+		}
 		
 	}
 

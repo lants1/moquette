@@ -1,7 +1,7 @@
 package org.eclipse.moquette.fce.model.configuration;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
-import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.ManagedCycle;
 
 /**
  * Periodic Restriction

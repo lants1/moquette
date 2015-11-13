@@ -1,7 +1,7 @@
 package org.eclipse.moquette.fce.model.quota;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
-import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.ManagedCycle;
 
 public class PeriodicQuotaState extends QuotaState {
 
