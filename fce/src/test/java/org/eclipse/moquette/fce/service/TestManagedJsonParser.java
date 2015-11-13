@@ -60,7 +60,7 @@ public class TestManagedJsonParser {
 		UserConfiguration sampleUserConfig = new UserConfiguration("swen", ManagedPermission.NONE, publishRestriction,
 				subscribeRestriction);
 
-		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
+		FceJsonParserService mJsonParser = new FceJsonParserService();
 		String json = mJsonParser.serialize(sampleUserConfig);
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
@@ -84,7 +84,7 @@ public class TestManagedJsonParser {
 		
 		Quota quota = new Quota("bla", quotas);
 
-		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
+		FceJsonParserService mJsonParser = new FceJsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
 		
 		Quota deserializedQuota = mJsonParser.deserializeQuotaState(serializedQuota);
@@ -98,7 +98,7 @@ public class TestManagedJsonParser {
 	
 	@Test
 	public void testDeserializationFromSample() throws IOException, URISyntaxException {
-		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
+		FceJsonParserService mJsonParser = new FceJsonParserService();
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
 		assertTrue(sampleUserConfig.getIdentifier().equalsIgnoreCase("swen"));
@@ -112,7 +112,7 @@ public class TestManagedJsonParser {
 	
 	@Test
 	public void testDeserializationFailure() throws IOException, URISyntaxException {
-		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
+		FceJsonParserService mJsonParser = new FceJsonParserService();
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration("asfdasdfsa");
 		assertNull(sampleUserConfig);
 	}

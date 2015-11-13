@@ -10,7 +10,7 @@ import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
 import com.google.gson.GsonBuilder;
 
-public class ManagedJsonParserService {
+public class FceJsonParserService {
 
 	public String serialize(UserConfiguration userConfig) {
 		GsonBuilder gson = new GsonBuilder();
@@ -36,7 +36,7 @@ public class ManagedJsonParserService {
 		try {
 			userConfigObject = gson.create().fromJson(userConfigString, UserConfiguration.class);
 		} catch (Exception e) {
-			// could happen
+			// could happen because the UserConfiguration comes from the user itself...
 		}
 		return userConfigObject;
 	}
@@ -48,7 +48,8 @@ public class ManagedJsonParserService {
 		try {
 			userConfigObject = gson.create().fromJson(quotaStateString, Quota.class);
 		} catch (Exception e) {
-			// could happen
+			// something evil is wrong, stop plugin
+			throw new RuntimeException(e);
 		}
 		return userConfigObject;
 	}
@@ -59,7 +60,8 @@ public class ManagedJsonParserService {
 		try {
 			userConfigObject = gson.create().fromJson(infoMessageString, InfoMessage.class);
 		} catch (Exception e) {
-			// could happen
+			// something evil is wrong, stop plugin
+			throw new RuntimeException(e);
 		}
 		return userConfigObject;
 	}

@@ -10,18 +10,18 @@ public class FceServiceFactory {
 	Properties pluginConfig;
 	BrokerOperator brokerOperator;
 	
-	MqttDataStoreService dataStoreService;
+	MqttService dataStoreService;
 	FceAuthorizationService authorizationService;
-	ManagedJsonParserService jsonParserService;
+	FceJsonParserService jsonParserService;
 	
 	public FceServiceFactory(Properties config, BrokerOperator brokerOperator){
 		this.pluginConfig = config;
 		this.brokerOperator = brokerOperator;
 	}
 	
-	public MqttDataStoreService getMqttDataStore(){
+	public MqttService getMqttDataStore(){
 		if(dataStoreService == null){
-			dataStoreService = new MqttDataStoreService(pluginConfig, new MqttEventHandler(this));
+			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
 			dataStoreService.initializeDataStore();
 		}
 		return dataStoreService;
@@ -34,9 +34,9 @@ public class FceServiceFactory {
 		return authorizationService;
 	}
 	
-	public ManagedJsonParserService getJsonParser(){
+	public FceJsonParserService getJsonParser(){
 		if(jsonParserService == null){
-			jsonParserService = new ManagedJsonParserService();
+			jsonParserService = new FceJsonParserService();
 		}
 		return jsonParserService;
 	}

@@ -27,7 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
-public class MqttDataStoreService {
+public class MqttService {
 
 	private static final String PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
 	private static final String PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
@@ -37,7 +37,7 @@ public class MqttDataStoreService {
 	Properties config;
 	MqttEventHandler eventHandler;
 
-	public MqttDataStoreService(Properties config, MqttEventHandler eventHandler) {
+	public MqttService(Properties config, MqttEventHandler eventHandler) {
 		this.config = config;
 		this.eventHandler = eventHandler;
 	}
