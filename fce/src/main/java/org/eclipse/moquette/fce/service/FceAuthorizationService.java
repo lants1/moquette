@@ -3,8 +3,8 @@ package org.eclipse.moquette.fce.service;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.eclipse.moquette.fce.commons.TopicPermission;
-import org.eclipse.moquette.fce.commons.ManagedZone;
+import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.common.TopicPermission;
 
 public class FceAuthorizationService {
 

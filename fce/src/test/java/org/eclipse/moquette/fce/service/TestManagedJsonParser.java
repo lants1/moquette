@@ -1,5 +1,6 @@
 package org.eclipse.moquette.fce.service;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -14,12 +15,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.moquette.fce.model.ManagedCycle;
-import org.eclipse.moquette.fce.model.ManagedPermission;
-import org.eclipse.moquette.fce.model.PeriodicRestriction;
-import org.eclipse.moquette.fce.model.Restriction;
-import org.eclipse.moquette.fce.model.SpecificRestriction;
-import org.eclipse.moquette.fce.model.UserConfiguration;
+import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
+import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
+import org.eclipse.moquette.fce.model.configuration.Restriction;
+import org.eclipse.moquette.fce.model.configuration.SpecificRestriction;
+import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
+import org.eclipse.moquette.fce.model.quota.PeriodicQuotaState;
+import org.eclipse.moquette.fce.model.quota.Quota;
+import org.eclipse.moquette.fce.model.quota.QuotaState;
+import org.eclipse.moquette.fce.model.quota.SpecificQuotaState;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,9 +45,9 @@ public class TestManagedJsonParser {
 	}
 	
 	@Test
-	public void testSerializationAndDeserialization() throws IOException, URISyntaxException {
-		SpecificRestriction specificRestriction = new SpecificRestriction(sampleDate, sampleDate, 11, 1024, 2048);
-		PeriodicRestriction periodicRestriction = new PeriodicRestriction(ManagedCycle.DAILY, 11, 1024, 2048);
+	public void testSerializationAndDeserializationRestriction() throws IOException, URISyntaxException {
+		SpecificRestriction specificRestriction = new SpecificRestriction(sampleDate, sampleDate, 11, 1024, 2048, SizeUnit.kB);
+		PeriodicRestriction periodicRestriction = new PeriodicRestriction(ManagedCycle.DAILY, 11, 1024, 2048, SizeUnit.kB);
 
 		List<Restriction> publishRestriction = new ArrayList<Restriction>();
 		List<Restriction> subscribeRestriction = new ArrayList<Restriction>();
@@ -56,7 +62,7 @@ public class TestManagedJsonParser {
 				subscribeRestriction);
 
 		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
-		String json = mJsonParser.serializeUserConfiguration(sampleUserConfig);
+		String json = mJsonParser.serialize(sampleUserConfig);
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
 		assertTrue(sampleUserConfigDeserialized.getIdentifier().equalsIgnoreCase("swen"));
@@ -68,6 +74,29 @@ public class TestManagedJsonParser {
 		assertTrue(((PeriodicRestriction) sampleUserConfigDeserialized.getSubscribeRestrictions().get(1)).getCyle() == ManagedCycle.DAILY);
 	}
 
+	@Test
+	public void testSerializationAndDeserializationQuota() throws IOException, URISyntaxException {
+		QuotaState specificQuotaState = new SpecificQuotaState(sampleDate, sampleDate, 11, 1024, 12, 200, SizeUnit.kB);
+		QuotaState periodicQuotaState = new PeriodicQuotaState(ManagedCycle.DAILY, 11, 1024, 12, 200, SizeUnit.kB);
+
+		List<QuotaState> quotas = new ArrayList<>();
+		quotas.add(specificQuotaState);
+		quotas.add(periodicQuotaState);
+		
+		Quota quota = new Quota("bla", quotas);
+
+		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();
+		String serializedQuota = mJsonParser.serialize(quota);
+		
+		Quota deserializedQuota = mJsonParser.deserializeQuotaState(serializedQuota);
+		
+		deserializedQuota.getUsergroup().equalsIgnoreCase("bla");
+		
+		assertTrue(((SpecificQuotaState) deserializedQuota.getQuotaState().get(0)).getTo().equals(sampleDate));
+		assertTrue(((PeriodicQuotaState) deserializedQuota.getQuotaState().get(1)).getCycle() == ManagedCycle.DAILY);
+	}
+	
+	
 	@Test
 	public void testDeserializationFromSample() throws IOException, URISyntaxException {
 		ManagedJsonParserService mJsonParser = new ManagedJsonParserService();

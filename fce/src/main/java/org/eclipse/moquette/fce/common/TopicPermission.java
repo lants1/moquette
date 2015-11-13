@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.commons;
+package org.eclipse.moquette.fce.common;
 
 /**
  * The Broker itself can read/write everything. Client have restricted access on

@@ -8,8 +8,9 @@
         "from": "Jan 18, 2015 12:00:00 AM",
         "to": "Jan 18, 2015 12:00:00 AM",
         "messageCount": 11,
-        "maxMessageSizeKb": 1024,
-        "totalMessageSizeKb": 2048
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB"
       }
     },
     {
@@ -17,8 +18,9 @@
       "properties": {
         "cyle": "DAILY",
         "messageCount": 11,
-        "maxMessageSizeKb": 1024,
-        "totalMessageSizeKb": 2048
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB"
       }
     }
   ],
@@ -29,8 +31,9 @@
         "from": "Jan 18, 2015 12:00:00 AM",
         "to": "Jan 18, 2015 12:00:00 AM",
         "messageCount": 11,
-        "maxMessageSizeKb": 1024,
-        "totalMessageSizeKb": 2048
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB"
       }
     },
     {
@@ -38,8 +41,9 @@
       "properties": {
         "cyle": "DAILY",
         "messageCount": 11,
-        "maxMessageSizeKb": 1024,
-        "totalMessageSizeKb": 2048
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB"
       }
     }
   ]
