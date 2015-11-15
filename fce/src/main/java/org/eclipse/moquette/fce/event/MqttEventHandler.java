@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.event;
 
+import java.util.logging.Logger;
+
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
@@ -12,6 +14,8 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MqttEventHandler implements MqttCallback {
 
+	private final static Logger log = Logger.getLogger(MqttEventHandler.class.getName());
+	
 	FceServiceFactory services;
 
 	public MqttEventHandler(FceServiceFactory services) {
@@ -21,6 +25,7 @@ public class MqttEventHandler implements MqttCallback {
 	@Override
 	public void connectionLost(Throwable arg0) {
 		try {
+			log.warning("internal plugin mqttclient conection to broker connection lost");
 			services.getMqttService().connect();
 		} catch (MqttException e) {
 			throw new RuntimeException(e);
@@ -42,10 +47,12 @@ public class MqttEventHandler implements MqttCallback {
 		case MANAGED_CONFIGURATION:
 			UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 			services.getConfigDbService().put(topicIdentifier, msgConfig);
+			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
 		case MANAGED_QUOTA:
 			Quota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 			services.getQuotaDbService().put(topicIdentifier, msgQuota);
+			log.fine("received quota message for topic: " + topicIdentifier);
 			break;
 		default:
 			break;
