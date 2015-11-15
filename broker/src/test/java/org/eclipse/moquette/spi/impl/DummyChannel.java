@@ -29,9 +29,9 @@ import java.util.Map;
  */
 public class DummyChannel implements ServerChannel {
 
-    AbstractMessage m_receivedMessage;
+    protected AbstractMessage m_receivedMessage;
 
-    byte m_returnCode;
+    protected byte m_returnCode;
 
     private boolean m_channelClosed = false;
 
@@ -52,7 +52,7 @@ public class DummyChannel implements ServerChannel {
         m_channelClosed = true;
     }
 
-    boolean isClosed() {
+    public boolean isClosed() {
         return this.m_channelClosed;
     }
 

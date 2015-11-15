@@ -23,11 +23,11 @@ import org.eclipse.moquette.spi.impl.security.IAuthenticator;
  * 
  * @author andrea
  */
-class MockAuthenticator implements IAuthenticator {
+public class MockAuthenticator implements IAuthenticator {
     
     private Map<String, byte[]> m_userPwds;
     
-    MockAuthenticator(Map<String, byte[]> userPwds) {
+    public MockAuthenticator(Map<String, byte[]> userPwds) {
         m_userPwds = userPwds;
     }
 

@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * This a synchronous channel that avoid output ring buffer from Processor
  */
-class MockReceiverChannel implements ServerChannel {
+public class MockReceiverChannel implements ServerChannel {
     //        byte m_returnCode;
     AbstractMessage m_receivedMessage;
     private Map<Object, Object> m_attributes = new HashMap<>();
