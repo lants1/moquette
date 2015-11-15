@@ -136,7 +136,7 @@ public class Server {
 				// Only one Authentication and Authorization Plugin allowed.
 				if (!alreadyLoadedAuthenticationAndAuthorizationPlugin) {
 					AuthenticationAndAuthorizationPlugin currentPlugin = (AuthenticationAndAuthorizationPlugin) p;
-					currentPlugin.load((Properties) config, new MoquetteOperator());
+					currentPlugin.load((Properties) config, new MoquetteOperator(processor));
 					PluginAuthenticationAndAuthorizationAdapter pluginAdapter = new PluginAuthenticationAndAuthorizationAdapter(
 							currentPlugin);
 					// plugin replaces already defined Authenticator and Authorizator
@@ -149,7 +149,7 @@ public class Server {
 			}
 			if (p instanceof InterceptionPlugin) {
 				InterceptionPlugin currentPlugin = (InterceptionPlugin) p;
-				currentPlugin.load((Properties) config, new MoquetteOperator());
+				currentPlugin.load((Properties) config, new MoquetteOperator(processor));
 				processor.addInterceptionHandler(new PluginInterceptionHandlerAdapter(currentPlugin));
 				loadedPlugins.add(currentPlugin);
 				LOG.info("Loaded BrokerInterceptionPlugin: " + currentPlugin.getPluginIdentifier());

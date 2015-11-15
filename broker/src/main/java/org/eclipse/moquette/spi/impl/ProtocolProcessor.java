@@ -99,7 +99,7 @@ public class ProtocolProcessor {
     private boolean allowAnonymous;
     private IAuthorizator m_authorizator;
     private IMessagesStore m_messagesStore;
-    private ISessionsStore m_sessionsStore;
+	private ISessionsStore m_sessionsStore;
     private IAuthenticator m_authenticator;
     
 	private BrokerInterceptor m_interceptor;
@@ -107,7 +107,7 @@ public class ProtocolProcessor {
 	//maps clientID to Will testament, if specified on CONNECT
     private Map<String, WillMessage> m_willStore = new ConcurrentHashMap<>();
     
-    ProtocolProcessor() {}
+    public ProtocolProcessor() {}
 
     /**
      * @param subscriptions the subscription store where are stored all the existing
@@ -120,7 +120,7 @@ public class ProtocolProcessor {
      * @param authorizator used to apply ACL policies to publishes and subscriptions.
      * @param interceptor to notify events to an intercept handler
      */
-    void init(SubscriptionsStore subscriptions, IMessagesStore storageService,
+    public void init(SubscriptionsStore subscriptions, IMessagesStore storageService,
               ISessionsStore sessionsStore,
               IAuthenticator authenticator,
               boolean allowAnonymous, IAuthorizator authorizator, BrokerInterceptor interceptor) {
@@ -355,7 +355,7 @@ public class ProtocolProcessor {
     /**
      * Flood the subscribers with the message to notify. MessageID is optional and should only used for QoS 1 and 2
      * */
-    void forward2Subscribers(PublishEvent pubEvt) {
+    public void forward2Subscribers(PublishEvent pubEvt) {
         final String topic = pubEvt.getTopic();
         final AbstractMessage.QOSType publishingQos = pubEvt.getQos();
         final ByteBuffer origMessage = pubEvt.getMessage();
@@ -622,6 +622,10 @@ public class ProtocolProcessor {
     public void addInterceptionHandler(InterceptHandler handler){
     	m_interceptor.addInterceptionHandler(handler);
     }
+    
+    public IMessagesStore getMessagesStore() {
+		return m_messagesStore;
+	}
     
     private boolean subscribeSingleTopic(Subscription newSubscription, final String topic) {
         LOG.info("<{}> subscribed to topic <{}> with QoS {}", 
