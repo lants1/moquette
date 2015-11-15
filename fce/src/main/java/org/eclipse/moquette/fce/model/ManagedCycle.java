@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.model;
 
+import java.util.Calendar;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -10,25 +12,31 @@ import com.google.gson.annotations.SerializedName;
  */
 public enum ManagedCycle {
 	@SerializedName("HOURLY")
-	HOURLY("HOURLY"),
+	HOURLY("HOURLY", Calendar.HOUR_OF_DAY),
 	@SerializedName("DAILY")
-	DAILY("DAILY"),
+	DAILY("DAILY", Calendar.DAY_OF_YEAR),
 	@SerializedName("WEEKLY")
-	WEEKLY("WEEKLY"),
+	WEEKLY("WEEKLY", Calendar.WEEK_OF_YEAR),
 	@SerializedName("MONTHLY")
-	MONTHLY("MONTHLY"), 
+	MONTHLY("MONTHLY", Calendar.MONTH), 
 	@SerializedName("YEARLY")
-	YEARLY("YEARLY");
+	YEARLY("YEARLY", Calendar.YEAR);
 	
 	private String value;
+	private int calendarReference;
 
-    private ManagedCycle(String value)
+    private ManagedCycle(String value, int calendarReference)
     {
         this.value=value;
+        this.calendarReference=calendarReference;
     }
 
     public String getValue()
     {
         return(value);
+    }
+    
+    public int getCalendarReference(){
+    	return calendarReference;
     }
 }

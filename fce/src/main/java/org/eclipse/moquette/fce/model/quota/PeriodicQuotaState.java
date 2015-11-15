@@ -11,10 +11,10 @@ public class PeriodicQuotaState extends QuotaState {
 	Date lastManagedTimestamp;
 
 	public PeriodicQuotaState(ManagedCycle cycle, int maxQuota, int currentQuota, int maxQuotaCount,
-			int currentQuotaCount, SizeUnit sizeUnit, Date lastManagedTimestamp) {
+			int currentQuotaCount, SizeUnit sizeUnit) {
 		super(maxQuota, currentQuota, maxQuotaCount, currentQuotaCount, sizeUnit);
 		this.cycle = cycle;
-		this.lastManagedTimestamp = lastManagedTimestamp;
+		this.lastManagedTimestamp = new Date();
 	}
 
 	public ManagedCycle getCycle() {

@@ -1,6 +1,8 @@
 package org.eclipse.moquette.fce.service;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.model.quota.Quota;
@@ -16,6 +18,10 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
 	public Quota get(String topicIdentifier) {
 		return quotaStore.get(topicIdentifier);
+	}
+	
+	public Set<Entry<String, Quota>> getAll(){
+		return quotaStore.entrySet();
 	}
 
 	public void put(String topicIdentifier, Quota quota) {
