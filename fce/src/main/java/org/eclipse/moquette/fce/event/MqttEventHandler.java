@@ -21,7 +21,7 @@ public class MqttEventHandler implements MqttCallback {
 	@Override
 	public void connectionLost(Throwable arg0) {
 		try {
-			services.getMqttDataStore().connect();
+			services.getMqttService().connect();
 		} catch (MqttException e) {
 			throw new RuntimeException(e);
 		}

@@ -16,10 +16,10 @@ public class PluginEventHandler {
 	}
 
 	public boolean canWrite(String topic, String user, String client) {
-		return services.getAuthorization().getBasicPermission(topic).isWriteable();
+		return services.getAuthorizationService().getBasicPermission(topic).isWriteable();
 	}
 
 	public boolean canRead(String topic, String user, String client) {
-		return services.getAuthorization().getBasicPermission(topic).isReadable();
+		return services.getAuthorizationService().getBasicPermission(topic).isReadable();
 	}
 }

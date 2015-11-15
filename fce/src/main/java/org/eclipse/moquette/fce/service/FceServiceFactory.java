@@ -6,56 +6,58 @@ import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class FceServiceFactory {
-	
-	Properties pluginConfig;
-	BrokerOperator brokerOperator;
-	
-	MqttService dataStoreService;
-	AuthorizationService authorizationService;
-	JsonParserService jsonParserService;
-	QuotaDbService quotaDbService;
-	ConfigurationDbService configDbService;
-	
-	public FceServiceFactory(Properties config, BrokerOperator brokerOperator){
+
+	private Properties pluginConfig;
+	private BrokerOperator brokerOperator;
+
+	private MqttService dataStoreService;
+	private AuthorizationService authorizationService;
+	private JsonParserService jsonParserService;
+	private QuotaDbService quotaDbService;
+	private ConfigurationDbService configDbService;
+
+	public FceServiceFactory(Properties config, BrokerOperator brokerOperator) {
 		this.pluginConfig = config;
 		this.brokerOperator = brokerOperator;
 	}
-	
-	
-	public MqttService getMqttDataStore(){
-		if(dataStoreService == null){
+
+	public MqttService getMqttService() {
+		if (dataStoreService == null) {
 			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
-			dataStoreService.initializeDataStore();
+			dataStoreService.initializeInternalMqttClient();
 		}
 		return dataStoreService;
 	}
-	
-	public AuthorizationService getAuthorization(){
-		if(authorizationService == null){
+
+	public AuthorizationService getAuthorizationService() {
+		if (authorizationService == null) {
 			authorizationService = new AuthorizationService();
 		}
 		return authorizationService;
 	}
-	
-	public JsonParserService getJsonParser(){
-		if(jsonParserService == null){
+
+	public JsonParserService getJsonParser() {
+		if (jsonParserService == null) {
 			jsonParserService = new JsonParserService();
 		}
 		return jsonParserService;
 	}
 
 	public QuotaDbService getQuotaDbService() {
-		if(quotaDbService == null){
-			quotaDbService = new QuotaDbService();
+		if (quotaDbService == null) {
+			quotaDbService = new QuotaDbService(brokerOperator);
 		}
 		return quotaDbService;
 	}
 
 	public ConfigurationDbService getConfigDbService() {
-		if(configDbService == null){
-			configDbService = new ConfigurationDbService();
+		if (configDbService == null) {
+			configDbService = new ConfigurationDbService(brokerOperator);
 		}
 		return configDbService;
 	}
 
+	public boolean isInitialized() {
+		return (getConfigDbService().isInitialized() && this.getQuotaDbService().isInitialized());
+	}
 }
