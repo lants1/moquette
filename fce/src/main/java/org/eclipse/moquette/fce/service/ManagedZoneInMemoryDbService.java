@@ -1,11 +1,14 @@
 package org.eclipse.moquette.fce.service;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public abstract class ManagedZoneInMemoryDbService {
+	
+	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryDbService.class.getName());
 	
 	private boolean initialized;
 	private BrokerOperator brokerOperator;
@@ -23,6 +26,7 @@ public abstract class ManagedZoneInMemoryDbService {
 			if (getStore().size() >= brokerOperator
 					.countRetainedMessages(correspondingZone.getTopicFilter())) {
 				initialized = true;
+				log.info(correspondingZone.name() + "In-Memory DB initialized");
 			}
 		}
 		return initialized;

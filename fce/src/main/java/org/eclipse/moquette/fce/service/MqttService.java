@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -29,6 +30,8 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
 public class MqttService {
 
+	private final static Logger log = Logger.getLogger(MqttService.class.getName());
+	
 	private static final String PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
 	private static final String PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
 	private static final String PLUGIN_JKS_PATH = "plugin_jks_path";
@@ -57,6 +60,7 @@ public class MqttService {
 
 			client.connect();
 			client.setCallback(eventHandler);
+			log.info("internal mqtt client connected to broker");
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -65,9 +69,10 @@ public class MqttService {
 
 	public void publish(String topic, String json) {
 		MqttMessage message = new MqttMessage();
-		message.setPayload("A single message from my computer fff".getBytes());
+		message.setPayload(json.getBytes());
 		try {
 			client.publish(topic, message);
+			log.fine("mqtt message for topic: "+topic +" with content: " + json +" published to internal broker");
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
@@ -76,6 +81,7 @@ public class MqttService {
 	public void subscribe(String topicFilter) {
 		try {
 			client.subscribe(topicFilter);
+			log.info("internal mqtt client subscribed for: " + topicFilter);
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
