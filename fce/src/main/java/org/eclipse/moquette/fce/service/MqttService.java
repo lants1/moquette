@@ -42,7 +42,7 @@ public class MqttService {
 		this.eventHandler = eventHandler;
 	}
 
-	public void initializeDataStore() {
+	public void initializeInternalMqttClient() {
 		String ssl_port = config.getProperty("ssl_port");
 
 		try {

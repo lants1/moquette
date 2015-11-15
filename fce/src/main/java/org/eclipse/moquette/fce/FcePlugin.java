@@ -20,47 +20,59 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
 
-	private FceServiceFactory services;
+	private FceServiceFactory serviceFactory;
 	ScheduledExecutorService scheduler;
 
 	@Override
 	public void load(Properties config, BrokerOperator brokerOperator) {
-		services = new FceServiceFactory(config, brokerOperator);
+		serviceFactory = new FceServiceFactory(config, brokerOperator);
 
 		scheduler = Executors.newScheduledThreadPool(2);
-		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
-		scheduler.scheduleAtFixedRate(new ManagedZoneGarbageCollector(services), 7, 7, TimeUnit.DAYS);
+		scheduler.scheduleAtFixedRate(new QuotaUpdater(serviceFactory), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
+		scheduler.scheduleAtFixedRate(new ManagedZoneGarbageCollector(serviceFactory), 7, 7, TimeUnit.DAYS);
 
-		services.getMqttDataStore().subscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
-		services.getMqttDataStore().subscribe(ManagedZone.MANAGED_QUOTA.getTopicFilter());
-		services.getMqttDataStore().subscribe(ManagedZone.MANAGED_CONFIGURATION.getTopicFilter());
-		
+		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
+		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_QUOTA.getTopicFilter());
+		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_CONFIGURATION.getTopicFilter());
+
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 
 	@Override
 	public void unload() {
 		scheduler.shutdownNow();
-		services.getMqttDataStore().unsubscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
+		serviceFactory.getMqttService().unsubscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
 	@Override
 	public boolean checkValid(String username, byte[] password) {
-		PluginEventHandler handler = new PluginEventHandler(services);
-		return handler.checkValid(username, password);
+		if (serviceFactory.isInitialized()) {
+			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
+			return handler.checkValid(username, password);
+		}
+		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
+		return false;
 	}
 
 	@Override
 	public boolean canWrite(String topic, String user, String client) {
-		PluginEventHandler handler = new PluginEventHandler(services);
-		return handler.canWrite(topic, user, client);
+		if (serviceFactory.isInitialized()) {
+			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
+			return handler.canWrite(topic, user, client);
+		}
+		log.info("configuration not yet fully loaded from retained messages, write not possible");
+		return false;
 	}
 
 	@Override
 	public boolean canRead(String topic, String user, String client) {
-		PluginEventHandler handler = new PluginEventHandler(services);
-		return handler.canRead(topic, user, client);
+		if (serviceFactory.isInitialized()) {
+			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
+			return handler.canRead(topic, user, client);
+		}
+		log.info("configuration not yet fully loaded from retained messages, read not possible");
+		return false;
 	}
 
 	@Override

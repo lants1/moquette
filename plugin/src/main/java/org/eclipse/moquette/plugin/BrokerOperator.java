@@ -9,4 +9,6 @@ package org.eclipse.moquette.plugin;
  */
 public interface BrokerOperator {
 	
+	public int countRetainedMessages(String topicFilter);
+	
 }
