@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public final class FceTimeUtils {
+public final class FceTimeUtil {
 	
 	public static long delayTo(int targetMin, int targetSec) {
 		LocalDateTime localNow = LocalDateTime.now();

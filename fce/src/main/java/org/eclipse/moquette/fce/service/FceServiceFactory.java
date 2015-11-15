@@ -11,13 +11,16 @@ public class FceServiceFactory {
 	BrokerOperator brokerOperator;
 	
 	MqttService dataStoreService;
-	FceAuthorizationService authorizationService;
-	FceJsonParserService jsonParserService;
+	AuthorizationService authorizationService;
+	JsonParserService jsonParserService;
+	QuotaDbService quotaDbService;
+	ConfigurationDbService configDbService;
 	
 	public FceServiceFactory(Properties config, BrokerOperator brokerOperator){
 		this.pluginConfig = config;
 		this.brokerOperator = brokerOperator;
 	}
+	
 	
 	public MqttService getMqttDataStore(){
 		if(dataStoreService == null){
@@ -27,17 +30,32 @@ public class FceServiceFactory {
 		return dataStoreService;
 	}
 	
-	public FceAuthorizationService getAuthorization(){
+	public AuthorizationService getAuthorization(){
 		if(authorizationService == null){
-			authorizationService = new FceAuthorizationService();
+			authorizationService = new AuthorizationService();
 		}
 		return authorizationService;
 	}
 	
-	public FceJsonParserService getJsonParser(){
+	public JsonParserService getJsonParser(){
 		if(jsonParserService == null){
-			jsonParserService = new FceJsonParserService();
+			jsonParserService = new JsonParserService();
 		}
 		return jsonParserService;
 	}
+
+	public QuotaDbService getQuotaDbService() {
+		if(quotaDbService == null){
+			quotaDbService = new QuotaDbService();
+		}
+		return quotaDbService;
+	}
+
+	public ConfigurationDbService getConfigDbService() {
+		if(configDbService == null){
+			configDbService = new ConfigurationDbService();
+		}
+		return configDbService;
+	}
+
 }

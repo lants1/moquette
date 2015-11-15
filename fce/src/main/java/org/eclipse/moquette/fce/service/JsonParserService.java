@@ -10,7 +10,7 @@ import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
 import com.google.gson.GsonBuilder;
 
-public class FceJsonParserService {
+public class JsonParserService {
 
 	public String serialize(UserConfiguration userConfig) {
 		GsonBuilder gson = new GsonBuilder();
@@ -41,7 +41,7 @@ public class FceJsonParserService {
 		return userConfigObject;
 	}
 	
-	public Quota deserializeQuotaState(String quotaStateString) {
+	public Quota deserializeQuota(String quotaStateString) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(QuotaState.class, new QuotaStateAdapter());
 		Quota userConfigObject = null;

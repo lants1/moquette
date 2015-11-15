@@ -6,7 +6,7 @@ import java.util.Set;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.TopicPermission;
 
-public class FceAuthorizationService {
+public class AuthorizationService {
 
 	public TopicPermission getBasicPermission(String topicFilter){
 		

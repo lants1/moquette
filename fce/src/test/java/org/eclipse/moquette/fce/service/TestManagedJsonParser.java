@@ -60,7 +60,7 @@ public class TestManagedJsonParser {
 		UserConfiguration sampleUserConfig = new UserConfiguration("swen", ManagedPermission.NONE, publishRestriction,
 				subscribeRestriction);
 
-		FceJsonParserService mJsonParser = new FceJsonParserService();
+		JsonParserService mJsonParser = new JsonParserService();
 		String json = mJsonParser.serialize(sampleUserConfig);
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
@@ -76,7 +76,7 @@ public class TestManagedJsonParser {
 	@Test
 	public void testSerializationAndDeserializationQuota() throws IOException, URISyntaxException {
 		QuotaState specificQuotaState = new SpecificQuotaState(sampleDate, sampleDate, 11, 1024, 12, 200, SizeUnit.kB);
-		QuotaState periodicQuotaState = new PeriodicQuotaState(ManagedCycle.DAILY, 11, 1024, 12, 200, SizeUnit.kB);
+		QuotaState periodicQuotaState = new PeriodicQuotaState(ManagedCycle.DAILY, 11, 1024, 12, 200, SizeUnit.kB, new Date());
 
 		List<QuotaState> quotas = new ArrayList<>();
 		quotas.add(specificQuotaState);
@@ -84,10 +84,10 @@ public class TestManagedJsonParser {
 		
 		Quota quota = new Quota("bla", quotas);
 
-		FceJsonParserService mJsonParser = new FceJsonParserService();
+		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
 		
-		Quota deserializedQuota = mJsonParser.deserializeQuotaState(serializedQuota);
+		Quota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
 		deserializedQuota.getUsergroup().equalsIgnoreCase("bla");
 		
@@ -98,7 +98,7 @@ public class TestManagedJsonParser {
 	
 	@Test
 	public void testDeserializationFromSample() throws IOException, URISyntaxException {
-		FceJsonParserService mJsonParser = new FceJsonParserService();
+		JsonParserService mJsonParser = new JsonParserService();
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
 		assertTrue(sampleUserConfig.getIdentifier().equalsIgnoreCase("swen"));
@@ -112,7 +112,7 @@ public class TestManagedJsonParser {
 	
 	@Test
 	public void testDeserializationFailure() throws IOException, URISyntaxException {
-		FceJsonParserService mJsonParser = new FceJsonParserService();
+		JsonParserService mJsonParser = new JsonParserService();
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration("asfdasdfsa");
 		assertNull(sampleUserConfig);
 	}
