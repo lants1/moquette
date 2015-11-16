@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuotaState;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.QuotaState;
-import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.model.ManagedCycle;
 
 public class QuotaUpdater implements Runnable {
 

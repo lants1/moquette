@@ -1,63 +1,17 @@
 package org.eclipse.moquette.fce.service;
 
-import java.util.Properties;
+public interface FceServiceFactory {
 
-import org.eclipse.moquette.fce.event.MqttEventHandler;
-import org.eclipse.moquette.plugin.BrokerOperator;
+	MqttService getMqttService();
 
-public class FceServiceFactory {
+	AuthorizationService getAuthorizationService();
 
-	private Properties pluginConfig;
-	private BrokerOperator brokerOperator;
+	JsonParserService getJsonParser();
 
-	private MqttService dataStoreService;
-	private AuthorizationService authorizationService;
-	private JsonParserService jsonParserService;
-	private QuotaDbService quotaDbService;
-	private ConfigurationDbService configDbService;
+	QuotaDbService getQuotaDbService();
 
-	public FceServiceFactory(Properties config, BrokerOperator brokerOperator) {
-		this.pluginConfig = config;
-		this.brokerOperator = brokerOperator;
-	}
+	ConfigurationDbService getConfigDbService();
 
-	public MqttService getMqttService() {
-		if (dataStoreService == null) {
-			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
-			dataStoreService.initializeInternalMqttClient();
-		}
-		return dataStoreService;
-	}
+	boolean isInitialized();
 
-	public AuthorizationService getAuthorizationService() {
-		if (authorizationService == null) {
-			authorizationService = new AuthorizationService();
-		}
-		return authorizationService;
-	}
-
-	public JsonParserService getJsonParser() {
-		if (jsonParserService == null) {
-			jsonParserService = new JsonParserService();
-		}
-		return jsonParserService;
-	}
-
-	public QuotaDbService getQuotaDbService() {
-		if (quotaDbService == null) {
-			quotaDbService = new QuotaDbService(brokerOperator);
-		}
-		return quotaDbService;
-	}
-
-	public ConfigurationDbService getConfigDbService() {
-		if (configDbService == null) {
-			configDbService = new ConfigurationDbService(brokerOperator);
-		}
-		return configDbService;
-	}
-
-	public boolean isInitialized() {
-		return (getConfigDbService().isInitialized() && this.getQuotaDbService().isInitialized());
-	}
 }

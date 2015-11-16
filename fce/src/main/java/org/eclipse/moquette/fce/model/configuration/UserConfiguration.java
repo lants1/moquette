@@ -16,27 +16,38 @@ public class UserConfiguration {
 	
 	private String identifier;
 	private ManagedPermission managedPermissionType;
+	private ManagedState managedState;
 	private List<Restriction> publishRestrictions;
 	private List<Restriction> subscribeRestrictions;
 	
 	public UserConfiguration(){
 		this.identifier = EVERYONE;
 		this.managedPermissionType = ManagedPermission.EVERYONE;
+		this.managedState = ManagedState.MANAGED;
 		this.publishRestrictions = new ArrayList<Restriction>();
 		this.subscribeRestrictions = new ArrayList<Restriction>();
 	}
 	
-	public UserConfiguration(String identifier, ManagedPermission managedPermissionType, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
+	public UserConfiguration(String identifier, ManagedPermission managedPermissionType, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
 		this.identifier = identifier;
 		this.managedPermissionType = managedPermissionType;
 		this.publishRestrictions = publishRestrictions;
 		this.subscribeRestrictions = subscribeRestrictions;
+		this.managedState = managedState;
 	}
 	
 	public ManagedPermission getManagedPermissionType() {
 		return managedPermissionType;
 	}
 	
+	public ManagedState getManagedState() {
+		return managedState;
+	}
+
+	public void setManagedState(ManagedState managedState) {
+		this.managedState = managedState;
+	}
+
 	public List<Restriction> getPublishRestrictions() {
 		return publishRestrictions;
 	}
