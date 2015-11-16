@@ -1,12 +1,14 @@
 package org.eclipse.moquette.fce.model.info;
 
-public class InfoMessage {
+import org.eclipse.moquette.fce.model.ManagedInformation;
+
+public class InfoMessage extends ManagedInformation{
 
 	private InfoMessageType messageType;
 	private String messageText;
 	
-	public InfoMessage(InfoMessageType messageType, String messageText) {
-		super();
+	public InfoMessage(String userName, String userIdentifier, InfoMessageType messageType, String messageText) {
+		super(userName, userIdentifier);
 		this.messageType = messageType;
 		this.messageText = messageText;
 	}

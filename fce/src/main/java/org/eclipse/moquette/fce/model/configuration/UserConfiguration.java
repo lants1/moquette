@@ -3,6 +3,8 @@ package org.eclipse.moquette.fce.model.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.moquette.fce.model.ManagedInformation;
+
 /**
  * 
  * Contains UserConfiguration information (Restrictions, Permissions) for an user. 
@@ -10,26 +12,15 @@ import java.util.List;
  * @author lants1
  *
  */
-public class UserConfiguration {
+public class UserConfiguration extends ManagedInformation {
 
-	private static final String EVERYONE = "";
-	
-	private String identifier;
 	private ManagedPermission managedPermissionType;
 	private ManagedState managedState;
 	private List<Restriction> publishRestrictions;
 	private List<Restriction> subscribeRestrictions;
 	
-	public UserConfiguration(){
-		this.identifier = EVERYONE;
-		this.managedPermissionType = ManagedPermission.EVERYONE;
-		this.managedState = ManagedState.MANAGED;
-		this.publishRestrictions = new ArrayList<Restriction>();
-		this.subscribeRestrictions = new ArrayList<Restriction>();
-	}
-	
-	public UserConfiguration(String identifier, ManagedPermission managedPermissionType, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
-		this.identifier = identifier;
+	public UserConfiguration(String userName, String userIdentifier, ManagedPermission managedPermissionType, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
+		super(userName, userIdentifier);
 		this.managedPermissionType = managedPermissionType;
 		this.publishRestrictions = publishRestrictions;
 		this.subscribeRestrictions = subscribeRestrictions;
@@ -76,11 +67,4 @@ public class UserConfiguration {
 		this.managedPermissionType = hasManagedPermission;
 	}
 	
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
 }

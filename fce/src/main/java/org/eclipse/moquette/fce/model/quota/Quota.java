@@ -2,25 +2,21 @@ package org.eclipse.moquette.fce.model.quota;
 
 import java.util.List;
 
-public class Quota {
+import org.eclipse.moquette.fce.model.ManagedInformation;
 
-	private String usergroup;
+public class Quota extends ManagedInformation{
+
 	private List<QuotaState> quotaState;
 	
-	public Quota(String usergroup, List<QuotaState> quotaState) {
-		super();
-		this.usergroup = usergroup;
+	public Quota(String userName, String userIdentifier, List<QuotaState> quotaState) {
+		super(userName, userIdentifier);
 		this.quotaState = quotaState;
 	}
-	public String getUsergroup() {
-		return usergroup;
-	}
-	public void setUsergroup(String usergroup) {
-		this.usergroup = usergroup;
-	}
+
 	public List<QuotaState> getQuotaState() {
 		return quotaState;
 	}
+	
 	public void setQuotaState(List<QuotaState> quotaState) {
 		this.quotaState = quotaState;
 	}
