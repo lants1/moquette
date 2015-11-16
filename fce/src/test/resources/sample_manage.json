@@ -1,6 +1,6 @@
 {
-  "identifier": "swen",
   "managedPermissionType": "NONE",
+  "managedState": "UNMANAGED",
   "publishRestrictions": [
     {
       "type": "SpecificRestriction",
@@ -46,5 +46,7 @@
         "sizeUnit": "kB"
       }
     }
-  ]
+  ],
+  "userName": "testuser",
+  "userIdentifier": "testidentifier"
 }

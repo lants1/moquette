@@ -31,6 +31,8 @@ import org.junit.Test;
 
 public class TestManagedJsonParser {
 
+	private static final String TESTIDENTIFIER = "testidentifier";
+	private static final String TESTUSER = "testuser";
 	Date sampleDate = null;
 	
 	@Before
@@ -58,14 +60,16 @@ public class TestManagedJsonParser {
 		subscribeRestriction.add(specificRestriction);
 		subscribeRestriction.add(periodicRestriction);
 
-		UserConfiguration sampleUserConfig = new UserConfiguration("swen", ManagedPermission.NONE, ManagedState.UNMANAGED, publishRestriction,
+		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.NONE, ManagedState.UNMANAGED, publishRestriction,
 				subscribeRestriction);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String json = mJsonParser.serialize(sampleUserConfig);
 		
+		System.out.println(json);
+		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
-		assertTrue(sampleUserConfigDeserialized.getIdentifier().equalsIgnoreCase("swen"));
+		assertTrue(sampleUserConfigDeserialized.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfigDeserialized.getManagedPermissionType() == ManagedPermission.NONE);
 		assertTrue(sampleUserConfigDeserialized.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfigDeserialized.getSubscribeRestrictions().size() == 2);
@@ -83,14 +87,14 @@ public class TestManagedJsonParser {
 		quotas.add(specificQuotaState);
 		quotas.add(periodicQuotaState);
 		
-		Quota quota = new Quota("bla", quotas);
+		Quota quota = new Quota(TESTUSER, TESTIDENTIFIER, quotas);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
 		
 		Quota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
-		deserializedQuota.getUsergroup().equalsIgnoreCase("bla");
+		deserializedQuota.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER);
 		
 		assertTrue(((SpecificQuotaState) deserializedQuota.getQuotaState().get(0)).getTo().equals(sampleDate));
 		assertTrue(((PeriodicQuotaState) deserializedQuota.getQuotaState().get(1)).getCycle() == ManagedCycle.DAILY);
@@ -102,7 +106,7 @@ public class TestManagedJsonParser {
 		JsonParserService mJsonParser = new JsonParserService();
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
-		assertTrue(sampleUserConfig.getIdentifier().equalsIgnoreCase("swen"));
+		assertTrue(sampleUserConfig.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfig.getManagedPermissionType() == ManagedPermission.NONE);
 		assertTrue(sampleUserConfig.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfig.getSubscribeRestrictions().size() == 2);

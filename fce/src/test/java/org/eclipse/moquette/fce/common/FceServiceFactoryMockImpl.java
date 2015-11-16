@@ -2,7 +2,6 @@ package org.eclipse.moquette.fce.common;
 
 import java.util.Properties;
 
-import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.service.AuthorizationService;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
@@ -10,10 +9,10 @@ import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
 import org.eclipse.moquette.fce.service.QuotaDbService;
 import org.eclipse.moquette.plugin.BrokerOperator;
+import org.mockito.Mockito;
 
 public class FceServiceFactoryMockImpl implements FceServiceFactory {
 
-	private Properties pluginConfig;
 	private BrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
@@ -27,7 +26,6 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 			JsonParserService jsonParserService, QuotaDbService quotaDbService,
 			ConfigurationDbService configDbService) {
 		super();
-		this.pluginConfig = pluginConfig;
 		this.brokerOperator = brokerOperator;
 		this.dataStoreService = dataStoreService;
 		this.authorizationService = authorizationService;
@@ -38,29 +36,28 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 
 	public MqttService getMqttService() {
 		if (dataStoreService == null) {
-			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
-			dataStoreService.initializeInternalMqttClient();
+			dataStoreService = Mockito.mock(MqttService.class);
 		}
 		return dataStoreService;
 	}
 
 	public AuthorizationService getAuthorizationService() {
 		if (authorizationService == null) {
-			authorizationService = new AuthorizationService();
+			authorizationService = Mockito.mock(AuthorizationService.class);
 		}
 		return authorizationService;
 	}
 
 	public JsonParserService getJsonParser() {
 		if (jsonParserService == null) {
-			jsonParserService = new JsonParserService();
+			jsonParserService = Mockito.mock(JsonParserService.class);
 		}
 		return jsonParserService;
 	}
 
 	public QuotaDbService getQuotaDbService() {
 		if (quotaDbService == null) {
-			quotaDbService = new QuotaDbService(brokerOperator);
+			quotaDbService = Mockito.mock(QuotaDbService.class);
 		}
 		return quotaDbService;
 	}

@@ -2,6 +2,7 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
+import org.eclipse.moquette.fce.common.ManagedTopicIdentifierUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
@@ -41,7 +42,8 @@ public class MqttEventHandler implements MqttCallback {
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
 		ManagedZone topicZone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
 		String msgPayload = String.valueOf(message.getPayload());
-
+		String userTopic;
+		
 		switch (topicZone) {
 		case MANAGED_INTENT:
 		case MANAGED_CONFIGURATION:
@@ -50,12 +52,17 @@ public class MqttEventHandler implements MqttCallback {
 			// in this case there would be no need to transmit the hash and login information in the same message
 			// TODO Lan maybe implement another handler for internal broker actions
 			UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
-			services.getConfigDbService().put(topicIdentifier, msgConfig);
+			userTopic = ManagedTopicIdentifierUtil.addUserSpecificTopicFilter(topicIdentifier, msgConfig);
+			services.getConfigDbService().put(userTopic, msgConfig);
+			services.getMqttService().publish(userTopic, msgPayload, true);
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
 		case MANAGED_QUOTA:
+			// TODO Lan generic implementation....
 			Quota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
+			userTopic = ManagedTopicIdentifierUtil.addUserSpecificTopicFilter(topicIdentifier, msgQuota);
 			services.getQuotaDbService().put(topicIdentifier, msgQuota);
+			services.getMqttService().publish(userTopic, msgPayload, true);
 			log.fine("received quota message for topic: " + topicIdentifier);
 			break;
 		default:

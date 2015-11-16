@@ -19,6 +19,8 @@ import org.junit.Test;
 
 public class QuotaUpdaterTest {
 
+	private static final String TESTIDENTIFIER = "testidentifier";
+	private static final String TESTUSER = "testuser";
 	private final String TEST_TOPIC1 = "/test1";
 	private final String TEST_TOPIC2 = "/test2";
 
@@ -42,7 +44,7 @@ public class QuotaUpdaterTest {
 		quotaStates.add(hourlyState1);
 		quotaStates.add(hourlyState2);
 
-		Quota quota = new Quota("bla", quotaStates);
+		Quota quota = new Quota(TESTUSER, TESTIDENTIFIER, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota);
 		quotaService.put(TEST_TOPIC2, quota);
 		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, null, null,
