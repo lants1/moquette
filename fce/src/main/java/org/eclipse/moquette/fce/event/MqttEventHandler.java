@@ -45,6 +45,10 @@ public class MqttEventHandler implements MqttCallback {
 		switch (topicZone) {
 		case MANAGED_INTENT:
 		case MANAGED_CONFIGURATION:
+			// less safety, login and hash needs to be sent in the same message
+			// direct access to the broker would be a safer solution
+			// in this case there would be no need to transmit the hash and login information in the same message
+			// TODO Lan maybe implement another handler for internal broker actions
 			UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 			services.getConfigDbService().put(topicIdentifier, msgConfig);
 			log.fine("received configuration message for topic: " + topicIdentifier);

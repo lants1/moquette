@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.moquette.fce.common.SizeUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
+import org.eclipse.moquette.fce.model.configuration.ManagedState;
 import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.SpecificRestriction;
@@ -57,7 +58,7 @@ public class TestManagedJsonParser {
 		subscribeRestriction.add(specificRestriction);
 		subscribeRestriction.add(periodicRestriction);
 
-		UserConfiguration sampleUserConfig = new UserConfiguration("swen", ManagedPermission.NONE, publishRestriction,
+		UserConfiguration sampleUserConfig = new UserConfiguration("swen", ManagedPermission.NONE, ManagedState.UNMANAGED, publishRestriction,
 				subscribeRestriction);
 
 		JsonParserService mJsonParser = new JsonParserService();

@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.common.FceTimeUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.PluginEventHandler;
-import org.eclipse.moquette.fce.job.ManagedZoneGarbageCollector;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
 import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
@@ -25,11 +25,10 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
 	@Override
 	public void load(Properties config, BrokerOperator brokerOperator) {
-		serviceFactory = new FceServiceFactory(config, brokerOperator);
+		serviceFactory = new FceServiceFactoryImpl(config, brokerOperator);
 
-		scheduler = Executors.newScheduledThreadPool(2);
+		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(serviceFactory), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
-		scheduler.scheduleAtFixedRate(new ManagedZoneGarbageCollector(serviceFactory), 7, 7, TimeUnit.DAYS);
 
 		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
 		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_QUOTA.getTopicFilter());
