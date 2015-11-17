@@ -92,7 +92,7 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic write /sensors");
 
         //verify
-        assertTrue(authorizator.canWrite("/sensors", "", ""));
+        assertTrue(authorizator.canWrite("/sensors", "", "", false));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic read /sensors");
 
         //verify
-        assertTrue(authorizator.canRead("/sensors", "", ""));
+        assertTrue(authorizator.canRead("/sensors", "", "", false));
     }
 
     @Test
@@ -109,8 +109,8 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic read /sensors/anemometer");
 
         //verify
-        assertTrue(authorizator.canWrite("/sensors", "", ""));
-        assertFalse(authorizator.canRead("/sensors", "", ""));
+        assertTrue(authorizator.canWrite("/sensors", "", "", false));
+        assertFalse(authorizator.canRead("/sensors", "", "", false));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic write /sensors/#");
 
         //verify
-        assertTrue(authorizator.canWrite("/sensors/anemometer/wind", "", ""));
+        assertTrue(authorizator.canWrite("/sensors/anemometer/wind", "", "", false));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic write /sensors/+");
 
         //verify
-        assertTrue(authorizator.canWrite("/sensors/anemometer", "", ""));
+        assertTrue(authorizator.canWrite("/sensors/anemometer", "", "", false));
     }
 
     @Test
@@ -135,8 +135,8 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("topic write /sensors");
 
         //verify
-        assertTrue(authorizator.canWrite("/sensors", "john", ""));
-        assertFalse(authorizator.canWrite("/sensors", "jack", ""));
+        assertTrue(authorizator.canWrite("/sensors", "john", "", false));
+        assertFalse(authorizator.canWrite("/sensors", "jack", "", false));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("pattern read /weather/italy/%c");
 
         //Verify
-        assertTrue(authorizator.canRead("/weather/italy/anemometer1", "", "anemometer1"));
+        assertTrue(authorizator.canRead("/weather/italy/anemometer1", "", "anemometer1", false));
     }
 
     @Test
@@ -152,6 +152,6 @@ public class AuthorizationsCollectorTest {
         authorizator.parse("pattern read /weather/%u/%c");
 
         //Verify
-        assertTrue(authorizator.canRead("/weather/italy/anemometer1", "italy", "anemometer1"));
+        assertTrue(authorizator.canRead("/weather/italy/anemometer1", "italy", "anemometer1", false));
     }
 }

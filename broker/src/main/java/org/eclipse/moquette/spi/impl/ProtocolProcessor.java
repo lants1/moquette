@@ -163,7 +163,7 @@ public class ProtocolProcessor {
                 failedCredentials(session);
                 return;
             }
-            if (!m_authenticator.checkValid(msg.getUsername(), pwd)) {
+            if (!m_authenticator.checkValid(msg.getUsername(), pwd, msg.getClientID())) {
                 failedCredentials(session);
                 return;
             }
@@ -172,6 +172,8 @@ public class ProtocolProcessor {
             failedCredentials(session);
             return;
         }
+        
+        session.setAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS, !msg.isPasswordFlag());
 
         //if an old client with the same ID already exists close its session.
         if (m_clientIDs.containsKey(msg.getClientID())) {
@@ -289,7 +291,8 @@ public class ProtocolProcessor {
         final String topic = msg.getTopicName();
         //check if the topic can be wrote
         String user = (String) session.getAttribute(NettyChannel.ATTR_KEY_USERNAME);
-        if (m_authorizator.canWrite(topic, user, clientID)) {
+        Boolean anonymous = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS);
+        if (m_authorizator.canWrite(topic, user, clientID, anonymous)) {
             executePublish(clientID, msg);
             m_interceptor.notifyTopicPublished(msg, clientID);
         } else {
@@ -437,7 +440,8 @@ public class ProtocolProcessor {
         LOG.debug("Session for clientId {} is {}", clientId, session);
 
         String user = (String) session.getAttribute(NettyChannel.ATTR_KEY_USERNAME);
-        if (!m_authorizator.canRead(topic, user, clientId)) {
+        Boolean anonymous = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS);
+        if (!m_authorizator.canRead(topic, user, clientId, anonymous)) {
             LOG.debug("topic {} doesn't have read credentials", topic);
             return;
         }

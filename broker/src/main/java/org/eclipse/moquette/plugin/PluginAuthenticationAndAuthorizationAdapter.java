@@ -12,19 +12,18 @@ public class PluginAuthenticationAndAuthorizationAdapter implements IAuthenticat
 	}
 
 	@Override
-	public boolean canWrite(String topic, String user, String client) {
-		return plugin.canWrite(topic, user, client);
+	public boolean canWrite(String topic, String user, String clientId, Boolean anonymous) {
+		return plugin.canWrite(new AuthorizationProperties(topic, user, clientId, anonymous));
 	}
 
 	@Override
-	public boolean canRead(String topic, String user, String client) {
-		return plugin.canRead(topic, user, client);
+	public boolean canRead(String topic, String user, String clientId, Boolean anonymous) {
+		return plugin.canRead(new AuthorizationProperties(topic, user, clientId, anonymous));
 	}
 
 	@Override
-	public boolean checkValid(String username, byte[] password) {
-		return plugin.checkValid(username, password);
+	public boolean checkValid(String username, byte[] password, String clientId) {
+		return plugin.checkValid(new AuthenticationProperties(username, password, clientId));
 	}
 	
-
 }

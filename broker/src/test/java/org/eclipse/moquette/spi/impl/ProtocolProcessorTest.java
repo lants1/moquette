@@ -481,4 +481,22 @@ public class ProtocolProcessorTest {
         assertEquals(subQos2.getClientId(), publishedForwarded.get(1).getClientID());
         assertEquals(subQos2.getRequestedQos(), publishedForwarded.get(1).getQos());
     }
+    
+    @Test
+    public void testAnonymousFlag() {
+        //connect anonymously
+        //connMsg.setClientID("Publisher");
+      //  m_processor.processConnect(m_session, connMsg);
+       // assertTrue((Boolean) m_session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS));
+        
+        //connect with password
+        connMsg.setClientID("bla");
+        connMsg.setPasswordFlag(true);
+        connMsg.setPassword(TEST_PWD);
+        connMsg.setUsername(TEST_USER);
+        connMsg.setUserFlag(true);
+        
+        m_processor.processConnect(m_session, connMsg);
+        assertFalse((Boolean) m_session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS));
+    }
 }

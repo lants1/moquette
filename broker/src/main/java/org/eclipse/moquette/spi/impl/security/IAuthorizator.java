@@ -29,7 +29,7 @@ public interface IAuthorizator {
     /**
      * Ask the implementation of the authorizator if the topic can be used in a publish.
      * */
-    boolean canWrite(String topic, String user, String client);
+    boolean canWrite(String topic, String user, String clientId, Boolean anonymous);
 
-    boolean canRead(String topic, String user, String client);
+    boolean canRead(String topic, String user, String clientId, Boolean anonymous);
 }

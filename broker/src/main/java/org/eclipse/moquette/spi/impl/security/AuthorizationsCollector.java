@@ -112,16 +112,16 @@ class AuthorizationsCollector implements IAuthorizator {
     }
 
     @Override
-    public boolean canWrite(String topic, String user, String client) {
-        return canDoOperation(topic, WRITE, user, client);
+    public boolean canWrite(String topic, String user, String client, Boolean anonymous) {
+        return canDoOperation(topic, WRITE, user, client, anonymous);
     }
 
     @Override
-    public boolean canRead(String topic, String user, String client) {
-        return canDoOperation(topic, READ, user, client);
+    public boolean canRead(String topic, String user, String client, Boolean anonymous) {
+        return canDoOperation(topic, READ, user, client, anonymous);
     }
 
-    private boolean canDoOperation(String topic, Authorization.Permission permission, String username, String client) {
+    private boolean canDoOperation(String topic, Authorization.Permission permission, String username, String client, Boolean anonymous) {
         if (matchACL(m_globalAuthorizations, topic, permission))  {
             return true;
         }

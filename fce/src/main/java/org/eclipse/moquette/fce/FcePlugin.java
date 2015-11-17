@@ -13,6 +13,8 @@ import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
 import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
+import org.eclipse.moquette.plugin.AuthenticationProperties;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
@@ -45,30 +47,30 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	}
 
 	@Override
-	public boolean checkValid(String username, byte[] password) {
+	public boolean checkValid(AuthenticationProperties props) {
 		if (serviceFactory.isInitialized()) {
 			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
-			return handler.checkValid(username, password);
+			return handler.checkValid(props);
 		}
 		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
 		return false;
 	}
 
 	@Override
-	public boolean canWrite(String topic, String user, String client) {
+	public boolean canWrite(AuthorizationProperties properties) {
 		if (serviceFactory.isInitialized()) {
 			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
-			return handler.canWrite(topic, user, client);
+			return handler.canWrite(properties);
 		}
 		log.info("configuration not yet fully loaded from retained messages, write not possible");
-		return false;
+		return false; 
 	}
 
 	@Override
-	public boolean canRead(String topic, String user, String client) {
+	public boolean canRead(AuthorizationProperties properties) {
 		if (serviceFactory.isInitialized()) {
 			PluginEventHandler handler = new PluginEventHandler(serviceFactory);
-			return handler.canRead(topic, user, client);
+			return handler.canRead(properties);
 		}
 		log.info("configuration not yet fully loaded from retained messages, read not possible");
 		return false;
