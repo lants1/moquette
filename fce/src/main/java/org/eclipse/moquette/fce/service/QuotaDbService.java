@@ -34,7 +34,7 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	}
 	
 	
-	// TODO lants1 handle wildcards
+	// TODO lants1 handle wildcards, treemap instead of hashmap?
 	
-	// TODO lants1 isTopicFilter Managed?
+	// TODO lants1 add method isTopicFilter Managed?
 }
