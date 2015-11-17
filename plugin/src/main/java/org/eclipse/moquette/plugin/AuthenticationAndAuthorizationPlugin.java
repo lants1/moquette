@@ -8,9 +8,9 @@ package org.eclipse.moquette.plugin;
  */
 public interface AuthenticationAndAuthorizationPlugin extends BrokerPlugin {
 	
-    boolean canWrite(String topic, String user, String client);
+    boolean canWrite(AuthorizationProperties props);
 
-    boolean canRead(String topic, String user, String client);
+    boolean canRead(AuthorizationProperties props);
     
-    boolean checkValid(String username, byte[] password);
+    boolean checkValid(AuthenticationProperties authProps);
 }

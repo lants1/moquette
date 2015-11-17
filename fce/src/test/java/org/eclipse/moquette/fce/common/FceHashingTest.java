@@ -13,13 +13,14 @@ public class FceHashingTest {
 		InfoMessage infoMsg = new InfoMessage("user", "pw", null, null);
 		InfoMessage infoMsg2 = new InfoMessage("user2", "pw2", null, null);
 	
-		String pw = FceHashUtil.getHash(infoMsg);
-		String pw2 = FceHashUtil.getHash(infoMsg2);
+		String pw = FceHashUtil.getFceHash(infoMsg);
+		String pw2 = FceHashUtil.getFceHash(infoMsg2);
 
 		assertFalse(pw.equalsIgnoreCase(pw2));
 
-		String pw3 = FceHashUtil.getHash(infoMsg);
+		String pw3 = FceHashUtil.getFceHash(infoMsg);
 
 		assertTrue(pw3.equalsIgnoreCase(pw));
 	}
+
 }
