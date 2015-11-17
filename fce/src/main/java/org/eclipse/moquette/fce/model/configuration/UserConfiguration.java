@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.moquette.fce.model.ManagedInformation;
