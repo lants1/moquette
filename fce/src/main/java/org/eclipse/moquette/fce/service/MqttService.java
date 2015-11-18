@@ -22,6 +22,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.moquette.fce.event.MqttEventHandler;
+import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -63,7 +64,7 @@ public class MqttService {
 			log.info("internal mqtt client connected to broker");
 
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new FceSystemFailureException(e);
 		}
 	}
 
@@ -148,6 +149,6 @@ public class MqttService {
 			return getClass().getClassLoader().getResourceAsStream(jksPath);
 		}
 
-		throw new RuntimeException("JKS is not found on path:" + jksPath);
+		throw new FceSystemFailureException("JKS is not found on path:" + jksPath);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.common.ManagedTopicIdentifierUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
@@ -29,7 +30,7 @@ public class MqttEventHandler implements MqttCallback {
 			log.warning("internal plugin mqttclient conection to broker connection lost");
 			services.getMqttService().connect();
 		} catch (MqttException e) {
-			throw new RuntimeException(e);
+			throw new FceSystemFailureException(e);
 		}
 	}
 
