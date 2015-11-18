@@ -33,4 +33,9 @@ public abstract class ManagedZoneInMemoryDbService {
 	}
 	
 	abstract protected HashMap<String, ?> getStore();
+
+	public ManagedZone getZone() {
+		return correspondingZone;
+	}
+	
 }
