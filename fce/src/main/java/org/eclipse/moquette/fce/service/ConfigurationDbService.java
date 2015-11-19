@@ -11,6 +11,7 @@ import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
@@ -22,8 +23,11 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		super(brokerOperator, ManagedZone.MANAGED_CONFIGURATION);
 	}
 
-	private UserConfiguration get(String topicIdentifier) {
-		return configStore.get(topicIdentifier);
+	private UserConfiguration get(String topicIdentifier, AuthorizationProperties props) {
+		if (configStore.get(topicIdentifier + props.getClientId()) != null) {
+			return configStore.get(topicIdentifier + props.getClientId());
+		}
+		return configStore.get(topicIdentifier + AuthorizationProperties.EVERYONE);
 	}
 
 	public void put(String topicIdentifier, UserConfiguration userConfig) {
@@ -35,22 +39,24 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		return configStore;
 	}
 
-	public UserConfiguration getConfigurationForSingleManagedTopic(String managedTopicIdentifier) throws FceNoAuthorizationPossibleException{
+	public UserConfiguration getConfigurationForSingleManagedTopic(String managedTopicIdentifier,
+			AuthorizationProperties props) throws FceNoAuthorizationPossibleException {
 		if (!managedTopicIdentifier.startsWith("/")) {
 			throw new FceSystemFailureException("invalid topicfilter which doesn't start with /");
 		}
 
 		String reducedTopicFilter = managedTopicIdentifier;
 		while (!reducedTopicFilter.isEmpty()) {
-			UserConfiguration userConfig = this.get(reducedTopicFilter);
-			if(userConfig != null){
+			UserConfiguration userConfig = this.get(reducedTopicFilter, props);
+			if (userConfig != null) {
 				return userConfig;
 			}
 			reducedTopicFilter = StringUtils.substringBeforeLast(reducedTopicFilter, "/");
 		}
-		throw new FceNoAuthorizationPossibleException("no userconfiguration found for topic: "+managedTopicIdentifier);
+		throw new FceNoAuthorizationPossibleException(
+				"no userconfiguration found for topic: " + managedTopicIdentifier);
 	}
-	
+
 	public List<String> getMangedTopics(String topicFilter) {
 		List<String> result = new ArrayList<>();
 
@@ -59,8 +65,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
 				String key = entry.getKey();
 
-				if (key.startsWith(
-						getZone().getTopicPrefix() + StringUtils.removeEnd(topicFilter, "/#"))) {
+				if (key.startsWith(getZone().getTopicPrefix() + StringUtils.removeEnd(topicFilter, "/#"))) {
 					result.add(key);
 				}
 
@@ -72,8 +77,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
 				String key = entry.getKey();
 
-				if (key.startsWith(
-						getZone().getTopicPrefix() + StringUtils.removeEnd(topicFilter, "/+"))) {
+				if (key.startsWith(getZone().getTopicPrefix() + StringUtils.removeEnd(topicFilter, "/+"))) {
 					if (StringUtils.countMatches(key, "/") == relevantSlashCount) {
 						result.add(key);
 					}
