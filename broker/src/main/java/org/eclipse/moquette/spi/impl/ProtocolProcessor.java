@@ -292,7 +292,7 @@ public class ProtocolProcessor {
         //check if the topic can be wrote
         String user = (String) session.getAttribute(NettyChannel.ATTR_KEY_USERNAME);
         Boolean anonymous = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS);
-        if (m_authorizator.canWrite(topic, user, clientID, anonymous)) {
+        if (m_authorizator.canWrite(topic, user, clientID, anonymous, msg.getPayload())) {
             executePublish(clientID, msg);
             m_interceptor.notifyTopicPublished(msg, clientID);
         } else {
@@ -441,7 +441,7 @@ public class ProtocolProcessor {
 
         String user = (String) session.getAttribute(NettyChannel.ATTR_KEY_USERNAME);
         Boolean anonymous = (Boolean) session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS);
-        if (!m_authorizator.canRead(topic, user, clientId, anonymous)) {
+        if (!m_authorizator.canRead(topic, user, clientId, anonymous, message)) {
             LOG.debug("topic {} doesn't have read credentials", topic);
             return;
         }

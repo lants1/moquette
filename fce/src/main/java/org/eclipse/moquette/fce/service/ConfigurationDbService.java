@@ -51,37 +51,6 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		throw new FceNoAuthorizationPossibleException("no userconfiguration found for topic: " + topic);
 	}
 
-	public List<String> getMangedTopics(ManagedTopic topic) {
-		List<String> result = new ArrayList<>();
-
-		if (topic.isMultiLevelTopic()) {
-			for (Map.Entry<String, UserConfiguration> entry : configStore.entrySet()) {
-
-				String key = entry.getKey();
-
-				if (key.startsWith(topic.getTopicIdentifierWithoutWildcards(getZone()))) {
-					result.add(key);
-				}
-
-			}
-		} else if (topic.isSingleLevelTopic()) {
-			for (Map.Entry<String, UserConfiguration> entry : configStore.entrySet()) {
-
-				String key = entry.getKey();
-
-				if (key.startsWith(topic.getTopicIdentifierWithoutWildcards(getZone()))) {
-					if (new ManagedTopic(key).getHierarchyDeep(getZone()) == topic.getHierarchyDeep(getZone())) {
-						result.add(key);
-					}
-				}
-
-			}
-		} else if (topic.isSingleTopic()) {
-			result.add(topic.getTopicIdentifer());
-		}
-		return result;
-	}
-
 	public boolean isTopicFilterManaged(ManagedTopic topic) {
 		List<String> tokens = getTokens(topic);
 
@@ -95,7 +64,6 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 			}
 		}
 		return false;
-
 	}
 
 	private List<String> getTokens(ManagedTopic topic) {

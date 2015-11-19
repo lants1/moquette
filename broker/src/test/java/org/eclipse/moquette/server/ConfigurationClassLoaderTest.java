@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Properties;
 
 import static org.eclipse.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
@@ -84,12 +85,12 @@ public class ConfigurationClassLoaderTest implements IAuthenticator, IAuthorizat
     }
 
     @Override
-    public boolean canWrite(String topic, String user, String client, Boolean anonymous) {
+    public boolean canWrite(String topic, String user, String client, Boolean anonymous, ByteBuffer msg) {
         return true;
     }
 
     @Override
-    public boolean canRead(String topic, String user, String client, Boolean anonymous) {
+    public boolean canRead(String topic, String user, String client, Boolean anonymous, ByteBuffer msg) {
         return true;
     }
     

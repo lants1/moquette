@@ -28,7 +28,7 @@ public class ConfigurationDbServiceTest {
 		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
 				null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null);
+		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
@@ -45,7 +45,7 @@ public class ConfigurationDbServiceTest {
 		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
 				null, null);
 		
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null);
+		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
@@ -59,7 +59,7 @@ public class ConfigurationDbServiceTest {
 	public void testIsManaged() throws FceNoAuthorizationPossibleException {
 		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
 				null, null);
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null);
+		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
@@ -76,7 +76,7 @@ public class ConfigurationDbServiceTest {
 		UserConfiguration everyoneConfig = new UserConfiguration(ALLUSER, ALLIDENTIFIER, ManagedPermission.EVERYONE, null,
 				null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null);
+		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC_SAMPLE.getEveryoneTopicIdentifier(ManagedZone.MANAGED_CONFIGURATION), everyoneConfig);

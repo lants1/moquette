@@ -14,32 +14,24 @@ public abstract class Restriction {
 	private int maxMessageSize;
 	private int totalMessageSize;
 	private SizeUnit sizeUnit;
-	
-	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, SizeUnit sizeUnit) {
+	private String wsdlUrl;
+
+	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, SizeUnit sizeUnit,
+			String wsdlUrl) {
 		super();
 		this.messageCount = messageCount;
 		this.maxMessageSize = maxMessageSizeKb;
 		this.totalMessageSize = totalMessageSizeKb;
 		this.sizeUnit = sizeUnit;
+		this.wsdlUrl = wsdlUrl;
 	}
-	
+
 	public int getMessageCount() {
 		return messageCount;
 	}
+
 	public void setMessageCount(int messageCount) {
 		this.messageCount = messageCount;
-	}
-	public int getMaxMessageSizeKb() {
-		return maxMessageSize;
-	}
-	public void setMaxMessageSizeKb(int maxMessageSizeKb) {
-		this.maxMessageSize = maxMessageSizeKb;
-	}
-	public int getTotalMessageSizeKb() {
-		return totalMessageSize;
-	}
-	public void setTotalMessageSizeKb(int totalMessageSizeKb) {
-		this.totalMessageSize = totalMessageSizeKb;
 	}
 
 	public SizeUnit getSizeUnit() {
@@ -49,4 +41,29 @@ public abstract class Restriction {
 	public void setSizeUnit(SizeUnit sizeUnit) {
 		this.sizeUnit = sizeUnit;
 	}
+
+	public String getWsdlUrl() {
+		return wsdlUrl;
+	}
+
+	public void setWsdlUrl(String wsdlUrl) {
+		this.wsdlUrl = wsdlUrl;
+	}
+
+	public int getMaxMessageSize() {
+		return maxMessageSize;
+	}
+
+	public void setMaxMessageSize(int maxMessageSize) {
+		this.maxMessageSize = maxMessageSize;
+	}
+
+	public int getTotalMessageSize() {
+		return totalMessageSize;
+	}
+
+	public void setTotalMessageSize(int totalMessageSize) {
+		this.totalMessageSize = totalMessageSize;
+	}
+
 }

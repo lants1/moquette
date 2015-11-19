@@ -13,8 +13,8 @@ public class PeriodicRestriction extends Restriction{
 
 	private ManagedCycle cyle;
 
-	public PeriodicRestriction(ManagedCycle cycle, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, SizeUnit sizeUnit) {
-		super(messageCount, maxMessageSizeKb, totalMessageSizeKb, sizeUnit);
+	public PeriodicRestriction(ManagedCycle cycle, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, SizeUnit sizeUnit, String wsdlUrl) {
+		super(messageCount, maxMessageSizeKb, totalMessageSizeKb, sizeUnit, wsdlUrl);
 		this.cyle = cycle;
 	}
 

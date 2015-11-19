@@ -10,8 +10,6 @@ import org.eclipse.moquette.plugin.AuthorizationProperties;
 public class ManagedTopic {
 
 	private static final String USER_PREFIX = "/_";
-	private static final String SINGLE_LEVEL = "/+";
-	private static final String MULTI_LEVEL = "/#";
 	private static final String LEVEL_CHAR = "/";
 	private static final String EVERYONE_TOPIC = "/_all";
 
@@ -42,42 +40,13 @@ public class ManagedTopic {
 		return ManagedZoneUtil.moveTopicIdentifierToZone(topicIdentifer + USER_PREFIX + authProps.getClientId(),
 				managedZone);
 	}
-
-	public String getTopicIdentifierWithoutWildcards(ManagedZone managedZone) {
-		return removeWildcards(getTopicIdentifier(managedZone));
-	}
-
-	public String getUserTopicIdentifierWithoutWildcards(ManagedInformation managedInfo, ManagedZone managedZone) {
-		return removeWildcards(getUserTopicIdentifier(managedInfo, managedZone));
-	}
-
-	public String getUserTopicIdentifierWithoutWildcards(AuthorizationProperties authProps, ManagedZone managedZone) {
-		return removeWildcards(getUserTopicIdentifier(authProps, managedZone));
-	}
 	
 	public String getEveryoneTopicIdentifier(ManagedZone managedZone){
-		return ManagedZoneUtil.moveTopicIdentifierToZone(removeWildcards(topicIdentifer)+EVERYONE_TOPIC, managedZone);
-	}
-	
-	private String removeWildcards(String stringToRemoveWildcards){
-		return StringUtils.removeEnd(
-				StringUtils.removeEnd(stringToRemoveWildcards, SINGLE_LEVEL), MULTI_LEVEL);
-	}
-
-	public boolean isSingleTopic() {
-		return !StringUtils.endsWithAny(topicIdentifer, SINGLE_LEVEL, MULTI_LEVEL);
-	}
-
-	public boolean isSingleLevelTopic() {
-		return StringUtils.endsWithAny(topicIdentifer, SINGLE_LEVEL);
-	}
-
-	public boolean isMultiLevelTopic() {
-		return StringUtils.endsWithAny(topicIdentifer, MULTI_LEVEL);
+		return ManagedZoneUtil.moveTopicIdentifierToZone(topicIdentifer+EVERYONE_TOPIC, managedZone);
 	}
 
 	public int getHierarchyDeep(ManagedZone managedZone){
-		return StringUtils.countMatches(removeWildcards(getTopicIdentifier(managedZone)), LEVEL_CHAR);
+		return StringUtils.countMatches(getTopicIdentifier(managedZone), LEVEL_CHAR);
 	}
 	
 	@Override

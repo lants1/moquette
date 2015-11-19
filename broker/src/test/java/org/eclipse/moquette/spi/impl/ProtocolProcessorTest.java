@@ -484,11 +484,6 @@ public class ProtocolProcessorTest {
     
     @Test
     public void testAnonymousFlag() {
-        //connect anonymously
-        //connMsg.setClientID("Publisher");
-      //  m_processor.processConnect(m_session, connMsg);
-       // assertTrue((Boolean) m_session.getAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS));
-        
         //connect with password
         connMsg.setClientID("bla");
         connMsg.setPasswordFlag(true);
