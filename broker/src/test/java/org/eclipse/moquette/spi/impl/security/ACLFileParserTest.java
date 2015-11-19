@@ -58,8 +58,8 @@ public class ACLFileParserTest {
         AuthorizationsCollector authorizations = ACLFileParser.parse(conf);
 
         //Verify
-        assertTrue(authorizations.canRead("/weather/italy/anemometer", "", "", false));
-        assertTrue(authorizations.canWrite("/weather/italy/anemometer", "", "", false));
+        assertTrue(authorizations.canRead("/weather/italy/anemometer", "", "", false, null));
+        assertTrue(authorizations.canWrite("/weather/italy/anemometer", "", "", false, null));
     }
 
 }

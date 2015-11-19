@@ -1,5 +1,7 @@
 package org.eclipse.moquette.plugin;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.moquette.spi.impl.security.IAuthenticator;
 import org.eclipse.moquette.spi.impl.security.IAuthorizator;
 
@@ -12,13 +14,13 @@ public class PluginAuthenticationAndAuthorizationAdapter implements IAuthenticat
 	}
 
 	@Override
-	public boolean canWrite(String topic, String user, String clientId, Boolean anonymous) {
-		return plugin.canWrite(new AuthorizationProperties(topic, user, clientId, anonymous));
+	public boolean canWrite(String topic, String user, String clientId, Boolean anonymous, ByteBuffer msg) {
+		return plugin.canWrite(new AuthorizationProperties(topic, user, clientId, anonymous, msg));
 	}
 
 	@Override
-	public boolean canRead(String topic, String user, String clientId, Boolean anonymous) {
-		return plugin.canRead(new AuthorizationProperties(topic, user, clientId, anonymous));
+	public boolean canRead(String topic, String user, String clientId, Boolean anonymous, ByteBuffer msg) {
+		return plugin.canRead(new AuthorizationProperties(topic, user, clientId, anonymous, msg));
 	}
 
 	@Override

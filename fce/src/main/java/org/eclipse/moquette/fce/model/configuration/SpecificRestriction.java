@@ -15,8 +15,8 @@ public class SpecificRestriction extends Restriction {
 	private Date from;
 	private Date to;
 
-	public SpecificRestriction(Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, SizeUnit sizeUnit) {
-		super(messageCount, maxMessageSize, totalMessageSize, sizeUnit);
+	public SpecificRestriction(Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, SizeUnit sizeUnit, String wsdlUrl) {
+		super(messageCount, maxMessageSize, totalMessageSize, sizeUnit, wsdlUrl);
 		this.from = from;
 		this.to = to;
 	}

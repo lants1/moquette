@@ -19,6 +19,7 @@ import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.util.*;
 
@@ -112,16 +113,16 @@ class AuthorizationsCollector implements IAuthorizator {
     }
 
     @Override
-    public boolean canWrite(String topic, String user, String client, Boolean anonymous) {
-        return canDoOperation(topic, WRITE, user, client, anonymous);
+    public boolean canWrite(String topic, String user, String client, Boolean anonymous, ByteBuffer message) {
+        return canDoOperation(topic, WRITE, user, client);
     }
 
     @Override
-    public boolean canRead(String topic, String user, String client, Boolean anonymous) {
-        return canDoOperation(topic, READ, user, client, anonymous);
+    public boolean canRead(String topic, String user, String client, Boolean anonymous,  ByteBuffer message) {
+        return canDoOperation(topic, READ, user, client);
     }
 
-    private boolean canDoOperation(String topic, Authorization.Permission permission, String username, String client, Boolean anonymous) {
+    private boolean canDoOperation(String topic, Authorization.Permission permission, String username, String client) {
         if (matchACL(m_globalAuthorizations, topic, permission))  {
             return true;
         }
