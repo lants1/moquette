@@ -1,6 +1,8 @@
 package org.eclipse.moquette.plugin;
 
 public class AuthorizationProperties {
+	public static final String EVERYONE = "everyone";
+	
 	private final String topic;
 	private final String user; 
 	private final String clientId;

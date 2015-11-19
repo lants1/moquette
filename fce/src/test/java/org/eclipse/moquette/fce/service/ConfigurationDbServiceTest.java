@@ -8,6 +8,7 @@ import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 
 public class ConfigurationDbServiceTest {
@@ -22,17 +23,20 @@ public class ConfigurationDbServiceTest {
 	public void testPutGet() throws FceNoAuthorizationPossibleException {
 		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
 				null, null);
+		
+		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null);
+		
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC_SAMPLE, userConfig);
 
 		assertTrue(configService
 				.getConfigurationForSingleManagedTopic(
-						ManagedZoneUtil.moveTopicIdentifierToZone(TOPIC_SAMPLE, ManagedZone.MANAGED_CONFIGURATION))
+						ManagedZoneUtil.moveTopicIdentifierToZone(TOPIC_SAMPLE, ManagedZone.MANAGED_CONFIGURATION),props)
 				.getUserIdentifier() == TESTIDENTIFIER);
 		
 		assertTrue(configService
 				.getConfigurationForSingleManagedTopic(
-						ManagedZoneUtil.moveTopicIdentifierToZone(TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC, ManagedZone.MANAGED_CONFIGURATION))
+						ManagedZoneUtil.moveTopicIdentifierToZone(TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC, ManagedZone.MANAGED_CONFIGURATION), props)
 				.getUserIdentifier() == TESTIDENTIFIER);
 	}
 
