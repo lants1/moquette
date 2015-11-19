@@ -29,7 +29,7 @@ import org.eclipse.moquette.fce.model.quota.SpecificQuotaState;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestManagedJsonParser {
+public class JsonParserServiceTest {
 
 	private static final String TESTIDENTIFIER = "testidentifier";
 	private static final String TESTUSER = "testuser";
@@ -123,7 +123,7 @@ public class TestManagedJsonParser {
 	}
 
 	static String readFile(String path) throws IOException, URISyntaxException {
-		byte[] encoded = Files.readAllBytes(Paths.get(TestManagedJsonParser.class.getResource(path).toURI()));
+		byte[] encoded = Files.readAllBytes(Paths.get(JsonParserServiceTest.class.getResource(path).toURI()));
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
 }
