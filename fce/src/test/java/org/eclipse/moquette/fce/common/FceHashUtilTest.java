@@ -21,6 +21,10 @@ public class FceHashUtilTest {
 		String pw3 = FceHashUtil.getFceHash(infoMsg);
 
 		assertTrue(pw3.equalsIgnoreCase(pw));
+		
+		
+		InfoMessage infoMsg3 = new InfoMessage("fceplugin", "samplepw", null, null);
+		System.out.println(FceHashUtil.getFceHash(infoMsg3));
 	}
 
 }

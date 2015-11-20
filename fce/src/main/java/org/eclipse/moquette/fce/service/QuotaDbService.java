@@ -5,7 +5,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.quota.Quota;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class QuotaDbService extends ManagedZoneInMemoryDbService {
@@ -33,7 +36,15 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return quotaStore;
 	}
 	
-	// TODO lants1 handle wildcards, treemap instead of hashmap?
+	@Override
+	protected Quota get(ManagedTopic topic, AuthorizationProperties props) {
+		if (quotaStore.get(topic.getUserTopicIdentifier(props, getZone())) != null) {
+			return quotaStore.get(topic.getUserTopicIdentifier(props, getZone()));
+		}
+		return quotaStore.get(topic.getEveryoneTopicIdentifier(getZone()));
+	}
 	
-	// TODO lants1 add method isTopicFilter Managed?
+	public Quota getQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+		return (Quota) getManagedInformation(props);
+	}
 }
