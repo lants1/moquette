@@ -9,9 +9,9 @@ import org.eclipse.moquette.plugin.AuthorizationProperties;
 
 public class ManagedTopic {
 
-	private static final String USER_PREFIX = "/_";
-	private static final String LEVEL_CHAR = "/";
-	private static final String EVERYONE_TOPIC = "/_all";
+	public static final String USER_PREFIX = "/_";
+	public static final String LEVEL_CHAR = "/";
+	public static final String EVERYONE_TOPIC = "/_all";
 
 	private final String topicIdentifer;
 

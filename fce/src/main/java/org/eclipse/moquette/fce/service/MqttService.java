@@ -21,6 +21,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.eclipse.moquette.fce.FcePlugin;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -32,10 +33,6 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 public class MqttService {
 
 	private final static Logger log = Logger.getLogger(MqttService.class.getName());
-	
-	private static final String PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
-	private static final String PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
-	private static final String PLUGIN_JKS_PATH = "plugin_jks_path";
 
 	MqttClient client;
 	Properties config;
@@ -50,13 +47,14 @@ public class MqttService {
 		String ssl_port = config.getProperty("ssl_port");
 
 		try {
-			client = new MqttClient("ssl://localhost:" + ssl_port, "Sending");
+			client = new MqttClient("ssl://localhost:" + ssl_port,
+					config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER));
 
 			SSLSocketFactory ssf = configureSSLSocketFactory(config);
 
 			MqttConnectOptions options = new MqttConnectOptions();
-			options.setUserName("user");
-			options.setPassword("pw".toCharArray());
+			options.setUserName(config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_USERNAME));
+			options.setPassword(config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_PASSWORD).toCharArray());
 			options.setSocketFactory(ssf);
 
 			client.connect();
@@ -74,12 +72,12 @@ public class MqttService {
 		message.setRetained(retained);
 		try {
 			client.publish(topic, message);
-			log.fine("mqtt message for topic: "+topic +" with content: " + json +" published to internal broker");
+			log.fine("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void subscribe(String topicFilter) {
 		try {
 			client.subscribe(topicFilter);
@@ -88,7 +86,7 @@ public class MqttService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void unsubscribe(String topicFilter) {
 		try {
 			client.unsubscribe(topicFilter);
@@ -98,7 +96,7 @@ public class MqttService {
 	}
 
 	public void connect() throws MqttSecurityException, MqttException {
-			client.connect();
+		client.connect();
 	}
 
 	/**
@@ -121,11 +119,11 @@ public class MqttService {
 			NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 
-		InputStream jksInputStream = jksDatastore(config.getProperty(PLUGIN_JKS_PATH));
-		ks.load(jksInputStream, config.getProperty(PLUGIN_KEY_STORE_PASSWORD).toCharArray());
+		InputStream jksInputStream = jksDatastore(config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
+		ks.load(jksInputStream, config.getProperty(FcePlugin.PROPS_PLUGIN_KEY_STORE_PASSWORD).toCharArray());
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(ks, config.getProperty(PLUGIN_KEY_MANAGER_PASSWORD).toCharArray());
+		kmf.init(ks, config.getProperty(FcePlugin.PROPS_PLUGIN_KEY_MANAGER_PASSWORD).toCharArray());
 
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		tmf.init(ks);

@@ -26,12 +26,12 @@ public final class FceHashUtil {
 	}
 	
 	public static String getFceHash(String username, String pw) {
-		return DigestUtils.sha1Hex(username+pw+loadPepperFromServer());
+		return DigestUtils.sha256Hex(username+pw+loadPepperFromServer());
 	}
 	
 	public static boolean validateClientIdHash(AuthenticationProperties props){
 		try {
-			return StringUtils.equals(DigestUtils.sha1Hex(props.getUsername()+new String(props.getPassword(), CharEncoding.UTF_8)),props.getClientId());
+			return StringUtils.equals(DigestUtils.sha256Hex(props.getUsername()+new String(props.getPassword(), CharEncoding.UTF_8)),props.getClientId());
 		} catch (UnsupportedEncodingException e) {
 			return false;
 		}

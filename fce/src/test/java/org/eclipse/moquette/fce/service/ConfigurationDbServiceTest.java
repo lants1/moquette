@@ -13,86 +13,83 @@ import org.junit.Test;
 
 public class ConfigurationDbServiceTest {
 
-	private static final String TESTIDENTIFIER = "testidentifier";
-	private static final String TESTUSER = "testuser";
-	
-	private static final String ALLIDENTIFIER = "allidentifier";
-	private static final String ALLUSER = "alluser";
-	
-	private static final ManagedTopic TOPIC_SAMPLE = new ManagedTopic("/house/firstfloor/light");
-	private static final ManagedTopic TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC = new ManagedTopic("/house/firstfloor/light/morelight");
+	private static final String ID = "testidentifier";
+	private static final String USER = "testuser";
+
+	private static final String ALL_ID = "allidentifier";
+	private static final String ALL_USER = "alluser";
+
+	private static final ManagedTopic TOPIC = new ManagedTopic("/house/firstfloor/light");
+	private static final ManagedTopic CONFIG_SUBTOPIC = new ManagedTopic("/house/firstfloor/light/morelight");
 	private static final ManagedTopic TOPIC_INVALID = new ManagedTopic("/asdf/asdfasfd/dfasf");
 
 	@Test
 	public void testPutGet() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
-				null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
+		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getTopicIdentifer(), null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
+		configService.put(TOPIC.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE, props)
-				.getUserIdentifier() == TESTIDENTIFIER);
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC, props)
-				.getUserIdentifier() == TESTIDENTIFIER);
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getTopicIdentifer(), null, ID, null, null);
+
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
 
 	@Test(expected = FceNoAuthorizationPossibleException.class)
 	public void testPutGetException() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
-				null, null);
-		
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+
+		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getTopicIdentifer(), null, ID, null,
+				null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
+		configService.put(TOPIC.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
 
-
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_INVALID, props)
-				.getUserIdentifier() == TESTIDENTIFIER);
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
 
 	@Test
 	public void testIsManaged() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
-				null, null);
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
+		configService.put(TOPIC.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
 
-		assertTrue(configService.isTopicFilterManaged(TOPIC_SAMPLE));
+		assertTrue(configService.isTopicFilterManaged(TOPIC));
 		assertFalse(configService.isTopicFilterManaged(TOPIC_INVALID));
 	}
 
 	@Test
 	public void testPutGetEveryone() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.EVERYONE, null,
-				null, null);
-		
-		UserConfiguration everyoneConfig = new UserConfiguration(ALLUSER, ALLIDENTIFIER, ManagedPermission.EVERYONE, null,
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+
+		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ManagedPermission.EVERYONE, null,
 				null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
+		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getTopicIdentifer(), null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC_SAMPLE.getEveryoneTopicIdentifier(ManagedZone.MANAGED_CONFIGURATION), everyoneConfig);
+		configService.put(TOPIC.getEveryoneTopicIdentifier(ManagedZone.MANAGED_CONFIGURATION), everyoneConfig);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE, props)
-				.getUserIdentifier() == ALLIDENTIFIER);
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC, props)
-				.getUserIdentifier() == ALLIDENTIFIER);
-		
-		configService.put(TOPIC_SAMPLE.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getTopicIdentifer(), null, ID, null, null);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE, props)
-				.getUserIdentifier() == TESTIDENTIFIER);
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
-		assertTrue(configService.getConfigurationForSingleManagedTopic(TOPIC_SAMPLE_CONFIG_IN_SUBTOPIC, props)
-				.getUserIdentifier() == TESTIDENTIFIER);
+		configService.put(TOPIC.getUserTopicIdentifier(props, ManagedZone.MANAGED_CONFIGURATION), userConfig);
+
+		props = new AuthorizationProperties(TOPIC.getTopicIdentifer(), null, ID, null, null);
+
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
+
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getTopicIdentifer(), null, ID, null, null);
+
+		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
 }
