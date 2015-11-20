@@ -44,7 +44,13 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return quotaStore.get(topic.getEveryoneTopicIdentifier(getZone()));
 	}
 	
-	public Quota getQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+	public Quota getPublishQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+		// TODO lants1 only published quotas
+		return (Quota) getManagedInformation(props);
+	}
+	
+	public Quota getSubscribeQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+		// TODO lants1 only subscribed quotas
 		return (Quota) getManagedInformation(props);
 	}
 }

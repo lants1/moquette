@@ -71,5 +71,4 @@ public abstract class QuotaState {
 		this.sizeUnit = sizeUnit;
 	}
 
-	
 }

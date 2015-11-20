@@ -47,14 +47,13 @@ public class QuotaUpdaterTest {
 		Quota quota = new Quota(TESTUSER, TESTIDENTIFIER, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota);
 		quotaService.put(TEST_TOPIC2, quota);
-		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, null, null,
-				quotaService, null);
+		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, quotaService);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();
 
 		Quota result1 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
 		Quota result2 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
-		
+
 		assertTrue(result1.getQuotaState().size() == 3);
 		assertTrue(result2.getQuotaState().size() == 3);
 

@@ -12,6 +12,8 @@ public interface FceServiceFactory {
 
 	ConfigurationDbService getConfigDbService();
 
+	XmlSchemaValidationService getXmlSchemaValidationService();
+	
 	boolean isInitialized();
 
 }
