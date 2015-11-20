@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.model.quota;
 import java.util.List;
 
 import org.eclipse.moquette.fce.model.ManagedInformation;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 
 public class Quota extends ManagedInformation{
 
@@ -21,5 +22,13 @@ public class Quota extends ManagedInformation{
 		this.quotaState = quotaState;
 	}
 	
+	public boolean isValid(AuthorizationProperties props){
+		return false;
+		
+	}
 	
+	public boolean substractRequestFromQuota(AuthorizationProperties props){
+		return false;
+		
+	}
 }

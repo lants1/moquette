@@ -15,6 +15,7 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbService;
 	private ConfigurationDbService configDbService;
+	private XmlSchemaValidationService schemaValidationService;
 
 	public FceServiceFactoryImpl(Properties config, BrokerOperator brokerOperator) {
 		this.pluginConfig = config;
@@ -77,6 +78,14 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 		return configDbService;
 	}
 
+	@Override
+	public XmlSchemaValidationService getXmlSchemaValidationService() {
+		if (schemaValidationService == null) {
+			schemaValidationService = new XmlSchemaValidationService();
+		}
+		return schemaValidationService;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#isInitialized()
 	 */
