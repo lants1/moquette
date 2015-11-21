@@ -1,6 +1,7 @@
 package org.eclipse.moquette.fce.model.quota;
 
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class MessageCountState implements QuotaState {
 
@@ -30,7 +31,7 @@ public class MessageCountState implements QuotaState {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props) {
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
 		// TODO Auto-generated method stub
 		return false;
 	}

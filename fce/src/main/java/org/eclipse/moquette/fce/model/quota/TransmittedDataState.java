@@ -2,6 +2,7 @@ package org.eclipse.moquette.fce.model.quota;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class TransmittedDataState implements QuotaState {
 
@@ -42,7 +43,7 @@ public class TransmittedDataState implements QuotaState {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props) {
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
 		if (this.getCurrentQuota() + props.getMessage().position() < this.getMaxQuota()) {
 			return true;
 		}

@@ -7,7 +7,6 @@ import java.util.Set;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
@@ -29,11 +28,14 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return quotaStore.entrySet();
 	}
 
-	public void put(String topicIdentifier, UserQuotaData quota, boolean ignoreTimestamp) throws FceNoAuthorizationPossibleException {
+	public void put(String topicIdentifier, UserQuotaData quota, boolean ignoreTimestamp)
+			throws FceNoAuthorizationPossibleException {
 		if (ignoreTimestamp || quota.getTimestamp().after(get(topicIdentifier).getTimestamp())) {
 			quotaStore.put(topicIdentifier, quota);
+
+		} else {
+			throw new FceNoAuthorizationPossibleException("outdateddata");
 		}
-		throw new FceNoAuthorizationPossibleException("outdateddata");
 	}
 
 	@Override
@@ -54,8 +56,4 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return (UserQuotaData) getManagedInformation(props, operation);
 	}
 
-	public void initializeQuotas(UserConfiguration msgIntent) {
-		// TODO lants1
-		
-	}
 }

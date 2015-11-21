@@ -33,11 +33,17 @@ public class ManagedTopic {
 	}
 
 	public String getUserTopicIdentifier(ManagedInformation managedInfo, ManagedZone zone) {
+		if(StringUtils.isEmpty(managedInfo.getUserIdentifier())){
+			return getEveryoneTopicIdentifier(zone);
+		}
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
 				zone);
 	}
 
 	public String getUserTopicIdentifier(AuthorizationProperties authProps, ManagedZone zone) {
+		if(StringUtils.isEmpty(authProps.getClientId())){
+			return getEveryoneTopicIdentifier(zone);
+		}
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + authProps.getClientId(), zone);
 	}
 
@@ -46,6 +52,10 @@ public class ManagedTopic {
 	}
 
 	public String getUserTopicIdentifier(ManagedInformation managedInfo, ManagedZone zone, MqttOperation operation) {
+		if(StringUtils.isEmpty(managedInfo.getUserIdentifier())){
+			return getEveryoneTopicIdentifier(zone, operation);
+		}
+		
 		return ManagedZoneUtil.moveTopicToZone(
 				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
 				zone);

@@ -2,7 +2,9 @@ package org.eclipse.moquette.fce.model.configuration;
 
 import java.util.List;
 
+import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.fce.model.ManagedInformation;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttOperation;
 
 /**
@@ -12,7 +14,7 @@ import org.eclipse.moquette.plugin.MqttOperation;
  * @author lants1
  *
  */
-public class UserConfiguration extends ManagedInformation {
+public class UserConfiguration extends ManagedInformation implements IValid{
 
 	private ManagedState managedState;
 	private ManagedPermission managePermission;
@@ -75,5 +77,20 @@ public class UserConfiguration extends ManagedInformation {
 
 	public void setManagePermission(ManagedPermission managePermission) {
 		this.managePermission = managePermission;
+	}
+
+	@Override
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+		List<Restriction> restrictions = getRestrictions(operation);
+
+		if (!getManagePermission().canDoOperation(operation)) {
+			return false;
+		}
+
+		if (restrictions.isEmpty()) {
+			return true;
+		}
+		
+		return false;
 	}
 }

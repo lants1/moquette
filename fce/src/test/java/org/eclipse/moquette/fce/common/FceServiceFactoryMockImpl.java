@@ -8,7 +8,6 @@ import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
 import org.eclipse.moquette.fce.service.QuotaDbService;
-import org.eclipse.moquette.fce.service.XmlSchemaValidationService;
 import org.eclipse.moquette.plugin.BrokerOperator;
 import org.mockito.Mockito;
 
@@ -21,7 +20,6 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbService;
 	private ConfigurationDbService configDbService;
-	private XmlSchemaValidationService schemaValidationService;
 
 	public FceServiceFactoryMockImpl(Properties pluginConfig, BrokerOperator brokerOperator,
 			ConfigurationDbService configDbService, QuotaDbService quotaDbService) {
@@ -70,11 +68,4 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 		return (getConfigDbService().isInitialized() && this.getQuotaDbService().isInitialized());
 	}
 
-	@Override
-	public XmlSchemaValidationService getXmlSchemaValidationService() {
-		if (schemaValidationService == null) {
-			schemaValidationService = Mockito.mock(XmlSchemaValidationService.class);
-		}
-		return schemaValidationService;
-	}
 }

@@ -2,10 +2,12 @@ package org.eclipse.moquette.fce.model.quota;
 
 import java.util.List;
 
+import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
-public class UserQuotaData extends ManagedInformation{
+public class UserQuotaData extends ManagedInformation implements IValid{
 
 	private List<Quota> quotas;
 	
@@ -22,18 +24,20 @@ public class UserQuotaData extends ManagedInformation{
 		this.quotas = quotas;
 	}
 
-	public boolean isValid(AuthorizationProperties props){
+	@Override
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation){
 		for(Quota quota : quotas){
-			if(!quota.isValid(props)){
+			if(!quota.isValid(props, operation)){
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public void substractRequestFromQuota(AuthorizationProperties props){
+	public void substractRequestFromQuota(AuthorizationProperties props, MqttOperation operation){
 		for(Quota quota : quotas){
 			quota.substractRequestFromQuota(props);
 		}
 	}
+
 }

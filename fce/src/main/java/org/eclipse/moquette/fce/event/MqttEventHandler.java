@@ -1,14 +1,18 @@
 package org.eclipse.moquette.fce.event;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.converter.ModelConverter;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
+import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.plugin.MqttOperation;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -49,9 +53,23 @@ public class MqttEventHandler implements MqttCallback {
 		switch (topicZone) {
 		case MANAGED_INTENT:
 			UserConfiguration msgIntent = services.getJsonParser().deserializeUserConfiguration(msgPayload);
+	
 			services.getConfigDbService().put(topic.getUserTopicIdentifier(msgIntent, topicZone), msgIntent);
 			services.getMqttService().publish(topic.getUserTopicIdentifier(msgIntent, topicZone), msgPayload, true);
-			services.getQuotaDbService().initializeQuotas(msgIntent);
+			
+			List<Quota> subscribeState = ModelConverter.convertRestrictionsToQuotas(msgIntent.getSubscribeRestrictions());
+			List<Quota> publishState = ModelConverter.convertRestrictionsToQuotas(msgIntent.getPublishRestrictions());
+			UserQuotaData subscribeQuotas = new UserQuotaData(msgIntent.getUserName(), msgIntent.getUserIdentifier(), subscribeState);
+			UserQuotaData publishQuotas = new UserQuotaData(msgIntent.getUserName(), msgIntent.getUserIdentifier(), publishState);
+		
+			String subscribeQuotasTopic = topic.getUserTopicIdentifier(subscribeQuotas, ManagedZone.MANAGED_QUOTA, MqttOperation.SUBSCRIBE);
+			String publishQuotasTopic = topic.getUserTopicIdentifier(publishQuotas, ManagedZone.MANAGED_QUOTA, MqttOperation.PUBLISH);
+			
+			services.getQuotaDbService().put(subscribeQuotasTopic, subscribeQuotas, true);
+			services.getQuotaDbService().put(publishQuotasTopic, publishQuotas, true);
+			services.getMqttService().publish(subscribeQuotasTopic, services.getJsonParser().serialize(subscribeQuotas), true);
+			services.getMqttService().publish(publishQuotasTopic, services.getJsonParser().serialize(publishQuotas), true);
+			
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
 		case MANAGED_CONFIGURATION:
@@ -63,7 +81,6 @@ public class MqttEventHandler implements MqttCallback {
 			}
 			break;
 		case MANAGED_QUOTA:
-
 			if (!services.isInitialized()) {
 				UserQuotaData msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 				services.getQuotaDbService().put(topic.getUserTopicIdentifier(msgQuota, topicZone), msgQuota, true);

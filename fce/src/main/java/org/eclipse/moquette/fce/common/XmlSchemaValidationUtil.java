@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.common;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,9 +14,9 @@ import javax.xml.validation.Validator;
 import org.eclipse.moquette.fce.common.io.ByteBufferInputStream;
 import org.xml.sax.SAXException;
 
-public class XmlSchemaValidationService {
+public final class XmlSchemaValidationUtil {
 
-	public boolean isValidXmlFileAccordingToSchema(ByteBuffer fileMsg, String schemaUrl) {
+	public static boolean isValidXmlFileAccordingToSchema(ByteBuffer fileMsg, String schemaUrl) {
 		try {
 			URL schemaFile = new URL(schemaUrl);
 			Source xmlFile = new StreamSource(new ByteBufferInputStream(fileMsg));

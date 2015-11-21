@@ -1,8 +1,10 @@
 package org.eclipse.moquette.fce.model.quota;
 
+import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
-public abstract class Quota {
+public abstract class Quota implements IValid {
 	
 	QuotaState state;
 	
@@ -11,7 +13,7 @@ public abstract class Quota {
 		this.state = state;
 	}
 
-	abstract boolean isValid(AuthorizationProperties prop);
+	public abstract boolean isValid(AuthorizationProperties prop, MqttOperation operation);
 	
 	public void substractRequestFromQuota(AuthorizationProperties prop){
 		state.substractRequestFromQuota(prop);

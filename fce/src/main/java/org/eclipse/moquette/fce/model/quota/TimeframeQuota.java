@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.model.quota;
 import java.util.Date;
 
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class TimeframeQuota extends Quota {
 
@@ -32,10 +33,10 @@ public class TimeframeQuota extends Quota {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props) {
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
 		Date now = new Date();
 		if (now.after(from) && now.before(to)) {
-			getState().isValid(props);
+			getState().isValid(props, operation);
 		}
 
 		return false;
