@@ -20,7 +20,7 @@ import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
 import org.eclipse.moquette.fce.model.configuration.ManagedState;
 import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
-import org.eclipse.moquette.fce.model.configuration.SpecificRestriction;
+import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuotaData;
@@ -49,7 +49,7 @@ public class JsonParserServiceTest {
 	
 	@Test
 	public void testSerializationAndDeserializationRestriction() throws IOException, URISyntaxException {
-		SpecificRestriction specificRestriction = new SpecificRestriction(sampleDate, sampleDate, 11, 1024, 2048, SizeUnit.kB, "");
+		TimeframeRestriction specificRestriction = new TimeframeRestriction(sampleDate, sampleDate, 11, 1024, 2048, SizeUnit.kB, "");
 		PeriodicRestriction periodicRestriction = new PeriodicRestriction(ManagedCycle.DAILY, 11, 1024, 2048, SizeUnit.kB, "");
 
 		List<Restriction> publishRestriction = new ArrayList<Restriction>();
@@ -75,7 +75,7 @@ public class JsonParserServiceTest {
 		assertTrue(sampleUserConfigDeserialized.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfigDeserialized.getSubscribeRestrictions().size() == 2);
 		
-		assertTrue(((SpecificRestriction) sampleUserConfigDeserialized.getPublishRestrictions().get(0)).getFrom().equals(sampleDate));
+		assertTrue(((TimeframeRestriction) sampleUserConfigDeserialized.getPublishRestrictions().get(0)).getFrom().equals(sampleDate));
 		assertTrue(((PeriodicRestriction) sampleUserConfigDeserialized.getSubscribeRestrictions().get(1)).getCyle() == ManagedCycle.DAILY);
 	}
 
@@ -112,7 +112,7 @@ public class JsonParserServiceTest {
 		assertTrue(sampleUserConfig.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfig.getSubscribeRestrictions().size() == 2);
 		
-		assertTrue(((SpecificRestriction) sampleUserConfig.getPublishRestrictions().get(0)).getFrom().equals(sampleDate));
+		assertTrue(((TimeframeRestriction) sampleUserConfig.getPublishRestrictions().get(0)).getFrom().equals(sampleDate));
 		assertTrue(((PeriodicRestriction) sampleUserConfig.getSubscribeRestrictions().get(1)).getCyle() == ManagedCycle.DAILY);
 	}
 	

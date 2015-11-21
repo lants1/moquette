@@ -1,6 +1,10 @@
 package org.eclipse.moquette.fce.model.configuration;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.common.XmlSchemaValidationUtil;
+import org.eclipse.moquette.fce.model.IValid;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 /**
  * Abstract class for all publish or subscribe restrictions with common methods.
@@ -8,7 +12,7 @@ import org.eclipse.moquette.fce.common.SizeUnit;
  * @author lants1
  *
  */
-public abstract class Restriction {
+public abstract class Restriction implements IValid {
 
 	private int messageCount;
 	private int maxMessageSize;
@@ -66,4 +70,21 @@ public abstract class Restriction {
 		this.totalMessageSize = totalMessageSize;
 	}
 
+	public boolean isValidCommon(AuthorizationProperties props, MqttOperation operation){
+		if(getMaxMessageSize() > 0){
+			if(!(props.getMessage().position() < (getMaxMessageSize() * sizeUnit.getMultiplikator()))){
+				return false;
+			}
+		}
+		
+		if (!getWsdlUrl().isEmpty()) {
+			if (!XmlSchemaValidationUtil
+					.isValidXmlFileAccordingToSchema(props.getMessage(), getWsdlUrl())) {
+				return false;
+			}
+		}
+		
+		return true;
+		
+	}
 }

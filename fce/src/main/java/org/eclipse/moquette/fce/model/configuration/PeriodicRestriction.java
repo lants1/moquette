@@ -2,6 +2,8 @@ package org.eclipse.moquette.fce.model.configuration;
 
 import org.eclipse.moquette.fce.common.SizeUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 /**
  * Periodic Restriction
@@ -25,5 +27,9 @@ public class PeriodicRestriction extends Restriction{
 	public void setCyle(ManagedCycle cyle) {
 		this.cyle = cyle;
 	}
-
+	
+	@Override
+	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+		return isValidCommon(props, operation);
+	}
 }

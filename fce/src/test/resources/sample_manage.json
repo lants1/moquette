@@ -5,7 +5,7 @@
   "managedState": "UNMANAGED",
   "publishRestrictions": [
     {
-      "type": "SpecificRestriction",
+      "type": "TimeframeRestriction",
       "properties": {
         "from": "Jan 18, 2015 12:00:00 AM",
         "to": "Jan 18, 2015 12:00:00 AM",
@@ -28,7 +28,7 @@
   ],
   "subscribeRestrictions": [
     {
-      "type": "SpecificRestriction",
+      "type": "TimeframeRestriction",
       "properties": {
         "from": "Jan 18, 2015 12:00:00 AM",
         "to": "Jan 18, 2015 12:00:00 AM",

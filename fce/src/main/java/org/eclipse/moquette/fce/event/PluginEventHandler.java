@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce.event;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -8,7 +7,6 @@ import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
@@ -34,7 +32,6 @@ public class PluginEventHandler {
 		return FceHashUtil.validateClientIdHash(props);
 	}
 
-	// TODO lants1 evil code do refactoring....
 	public boolean canDoOperation(AuthorizationProperties properties, MqttOperation operation) {
 		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
 		Boolean preCheckResult = preCheckForManagedZone(properties);
@@ -45,40 +42,18 @@ public class PluginEventHandler {
 		// we are in a managed zone
 		try {
 			UserConfiguration userConfig = services.getConfigDbService().getConfiguration(properties);
-
 			UserQuotaData userQuotas = services.getQuotaDbService().getQuota(properties, operation);
 
-			if (!userConfig.getManagePermission().canDoOperation(operation)) {
+			if (!userConfig.isValid(properties, operation) || !userQuotas.isValid(properties, operation)) {
 				return false;
 			}
 
-			List<Restriction> restrictions = userConfig.getRestrictions(operation);
-
-			if (restrictions.isEmpty()) {
-				return true;
-			}
-
-			if(!isSchemaValid(properties, restrictions)){
-				return false;
-			}
-
-			if (!userQuotas.isValid(properties)) {
-				return false;
-			}
-
-			userQuotas.substractRequestFromQuota(properties);
+			userQuotas.substractRequestFromQuota(properties, operation);
 			String quotaJson = services.getJsonParser().serialize(userQuotas);
 
-			String userTopicIdentifier = "";
-			if (!userQuotas.getUserIdentifier().isEmpty()) {
-				userTopicIdentifier = new ManagedTopic(properties.getTopic())
-						.getUserTopicIdentifier(properties, ManagedZone.MANAGED_QUOTA, operation);
-			
-			} else {
-				userTopicIdentifier = new ManagedTopic(properties.getTopic())
-						.getEveryoneTopicIdentifier(ManagedZone.MANAGED_QUOTA, operation);
-			}
-			
+			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getUserTopicIdentifier(properties,
+					ManagedZone.MANAGED_QUOTA, operation);
+
 			services.getQuotaDbService().put(userTopicIdentifier, userQuotas, false);
 			services.getMqttService().publish(userTopicIdentifier, quotaJson, true);
 
@@ -89,18 +64,6 @@ public class PluginEventHandler {
 			// services.getMqttService().publish(topic, json, retained);
 			return false;
 		}
-	}
-
-	private boolean isSchemaValid(AuthorizationProperties properties, List<Restriction> restrictions) {
-		for (Restriction restriction : restrictions) {
-			if (!restriction.getWsdlUrl().isEmpty()) {
-				if (!services.getXmlSchemaValidationService()
-						.isValidXmlFileAccordingToSchema(properties.getMessage(), restriction.getWsdlUrl())) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	private boolean isPluginClient(AuthorizationProperties properties) {
