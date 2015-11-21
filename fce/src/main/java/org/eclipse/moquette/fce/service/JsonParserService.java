@@ -4,8 +4,10 @@ import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessage;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.QuotaState;
+import org.eclipse.moquette.fce.service.parser.QuotaAdapter;
 import org.eclipse.moquette.fce.service.parser.QuotaStateAdapter;
 import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
@@ -19,8 +21,9 @@ public class JsonParserService {
 		return gson.create().toJson(userConfig);
 	}
 	
-	public String serialize(Quota quota) {
+	public String serialize(UserQuotaData quota) {
 		GsonBuilder gson = new GsonBuilder();
+		gson.registerTypeAdapter(Quota.class, new QuotaAdapter());
 		gson.registerTypeAdapter(QuotaState.class, new QuotaStateAdapter());
 		return gson.create().toJson(quota);
 	}
@@ -42,12 +45,13 @@ public class JsonParserService {
 		return userConfigObject;
 	}
 	
-	public Quota deserializeQuota(String quotaStateString) {
+	public UserQuotaData deserializeQuota(String quotaStateString) {
 		GsonBuilder gson = new GsonBuilder();
+		gson.registerTypeAdapter(Quota.class, new QuotaAdapter());
 		gson.registerTypeAdapter(QuotaState.class, new QuotaStateAdapter());
-		Quota userConfigObject = null;
+		UserQuotaData userConfigObject = null;
 		try {
-			userConfigObject = gson.create().fromJson(quotaStateString, Quota.class);
+			userConfigObject = gson.create().fromJson(quotaStateString, UserQuotaData.class);
 		} catch (Exception e) {
 			// something evil is wrong, stop plugin
 			throw new FceSystemFailureException(e);

@@ -7,7 +7,7 @@ import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.Quota;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -62,7 +62,7 @@ public class MqttEventHandler implements MqttCallback {
 			break;
 		case MANAGED_QUOTA:
 			// TODO Lan generic implementation....
-			Quota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
+			UserQuotaData msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 			services.getQuotaDbService().put(topic.getUserTopicIdentifier(msgQuota, topicZone), msgQuota);
 			services.getMqttService().publish(topic.getUserTopicIdentifier(msgQuota, topicZone), msgPayload,
 					true);

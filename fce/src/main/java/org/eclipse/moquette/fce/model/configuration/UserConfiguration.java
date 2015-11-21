@@ -13,21 +13,17 @@ import org.eclipse.moquette.fce.model.ManagedInformation;
  */
 public class UserConfiguration extends ManagedInformation {
 
-	private ManagedPermission managedPermissionType;
 	private ManagedState managedState;
+	private ManagedPermission managePermission;
 	private List<Restriction> publishRestrictions;
 	private List<Restriction> subscribeRestrictions;
 	
-	public UserConfiguration(String userName, String userIdentifier, ManagedPermission managedPermissionType, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
+	public UserConfiguration(String userName, String userIdentifier, ManagedPermission managePermission, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
 		super(userName, userIdentifier);
-		this.managedPermissionType = managedPermissionType;
+		this.managePermission = managePermission;
 		this.publishRestrictions = publishRestrictions;
 		this.subscribeRestrictions = subscribeRestrictions;
 		this.managedState = managedState;
-	}
-	
-	public ManagedPermission getManagedPermissionType() {
-		return managedPermissionType;
 	}
 	
 	public ManagedState getManagedState() {
@@ -61,9 +57,12 @@ public class UserConfiguration extends ManagedInformation {
 	public void addSubscribeRestriction(Restriction subscribeRestriction) {
 		this.subscribeRestrictions.add(subscribeRestriction);
 	}
-	
-	public void setManagedPermissionType(ManagedPermission hasManagedPermission) {
-		this.managedPermissionType = hasManagedPermission;
+
+	public ManagedPermission getManagePermission() {
+		return managePermission;
 	}
-	
+
+	public void setManagePermission(ManagedPermission managePermission) {
+		this.managePermission = managePermission;
+	}
 }

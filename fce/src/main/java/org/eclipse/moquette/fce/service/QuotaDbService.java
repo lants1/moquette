@@ -7,27 +7,27 @@ import java.util.Set;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.quota.Quota;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
 public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
-	private HashMap<String, Quota> quotaStore = new HashMap<>(); 
+	private HashMap<String, UserQuotaData> quotaStore = new HashMap<>(); 
 	
 	public QuotaDbService(BrokerOperator brokerOperator) {
 		super(brokerOperator, ManagedZone.MANAGED_QUOTA);
 	}
 
-	public Quota get(String topicIdentifier) {
+	public UserQuotaData get(String topicIdentifier) {
 		return quotaStore.get(topicIdentifier);
 	}
 	
-	public Set<Entry<String, Quota>> getAll(){
+	public Set<Entry<String, UserQuotaData>> getAll(){
 		return quotaStore.entrySet();
 	}
 
-	public void put(String topicIdentifier, Quota quota) {
+	public void put(String topicIdentifier, UserQuotaData quota) {
 		quotaStore.put(topicIdentifier, quota);
 	}
 
@@ -37,20 +37,20 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	}
 	
 	@Override
-	protected Quota get(ManagedTopic topic, AuthorizationProperties props) {
+	protected UserQuotaData get(ManagedTopic topic, AuthorizationProperties props) {
 		if (quotaStore.get(topic.getUserTopicIdentifier(props, getZone())) != null) {
 			return quotaStore.get(topic.getUserTopicIdentifier(props, getZone()));
 		}
 		return quotaStore.get(topic.getEveryoneTopicIdentifier(getZone()));
 	}
 	
-	public Quota getPublishQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+	public UserQuotaData getPublishQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
 		// TODO lants1 only published quotas
-		return (Quota) getManagedInformation(props);
+		return (UserQuotaData) getManagedInformation(props);
 	}
 	
-	public Quota getSubscribeQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+	public UserQuotaData getSubscribeQuota(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
 		// TODO lants1 only subscribed quotas
-		return (Quota) getManagedInformation(props);
+		return (UserQuotaData) getManagedInformation(props);
 	}
 }

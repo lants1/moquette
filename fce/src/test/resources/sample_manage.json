@@ -1,5 +1,7 @@
 {
-  "managedPermissionType": "NONE",
+  "userName": "testuser",
+  "userIdentifier": "testidentifier",
+  "managePermission": "PUBLISH",
   "managedState": "UNMANAGED",
   "publishRestrictions": [
     {
@@ -46,7 +48,5 @@
         "sizeUnit": "kB"
       }
     }
-  ],
-  "userName": "testuser",
-  "userIdentifier": "testidentifier"
+  ]
 }

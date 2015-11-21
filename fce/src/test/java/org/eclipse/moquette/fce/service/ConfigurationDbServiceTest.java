@@ -25,7 +25,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGet() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getTopicIdentifer(), null, ID, null, null);
 
@@ -41,7 +41,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test(expected = FceNoAuthorizationPossibleException.class)
 	public void testPutGetException() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getTopicIdentifer(), null, ID, null,
 				null);
@@ -54,7 +54,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testIsManaged() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
 		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
@@ -66,9 +66,9 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGetEveryone() throws FceNoAuthorizationPossibleException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.EVERYONE, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
 
-		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ManagedPermission.EVERYONE, null,
+		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ManagedPermission.ALL, null,
 				null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getTopicIdentifer(), null, ID, null, null);

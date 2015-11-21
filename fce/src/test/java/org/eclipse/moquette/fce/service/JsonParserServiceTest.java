@@ -22,10 +22,11 @@ import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.SpecificRestriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.PeriodicQuotaState;
+import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.QuotaState;
-import org.eclipse.moquette.fce.model.quota.SpecificQuotaState;
+import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
+import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +61,7 @@ public class JsonParserServiceTest {
 		subscribeRestriction.add(specificRestriction);
 		subscribeRestriction.add(periodicRestriction);
 
-		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.NONE, ManagedState.UNMANAGED, publishRestriction,
+		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.PUBLISH,  ManagedState.UNMANAGED, publishRestriction,
 				subscribeRestriction);
 
 		JsonParserService mJsonParser = new JsonParserService();
@@ -70,7 +71,7 @@ public class JsonParserServiceTest {
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
 		assertTrue(sampleUserConfigDeserialized.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
-		assertTrue(sampleUserConfigDeserialized.getManagedPermissionType() == ManagedPermission.NONE);
+		assertTrue(sampleUserConfigDeserialized.getManagePermission() == ManagedPermission.PUBLISH);
 		assertTrue(sampleUserConfigDeserialized.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfigDeserialized.getSubscribeRestrictions().size() == 2);
 		
@@ -80,24 +81,24 @@ public class JsonParserServiceTest {
 
 	@Test
 	public void testSerializationAndDeserializationQuota() throws IOException, URISyntaxException {
-		QuotaState specificQuotaState = new SpecificQuotaState(sampleDate, sampleDate, 11, 1024, 12, 200, SizeUnit.kB);
-		QuotaState periodicQuotaState = new PeriodicQuotaState(ManagedCycle.DAILY, 11, 1024, 12, 200, SizeUnit.kB);
+		Quota specificQuotaState = new TimeframeQuota(sampleDate, sampleDate, new TransmittedDataState(2, 2, SizeUnit.kB));
+		Quota periodicQuotaState = new PeriodicQuota(ManagedCycle.DAILY, new TransmittedDataState(2, 2, SizeUnit.kB));
 
-		List<QuotaState> quotas = new ArrayList<>();
+		List<Quota> quotas = new ArrayList<>();
 		quotas.add(specificQuotaState);
 		quotas.add(periodicQuotaState);
 		
-		Quota quota = new Quota(TESTUSER, TESTIDENTIFIER, quotas);
+		UserQuotaData quota = new UserQuotaData(TESTUSER, TESTIDENTIFIER, quotas);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
 		
-		Quota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
+		UserQuotaData deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
 		deserializedQuota.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER);
 		
-		assertTrue(((SpecificQuotaState) deserializedQuota.getQuotaState().get(0)).getTo().equals(sampleDate));
-		assertTrue(((PeriodicQuotaState) deserializedQuota.getQuotaState().get(1)).getCycle() == ManagedCycle.DAILY);
+		assertTrue(((TimeframeQuota) deserializedQuota.getQuotas().get(0)).getTo().equals(sampleDate));
+		assertTrue(((PeriodicQuota) deserializedQuota.getQuotas().get(1)).getCycle() == ManagedCycle.DAILY);
 	}
 	
 	
@@ -107,7 +108,7 @@ public class JsonParserServiceTest {
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
 		assertTrue(sampleUserConfig.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
-		assertTrue(sampleUserConfig.getManagedPermissionType() == ManagedPermission.NONE);
+		assertTrue(sampleUserConfig.getManagePermission() == ManagedPermission.PUBLISH);
 		assertTrue(sampleUserConfig.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfig.getSubscribeRestrictions().size() == 2);
 		

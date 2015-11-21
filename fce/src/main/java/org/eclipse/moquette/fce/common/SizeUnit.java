@@ -4,25 +4,29 @@ import com.google.gson.annotations.SerializedName;
 
 public enum SizeUnit {
 	@SerializedName("B")
-	B("B"), 
+	B("B", 1), 
 	@SerializedName("kB")
-	kB("kB"),
+	kB("kB", 1024),
 	@SerializedName("MB")
-	MB("MB"),
+	MB("MB", (1024*1024)),
 	@SerializedName("GB")
-	GB("GB"),
-	@SerializedName("TB")
-	TB("TB");
+	GB("GB", (1024*1024*1024));
 	
 	private String value;
+	private int multiplikator;
 
-    private SizeUnit(String value)
+    private SizeUnit(String value, int multiplikator)
     {
         this.value=value;
+        this.multiplikator=multiplikator;
     }
 
     public String getValue()
     {
         return(value);
+    }
+    
+    public int getMultiplikator(){
+    	return multiplikator;
     }
 }
