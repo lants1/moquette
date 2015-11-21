@@ -8,20 +8,20 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
+import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class PluginEventHandler {
 
 	private final static Logger log = Logger.getLogger(PluginEventHandler.class.getName());
 
-	FceServiceFactory services;
+	IFceServiceFactory services;
 	String pluginClientIdentifer;
 
-	public PluginEventHandler(FceServiceFactory services, String pluginClientIdentifier) {
+	public PluginEventHandler(IFceServiceFactory services, String pluginClientIdentifier) {
 		this.services = services;
 		this.pluginClientIdentifer = pluginClientIdentifier;
 	}
@@ -32,7 +32,7 @@ public class PluginEventHandler {
 		return FceHashUtil.validateClientIdHash(props);
 	}
 
-	public boolean canDoOperation(AuthorizationProperties properties, MqttOperation operation) {
+	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
 		Boolean preCheckResult = preCheckForManagedZone(properties);
 		if (preCheckResult != null) {
@@ -41,8 +41,8 @@ public class PluginEventHandler {
 
 		// we are in a managed zone
 		try {
-			UserConfiguration userConfig = services.getConfigDbService().getConfiguration(properties);
-			UserQuotaData userQuotas = services.getQuotaDbService().getQuota(properties, operation);
+			UserConfiguration userConfig = services.getConfigDb().getConfiguration(properties);
+			UserQuota userQuotas = services.getQuotaDb().getQuota(properties, operation);
 
 			if (!userConfig.isValid(properties, operation) || !userQuotas.isValid(properties, operation)) {
 				return false;
@@ -51,11 +51,11 @@ public class PluginEventHandler {
 			userQuotas.substractRequestFromQuota(properties, operation);
 			String quotaJson = services.getJsonParser().serialize(userQuotas);
 
-			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getUserTopicIdentifier(properties,
-					ManagedZone.MANAGED_QUOTA, operation);
+			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
+					ManagedZone.QUOTA, operation);
 
-			services.getQuotaDbService().put(userTopicIdentifier, userQuotas, false);
-			services.getMqttService().publish(userTopicIdentifier, quotaJson, true);
+			services.getQuotaDb().put(userTopicIdentifier, userQuotas, false);
+			services.getMqtt().publish(userTopicIdentifier, quotaJson, true);
 
 			return true;
 		} catch (FceNoAuthorizationPossibleException e) {
@@ -78,11 +78,11 @@ public class PluginEventHandler {
 			return Boolean.TRUE;
 		}
 
-		if (!services.getAuthorizationService().getBasicPermission(properties.getTopic()).isWriteable()) {
+		if (!services.getAuthorization().getBasicPermission(properties.getTopic()).isWriteable()) {
 			return Boolean.FALSE;
 		}
 
-		if (!services.getConfigDbService().isTopicFilterManaged(new ManagedTopic(properties.getTopic()))) {
+		if (!services.getConfigDb().isTopicFilterManaged(new ManagedTopic(properties.getTopic()))) {
 			return Boolean.TRUE;
 		}
 

@@ -10,22 +10,22 @@ import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
 	private HashMap<String, UserConfiguration> configStore = new HashMap<>();
 
 	public ConfigurationDbService(BrokerOperator brokerOperator) {
-		super(brokerOperator, ManagedZone.MANAGED_CONFIGURATION);
+		super(brokerOperator, ManagedZone.CONFIGURATION);
 	}
 
 	@Override
-	protected UserConfiguration get(ManagedTopic topic, AuthorizationProperties props, MqttOperation operation) {
-		if (configStore.get(topic.getUserTopicIdentifier(props, getZone())) != null) {
-			return configStore.get(topic.getUserTopicIdentifier(props, getZone()));
+	protected UserConfiguration get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation) {
+		if (configStore.get(topic.getIdentifier(props, getZone())) != null) {
+			return configStore.get(topic.getIdentifier(props, getZone()));
 		}
-		return configStore.get(topic.getEveryoneTopicIdentifier(getZone()));
+		return configStore.get(topic.getAllIdentifier(getZone()));
 	}
 
 	public void put(String topicIdentifier, UserConfiguration userConfig) {

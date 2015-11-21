@@ -14,7 +14,7 @@ import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public abstract class ManagedZoneInMemoryDbService {
 	
@@ -46,10 +46,10 @@ public abstract class ManagedZoneInMemoryDbService {
 		return correspondingZone;
 	}
 	
-	protected ManagedInformation getManagedInformation(AuthorizationProperties props, MqttOperation operation)
+	protected ManagedInformation getManagedInformation(AuthorizationProperties props, MqttAction operation)
 			throws FceNoAuthorizationPossibleException {
 		ManagedTopic topic = new ManagedTopic(props.getTopic());
-		String reducedTopicFilter = topic.getTopicIdentifer();
+		String reducedTopicFilter = topic.getIdentifer();
 		while (!reducedTopicFilter.isEmpty()) {
 			ManagedInformation userConfig = get(new ManagedTopic(reducedTopicFilter), props, operation);
 			if (userConfig != null) {
@@ -77,7 +77,7 @@ public abstract class ManagedZoneInMemoryDbService {
 
 	protected List<String> getTokens(ManagedTopic topic) {
 		List<String> tokens = new ArrayList<>();
-		String reducedTopicFilter = topic.getTopicIdentifer();
+		String reducedTopicFilter = topic.getIdentifer();
 		while (!reducedTopicFilter.isEmpty()) {
 			tokens.add(ManagedZoneUtil.moveTopicToZone(reducedTopicFilter, getZone()));
 			reducedTopicFilter = StringUtils.substringBeforeLast(reducedTopicFilter, "/");
@@ -87,5 +87,5 @@ public abstract class ManagedZoneInMemoryDbService {
 
 	abstract protected HashMap<String, ?> getStore();
 
-	abstract protected ManagedInformation get(ManagedTopic topic, AuthorizationProperties props, MqttOperation operation);
+	abstract protected ManagedInformation get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation);
 }

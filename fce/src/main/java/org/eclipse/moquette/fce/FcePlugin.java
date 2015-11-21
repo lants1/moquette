@@ -10,13 +10,13 @@ import org.eclipse.moquette.fce.common.FceTimeUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.PluginEventHandler;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
 import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
@@ -32,7 +32,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
 	
 	private String pluginClientIdentifier;
-	private FceServiceFactory serviceFactory;
+	private IFceServiceFactory serviceFactory;
 	ScheduledExecutorService scheduler;
 
 	@Override
@@ -42,9 +42,9 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(serviceFactory), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 
-		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
-		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_QUOTA.getTopicFilter());
-		serviceFactory.getMqttService().subscribe(ManagedZone.MANAGED_CONFIGURATION.getTopicFilter());
+		serviceFactory.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
+		serviceFactory.getMqtt().subscribe(ManagedZone.QUOTA.getTopicFilter());
+		serviceFactory.getMqtt().subscribe(ManagedZone.CONFIGURATION.getTopicFilter());
 
 		
 		pluginClientIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
@@ -54,7 +54,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	@Override
 	public void unload() {
 		scheduler.shutdownNow();
-		serviceFactory.getMqttService().unsubscribe(ManagedZone.MANAGED_INTENT.getTopicFilter());
+		serviceFactory.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
@@ -69,7 +69,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	}
 
 	@Override
-	public boolean canDoOperation(AuthorizationProperties properties, MqttOperation operation) {
+	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		if (serviceFactory.isInitialized()) {
 			PluginEventHandler handler = new PluginEventHandler(serviceFactory, pluginClientIdentifier);
 			return handler.canDoOperation(properties, operation);

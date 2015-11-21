@@ -1,11 +1,11 @@
 package org.eclipse.moquette.plugin;
 
-public enum MqttOperation {
+public enum MqttAction {
 	PUBLISH("publish"), SUBSCRIBE("subscribe");
 	
 	private String value;
 
-	private MqttOperation(String value) {
+	private MqttAction(String value) {
 		this.value = value;
 	}
 

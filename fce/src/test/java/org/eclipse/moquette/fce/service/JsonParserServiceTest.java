@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.common.DataUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
 import org.eclipse.moquette.fce.model.configuration.ManagedState;
@@ -23,7 +23,7 @@ import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
 import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
@@ -49,8 +49,8 @@ public class JsonParserServiceTest {
 	
 	@Test
 	public void testSerializationAndDeserializationRestriction() throws IOException, URISyntaxException {
-		TimeframeRestriction specificRestriction = new TimeframeRestriction(sampleDate, sampleDate, 11, 1024, 2048, SizeUnit.kB, "");
-		PeriodicRestriction periodicRestriction = new PeriodicRestriction(ManagedCycle.DAILY, 11, 1024, 2048, SizeUnit.kB, "");
+		TimeframeRestriction specificRestriction = new TimeframeRestriction(sampleDate, sampleDate, 11, 1024, 2048, DataUnit.kB, "");
+		PeriodicRestriction periodicRestriction = new PeriodicRestriction(ManagedCycle.DAILY, 11, 1024, 2048, DataUnit.kB, "");
 
 		List<Restriction> publishRestriction = new ArrayList<Restriction>();
 		List<Restriction> subscribeRestriction = new ArrayList<Restriction>();
@@ -88,12 +88,12 @@ public class JsonParserServiceTest {
 		quotas.add(specificQuotaState);
 		quotas.add(periodicQuotaState);
 		
-		UserQuotaData quota = new UserQuotaData(TESTUSER, TESTIDENTIFIER, quotas);
+		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, quotas);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
 		
-		UserQuotaData deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
+		UserQuota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
 		deserializedQuota.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER);
 		

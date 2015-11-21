@@ -8,7 +8,7 @@ package org.eclipse.moquette.plugin;
  */
 public interface AuthenticationAndAuthorizationPlugin extends BrokerPlugin {
 	
-    boolean canDoOperation(AuthorizationProperties props, MqttOperation operation);
+    boolean canDoOperation(AuthorizationProperties props, MqttAction operation);
     
     boolean checkValid(AuthenticationProperties authProps);
 }

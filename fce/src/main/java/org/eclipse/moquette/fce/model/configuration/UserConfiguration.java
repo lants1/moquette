@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 /**
  * 
@@ -53,11 +53,11 @@ public class UserConfiguration extends ManagedInformation implements IValid{
 		return subscribeRestrictions;
 	}
 	
-	public List<Restriction> getRestrictions(MqttOperation operation) {
-		if(MqttOperation.PUBLISH == operation){
+	public List<Restriction> getRestrictions(MqttAction operation) {
+		if(MqttAction.PUBLISH == operation){
 			return publishRestrictions;
 		}
-		if(MqttOperation.SUBSCRIBE == operation){
+		if(MqttAction.SUBSCRIBE == operation){
 			return subscribeRestrictions;
 		}
 		return null;
@@ -80,7 +80,7 @@ public class UserConfiguration extends ManagedInformation implements IValid{
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		List<Restriction> restrictions = getRestrictions(operation);
 
 		if (!getManagePermission().canDoOperation(operation)) {

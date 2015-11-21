@@ -4,14 +4,14 @@ import java.util.Date;
 
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class PeriodicQuota extends Quota {
 
 	ManagedCycle cycle;
 	Date lastManagedTimestamp;
 
-	public PeriodicQuota(ManagedCycle cycle, QuotaState state) {
+	public PeriodicQuota(ManagedCycle cycle, IQuotaState state) {
 		super(state);
 		this.cycle = cycle;
 		this.lastManagedTimestamp = new Date();
@@ -34,7 +34,7 @@ public class PeriodicQuota extends Quota {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		return getState().isValid(props, operation);
 	}
 	

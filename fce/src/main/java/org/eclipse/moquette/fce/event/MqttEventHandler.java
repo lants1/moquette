@@ -1,18 +1,16 @@
 package org.eclipse.moquette.fce.event;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
-import org.eclipse.moquette.fce.common.converter.ModelConverter;
+import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
+import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.plugin.MqttAction;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -22,9 +20,9 @@ public class MqttEventHandler implements MqttCallback {
 
 	private final static Logger log = Logger.getLogger(MqttEventHandler.class.getName());
 
-	FceServiceFactory services;
+	IFceServiceFactory services;
 
-	public MqttEventHandler(FceServiceFactory services) {
+	public MqttEventHandler(IFceServiceFactory services) {
 		this.services = services;
 	}
 
@@ -32,7 +30,7 @@ public class MqttEventHandler implements MqttCallback {
 	public void connectionLost(Throwable arg0) {
 		try {
 			log.warning("internal plugin mqttclient conection to broker connection lost");
-			services.getMqttService().connect();
+			services.getMqtt().connect();
 		} catch (MqttException e) {
 			throw new FceSystemFailureException(e);
 		}
@@ -46,45 +44,43 @@ public class MqttEventHandler implements MqttCallback {
 	// TODO lants1 better implementation
 	@Override
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
-		ManagedZone topicZone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
+		ManagedZone zone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
 		String msgPayload = String.valueOf(message.getPayload());
 		ManagedTopic topic = new ManagedTopic(topicIdentifier);
 
-		switch (topicZone) {
-		case MANAGED_INTENT:
-			UserConfiguration msgIntent = services.getJsonParser().deserializeUserConfiguration(msgPayload);
+		switch (zone) {
+		case INTENT:
+			UserConfiguration usrConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 	
-			services.getConfigDbService().put(topic.getUserTopicIdentifier(msgIntent, topicZone), msgIntent);
-			services.getMqttService().publish(topic.getUserTopicIdentifier(msgIntent, topicZone), msgPayload, true);
+			services.getConfigDb().put(topic.getIdentifier(usrConfig, zone), usrConfig);
+			services.getMqtt().publish(topic.getIdentifier(usrConfig, zone), msgPayload, true);
 			
-			List<Quota> subscribeState = ModelConverter.convertRestrictionsToQuotas(msgIntent.getSubscribeRestrictions());
-			List<Quota> publishState = ModelConverter.convertRestrictionsToQuotas(msgIntent.getPublishRestrictions());
-			UserQuotaData subscribeQuotas = new UserQuotaData(msgIntent.getUserName(), msgIntent.getUserIdentifier(), subscribeState);
-			UserQuotaData publishQuotas = new UserQuotaData(msgIntent.getUserName(), msgIntent.getUserIdentifier(), publishState);
+			UserQuota subQuota =  QuotaConverter.convertSubscribeConfiguration(usrConfig);
+			UserQuota pubQuota =  QuotaConverter.convertPublishConfiguration(usrConfig);
 		
-			String subscribeQuotasTopic = topic.getUserTopicIdentifier(subscribeQuotas, ManagedZone.MANAGED_QUOTA, MqttOperation.SUBSCRIBE);
-			String publishQuotasTopic = topic.getUserTopicIdentifier(publishQuotas, ManagedZone.MANAGED_QUOTA, MqttOperation.PUBLISH);
+			String subQuotaTopic = topic.getIdentifier(subQuota, ManagedZone.QUOTA, MqttAction.SUBSCRIBE);
+			String pubQuotaTopic = topic.getIdentifier(pubQuota, ManagedZone.QUOTA, MqttAction.PUBLISH);
 			
-			services.getQuotaDbService().put(subscribeQuotasTopic, subscribeQuotas, true);
-			services.getQuotaDbService().put(publishQuotasTopic, publishQuotas, true);
-			services.getMqttService().publish(subscribeQuotasTopic, services.getJsonParser().serialize(subscribeQuotas), true);
-			services.getMqttService().publish(publishQuotasTopic, services.getJsonParser().serialize(publishQuotas), true);
+			services.getQuotaDb().put(subQuotaTopic, subQuota, true);
+			services.getQuotaDb().put(pubQuotaTopic, pubQuota, true);
+			services.getMqtt().publish(subQuotaTopic, services.getJsonParser().serialize(subQuota), true);
+			services.getMqtt().publish(pubQuotaTopic, services.getJsonParser().serialize(pubQuota), true);
 			
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
-		case MANAGED_CONFIGURATION:
+		case CONFIGURATION:
 			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
-				services.getConfigDbService().put(topic.getUserTopicIdentifier(msgConfig, topicZone), msgConfig);
-				services.getMqttService().publish(topic.getUserTopicIdentifier(msgConfig, topicZone), msgPayload, true);
+				services.getConfigDb().put(topic.getIdentifier(msgConfig, zone), msgConfig);
+				services.getMqtt().publish(topic.getIdentifier(msgConfig, zone), msgPayload, true);
 				log.fine("received configuration message for topic: " + topicIdentifier);
 			}
 			break;
-		case MANAGED_QUOTA:
+		case QUOTA:
 			if (!services.isInitialized()) {
-				UserQuotaData msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
-				services.getQuotaDbService().put(topic.getUserTopicIdentifier(msgQuota, topicZone), msgQuota, true);
-				services.getMqttService().publish(topic.getUserTopicIdentifier(msgQuota, topicZone), msgPayload, true);
+				UserQuota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
+				services.getQuotaDb().put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
+				services.getMqtt().publish(topic.getIdentifier(msgQuota, zone), msgPayload, true);
 				log.fine("received quota message for topic: " + topicIdentifier);
 			}
 			break;

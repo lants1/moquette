@@ -6,13 +6,13 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceSystemFailureException;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class ManagedTopic {
 
 	public static final String USER_PREFIX = "/_";
 	public static final String LEVEL_CHAR = "/";
-	public static final String EVERYONE_TOPIC = "/_all";
+	public static final String ALL_TOPIC = "/_all";
 
 	private final String topicIdentifer;
 
@@ -24,55 +24,54 @@ public class ManagedTopic {
 		this.topicIdentifer = topicIdentifer;
 	}
 
-	public String getTopicIdentifer() {
+	public String getIdentifer() {
 		return topicIdentifer;
 	}
 
-	public String getTopicIdentifier(ManagedZone managedZone) {
+	public String getIdentifier(ManagedZone managedZone) {
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer, managedZone);
 	}
 
-	public String getUserTopicIdentifier(ManagedInformation managedInfo, ManagedZone zone) {
-		if(StringUtils.isEmpty(managedInfo.getUserIdentifier())){
-			return getEveryoneTopicIdentifier(zone);
+	public String getIdentifier(ManagedInformation managedInfo, ManagedZone zone) {
+		if (StringUtils.isEmpty(managedInfo.getUserIdentifier())) {
+			return getAllIdentifier(zone);
 		}
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
 				zone);
 	}
 
-	public String getUserTopicIdentifier(AuthorizationProperties authProps, ManagedZone zone) {
-		if(StringUtils.isEmpty(authProps.getClientId())){
-			return getEveryoneTopicIdentifier(zone);
+	public String getIdentifier(AuthorizationProperties authProps, ManagedZone zone) {
+		if (StringUtils.isEmpty(authProps.getClientId())) {
+			return getAllIdentifier(zone);
 		}
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + authProps.getClientId(), zone);
 	}
 
-	public String getEveryoneTopicIdentifier(ManagedZone zone) {
-		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + EVERYONE_TOPIC, zone);
+	public String getAllIdentifier(ManagedZone zone) {
+		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + ALL_TOPIC, zone);
 	}
 
-	public String getUserTopicIdentifier(ManagedInformation managedInfo, ManagedZone zone, MqttOperation operation) {
-		if(StringUtils.isEmpty(managedInfo.getUserIdentifier())){
-			return getEveryoneTopicIdentifier(zone, operation);
+	public String getIdentifier(ManagedInformation managedInfo, ManagedZone zone, MqttAction operation) {
+		if (StringUtils.isEmpty(managedInfo.getUserIdentifier())) {
+			return getAllIdentifier(zone, operation);
 		}
-		
+
 		return ManagedZoneUtil.moveTopicToZone(
 				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
 				zone);
 	}
 
-	public String getUserTopicIdentifier(AuthorizationProperties authProps, ManagedZone zone, MqttOperation operation) {
+	public String getIdentifier(AuthorizationProperties authProps, ManagedZone zone, MqttAction operation) {
 		return ManagedZoneUtil.moveTopicToZone(
 				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + authProps.getClientId(), zone);
 	}
 
-	public String getEveryoneTopicIdentifier(ManagedZone zone, MqttOperation operation) {
-		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + LEVEL_CHAR + operation.getValue() + EVERYONE_TOPIC,
-				zone);
+	public String getAllIdentifier(ManagedZone zone, MqttAction operation) {
+		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + LEVEL_CHAR + operation.getValue() + ALL_TOPIC, zone);
 	}
 
 	public int getHierarchyDeep(ManagedZone managedZone) {
-		return StringUtils.countMatches(getTopicIdentifier(managedZone), LEVEL_CHAR);
+		return StringUtils.countMatches(getIdentifier(managedZone), LEVEL_CHAR);
 	}
 
 	@Override

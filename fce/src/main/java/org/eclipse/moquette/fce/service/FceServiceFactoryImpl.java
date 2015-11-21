@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.plugin.BrokerOperator;
 
-public class FceServiceFactoryImpl implements FceServiceFactory {
+public class FceServiceFactoryImpl implements IFceServiceFactory {
 
 	private Properties pluginConfig;
 	private BrokerOperator brokerOperator;
@@ -25,7 +25,7 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#getMqttService()
 	 */
 	@Override
-	public MqttService getMqttService() {
+	public MqttService getMqtt() {
 		if (dataStoreService == null) {
 			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
 			dataStoreService.initializeInternalMqttClient();
@@ -37,7 +37,7 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#getAuthorizationService()
 	 */
 	@Override
-	public AuthorizationService getAuthorizationService() {
+	public AuthorizationService getAuthorization() {
 		if (authorizationService == null) {
 			authorizationService = new AuthorizationService();
 		}
@@ -59,7 +59,7 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#getQuotaDbService()
 	 */
 	@Override
-	public QuotaDbService getQuotaDbService() {
+	public QuotaDbService getQuotaDb() {
 		if (quotaDbService == null) {
 			quotaDbService = new QuotaDbService(brokerOperator);
 		}
@@ -70,7 +70,7 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#getConfigDbService()
 	 */
 	@Override
-	public ConfigurationDbService getConfigDbService() {
+	public ConfigurationDbService getConfigDb() {
 		if (configDbService == null) {
 			configDbService = new ConfigurationDbService(brokerOperator);
 		}
@@ -82,6 +82,6 @@ public class FceServiceFactoryImpl implements FceServiceFactory {
 	 */
 	@Override
 	public boolean isInitialized() {
-		return (getConfigDbService().isInitialized() && this.getQuotaDbService().isInitialized());
+		return (getConfigDb().isInitialized() && this.getQuotaDb().isInitialized());
 	}
 }

@@ -2,7 +2,7 @@ package org.eclipse.moquette.fce.common;
 
 import com.google.gson.annotations.SerializedName;
 
-public enum SizeUnit {
+public enum DataUnit {
 	@SerializedName("B")
 	B("B", 1), 
 	@SerializedName("kB")
@@ -15,7 +15,7 @@ public enum SizeUnit {
 	private String value;
 	private int multiplikator;
 
-    private SizeUnit(String value, int multiplikator)
+    private DataUnit(String value, int multiplikator)
     {
         this.value=value;
         this.multiplikator=multiplikator;
@@ -26,7 +26,7 @@ public enum SizeUnit {
         return(value);
     }
     
-    public int getMultiplikator(){
+    public int getMultiplier(){
     	return multiplikator;
     }
 }
