@@ -81,8 +81,8 @@ public class JsonParserServiceTest {
 
 	@Test
 	public void testSerializationAndDeserializationQuota() throws IOException, URISyntaxException {
-		Quota specificQuotaState = new TimeframeQuota(sampleDate, sampleDate, new TransmittedDataState(2, 2, SizeUnit.kB));
-		Quota periodicQuotaState = new PeriodicQuota(ManagedCycle.DAILY, new TransmittedDataState(2, 2, SizeUnit.kB));
+		Quota specificQuotaState = new TimeframeQuota(sampleDate, sampleDate, new TransmittedDataState(2, 2));
+		Quota periodicQuotaState = new PeriodicQuota(ManagedCycle.DAILY, new TransmittedDataState(2, 2));
 
 		List<Quota> quotas = new ArrayList<>();
 		quotas.add(specificQuotaState);

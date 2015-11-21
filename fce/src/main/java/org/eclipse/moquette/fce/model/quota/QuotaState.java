@@ -8,4 +8,6 @@ public interface QuotaState {
 	
 	void flush();
 	
+	void substractRequestFromQuota(AuthorizationProperties props);
+	
 }

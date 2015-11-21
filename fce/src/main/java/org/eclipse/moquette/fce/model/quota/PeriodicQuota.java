@@ -36,4 +36,5 @@ public class PeriodicQuota extends Quota {
 	public boolean isValid(AuthorizationProperties props) {
 		return 	this.getState().isValid(props);
 	}
+	
 }

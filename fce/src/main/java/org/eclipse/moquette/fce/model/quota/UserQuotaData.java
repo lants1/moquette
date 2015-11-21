@@ -31,7 +31,9 @@ public class UserQuotaData extends ManagedInformation{
 		return true;
 	}
 
-	public boolean substractRequestFromQuota(AuthorizationProperties props){
-		return false;
+	public void substractRequestFromQuota(AuthorizationProperties props){
+		for(Quota quota : quotas){
+			quota.substractRequestFromQuota(props);
+		}
 	}
 }

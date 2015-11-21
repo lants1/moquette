@@ -16,6 +16,7 @@ import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
@@ -68,23 +69,13 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	}
 
 	@Override
-	public boolean canWrite(AuthorizationProperties properties) {
+	public boolean canDoOperation(AuthorizationProperties properties, MqttOperation operation) {
 		if (serviceFactory.isInitialized()) {
 			PluginEventHandler handler = new PluginEventHandler(serviceFactory, pluginClientIdentifier);
-			return handler.canWrite(properties);
+			return handler.canDoOperation(properties, operation);
 		}
 		log.info("configuration not yet fully loaded from retained messages, write not possible");
 		return false; 
-	}
-
-	@Override
-	public boolean canRead(AuthorizationProperties properties) {
-		if (serviceFactory.isInitialized()) {
-			PluginEventHandler handler = new PluginEventHandler(serviceFactory, pluginClientIdentifier);
-			return handler.canRead(properties);
-		}
-		log.info("configuration not yet fully loaded from retained messages, read not possible");
-		return false;
 	}
 
 	@Override
