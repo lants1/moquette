@@ -40,4 +40,9 @@ public class MessageCountState implements QuotaState {
 		setCurrentQuotaCount(0);
 	}
 
+	@Override
+	public void substractRequestFromQuota(AuthorizationProperties props) {
+		setCurrentQuotaCount(getCurrentQuotaCount()+1);
+	}
+
 }

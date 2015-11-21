@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
-import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuotaData;
@@ -26,7 +26,7 @@ public class QuotaUpdaterTest {
 	private final String TEST_TOPIC2 = "/test2";
 
 	@Test
-	public void testHourly() {
+	public void testHourly() throws FceNoAuthorizationPossibleException {
 		Calendar lastHour = Calendar.getInstance();
 		lastHour.add(Calendar.HOUR, -1);
 
@@ -34,23 +34,23 @@ public class QuotaUpdaterTest {
 		List<Quota> quotaStates = new ArrayList<>();
 
 		PeriodicQuota hourlyState1 = new PeriodicQuota(ManagedCycle.HOURLY,
-				new TransmittedDataState(2, 2, SizeUnit.B));
+				new TransmittedDataState(2, 2));
 		hourlyState1.setLastManagedTimestamp(lastHour.getTime());
 
 		PeriodicQuota hourlyState2 = new PeriodicQuota(ManagedCycle.WEEKLY,
-				new TransmittedDataState(2, 2, SizeUnit.B));
+				new TransmittedDataState(2, 2));
 		hourlyState2.setLastManagedTimestamp(lastHour.getTime());
 
 		TimeframeQuota specState = new TimeframeQuota(new Date(), new Date(),
-				new TransmittedDataState(2, 2, SizeUnit.B));
+				new TransmittedDataState(2, 2));
 
 		quotaStates.add(specState);
 		quotaStates.add(hourlyState1);
 		quotaStates.add(hourlyState2);
 
 		UserQuotaData quota = new UserQuotaData(TESTUSER, TESTIDENTIFIER, quotaStates);
-		quotaService.put(TEST_TOPIC1, quota);
-		quotaService.put(TEST_TOPIC2, quota);
+		quotaService.put(TEST_TOPIC1, quota, true);
+		quotaService.put(TEST_TOPIC2, quota, true);
 		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, quotaService);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();

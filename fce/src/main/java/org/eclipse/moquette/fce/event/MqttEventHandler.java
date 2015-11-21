@@ -39,6 +39,7 @@ public class MqttEventHandler implements MqttCallback {
 		// doNothing
 	}
 
+	// TODO lants1 better implementation
 	@Override
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
 		ManagedZone topicZone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
@@ -47,26 +48,28 @@ public class MqttEventHandler implements MqttCallback {
 
 		switch (topicZone) {
 		case MANAGED_INTENT:
-		case MANAGED_CONFIGURATION:
-			// less safety, login and hash needs to be sent in the same message
-			// direct access to the broker would be a safer solution
-			// in this case there would be no need to transmit the hash and
-			// login information in the same message
-			// TODO Lan maybe implement another handler for internal broker
-			// actions
-			UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
-			services.getConfigDbService().put(topic.getUserTopicIdentifier(msgConfig, topicZone), msgConfig);
-			services.getMqttService().publish(topic.getUserTopicIdentifier(msgConfig, topicZone), msgPayload,
-					true);
+			UserConfiguration msgIntent = services.getJsonParser().deserializeUserConfiguration(msgPayload);
+			services.getConfigDbService().put(topic.getUserTopicIdentifier(msgIntent, topicZone), msgIntent);
+			services.getMqttService().publish(topic.getUserTopicIdentifier(msgIntent, topicZone), msgPayload, true);
+			services.getQuotaDbService().initializeQuotas(msgIntent);
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
+		case MANAGED_CONFIGURATION:
+			if (!services.isInitialized()) {
+				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
+				services.getConfigDbService().put(topic.getUserTopicIdentifier(msgConfig, topicZone), msgConfig);
+				services.getMqttService().publish(topic.getUserTopicIdentifier(msgConfig, topicZone), msgPayload, true);
+				log.fine("received configuration message for topic: " + topicIdentifier);
+			}
+			break;
 		case MANAGED_QUOTA:
-			// TODO Lan generic implementation....
-			UserQuotaData msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
-			services.getQuotaDbService().put(topic.getUserTopicIdentifier(msgQuota, topicZone), msgQuota);
-			services.getMqttService().publish(topic.getUserTopicIdentifier(msgQuota, topicZone), msgPayload,
-					true);
-			log.fine("received quota message for topic: " + topicIdentifier);
+
+			if (!services.isInitialized()) {
+				UserQuotaData msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
+				services.getQuotaDbService().put(topic.getUserTopicIdentifier(msgQuota, topicZone), msgQuota, true);
+				services.getMqttService().publish(topic.getUserTopicIdentifier(msgQuota, topicZone), msgPayload, true);
+				log.fine("received quota message for topic: " + topicIdentifier);
+			}
 			break;
 		default:
 			break;

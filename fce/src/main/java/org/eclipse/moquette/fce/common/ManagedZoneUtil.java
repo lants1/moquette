@@ -18,14 +18,14 @@ public final class ManagedZoneUtil {
 		throw new FceSystemFailureException("no managed zone for topic found");
 	}
 	
-	public static String moveTopicIdentifierToZone(String topicIdentifier, ManagedZone topicZone){
+	public static String moveTopicToZone(String topic, ManagedZone topicZone){
 		
 		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
 		for(ManagedZone zone : zones) {
-		    if(topicIdentifier.startsWith(zone.getTopicPrefix())){
-		    	return StringUtils.replace(topicIdentifier, zone.getTopicPrefix(), topicZone.getTopicPrefix());
+		    if(topic.startsWith(zone.getTopicPrefix())){
+		    	return StringUtils.replace(topic, zone.getTopicPrefix(), topicZone.getTopicPrefix());
 		    }
 		}
-		return topicZone.getTopicPrefix() + topicIdentifier;
+		return topicZone.getTopicPrefix() + topic;
 	}
 }

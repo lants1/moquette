@@ -10,6 +10,7 @@ import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
@@ -20,7 +21,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	@Override
-	protected UserConfiguration get(ManagedTopic topic, AuthorizationProperties props) {
+	protected UserConfiguration get(ManagedTopic topic, AuthorizationProperties props, MqttOperation operation) {
 		if (configStore.get(topic.getUserTopicIdentifier(props, getZone())) != null) {
 			return configStore.get(topic.getUserTopicIdentifier(props, getZone()));
 		}
@@ -28,7 +29,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	public void put(String topicIdentifier, UserConfiguration userConfig) {
-		configStore.put(ManagedZoneUtil.moveTopicIdentifierToZone(topicIdentifier, getZone()), userConfig);
+		configStore.put(ManagedZoneUtil.moveTopicToZone(topicIdentifier, getZone()), userConfig);
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
-		ManagedInformation information = getManagedInformation(props);
+		ManagedInformation information = getManagedInformation(props, null);
 		if(information == null){
 			throw new FceNoAuthorizationPossibleException("no userconfiguration found for topic: " + props.getTopic());
 		}

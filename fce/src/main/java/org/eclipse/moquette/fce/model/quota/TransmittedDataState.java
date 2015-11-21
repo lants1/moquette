@@ -10,15 +10,11 @@ public class TransmittedDataState implements QuotaState {
 
 	private SizeUnit sizeUnit;
 
-	public TransmittedDataState(int maxQuota, int currentQuota, SizeUnit sizeUnit) {
+	public TransmittedDataState(int maxQuota, int currentQuota) {
 		super();
 		this.maxQuota = maxQuota;
 		this.currentQuota = currentQuota;
-		this.sizeUnit = sizeUnit;
-
-		if (sizeUnit == null) {
-			sizeUnit = SizeUnit.B;
-		}
+		this.sizeUnit = SizeUnit.B;
 	}
 
 	public int getMaxQuota() {
@@ -57,4 +53,11 @@ public class TransmittedDataState implements QuotaState {
 	public void flush() {
 		setCurrentQuota(0);
 	}
+
+	@Override
+	public void substractRequestFromQuota(AuthorizationProperties props) {
+		this.setCurrentQuota(getCurrentQuota()+props.getMessage().position());
+		
+	}
+	
 }

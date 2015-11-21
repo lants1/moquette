@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.model.configuration;
 import java.util.List;
 
 import org.eclipse.moquette.fce.model.ManagedInformation;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 /**
  * 
@@ -48,6 +49,16 @@ public class UserConfiguration extends ManagedInformation {
 	
 	public List<Restriction> getSubscribeRestrictions() {
 		return subscribeRestrictions;
+	}
+	
+	public List<Restriction> getRestrictions(MqttOperation operation) {
+		if(MqttOperation.PUBLISH == operation){
+			return publishRestrictions;
+		}
+		if(MqttOperation.SUBSCRIBE == operation){
+			return subscribeRestrictions;
+		}
+		return null;
 	}
 	
 	public void setSubscribeRestrictions(List<Restriction> subscribeRestrictions) {

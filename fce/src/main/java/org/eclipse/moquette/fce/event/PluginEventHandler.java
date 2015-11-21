@@ -14,6 +14,7 @@ import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
+import org.eclipse.moquette.plugin.MqttOperation;
 
 public class PluginEventHandler {
 
@@ -33,94 +34,53 @@ public class PluginEventHandler {
 		return FceHashUtil.validateClientIdHash(props);
 	}
 
-	// TODO lants1 evil, evil.. refactor this methods...
-	public boolean canWrite(AuthorizationProperties properties) {
-		log.fine("recieved canWrite Event on " + properties.getTopic() + "from client" + properties.getClientId());
-		Boolean preCheckResult = preCheckForManagedZone(properties);
-		if (preCheckResult != null) {
-			return preCheckResult.booleanValue();
-		}
-
-		// --- it is managed and user needs to validated by configuration and
-		// quota
-		UserConfiguration userConfig;
-		UserQuotaData quota;
-
-		try {
-			userConfig = services.getConfigDbService().getConfiguration(properties);
-			quota = services.getQuotaDbService().getPublishQuota(properties);
-
-			List<Restriction> restrictions = userConfig.getPublishRestrictions();
-
-			if (restrictions.isEmpty()) {
-				return true;
-			}
-
-			for (Restriction restriction : restrictions) {
-				if (!restriction.getWsdlUrl().isEmpty()) {
-					if (!services.getXmlSchemaValidationService()
-							.isValidXmlFileAccordingToSchema(properties.getMessage(), restriction.getWsdlUrl())) {
-						return false;
-					}
-				}
-			}
-
-			if (!quota.isValid(properties)) {
-				return false;
-			}
-
-			quota.substractRequestFromQuota(properties);
-			String quotaJson = services.getJsonParser().serialize(quota);
-			// TODO lants1 could be a user quota or a everyone quota
-			services.getMqttService().publish(new ManagedTopic(properties.getTopic()).getUserTopicIdentifier(properties,
-					ManagedZone.MANAGED_QUOTA), quotaJson, true);
-
-			return true;
-		} catch (FceNoAuthorizationPossibleException e) {
-			log.warning(e.toString());
-			return false;
-		}
-	}
-
-	public boolean canRead(AuthorizationProperties properties) {
+	// TODO lants1 evil code do refactoring....
+	public boolean canDoOperation(AuthorizationProperties properties, MqttOperation operation) {
 		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
 		Boolean preCheckResult = preCheckForManagedZone(properties);
 		if (preCheckResult != null) {
 			return preCheckResult.booleanValue();
 		}
 
-		UserConfiguration userConfig;
-		UserQuotaData quota;
-
+		// we are in a managed zone
 		try {
-			userConfig = services.getConfigDbService().getConfiguration(properties);
+			UserConfiguration userConfig = services.getConfigDbService().getConfiguration(properties);
 
-			quota = services.getQuotaDbService().getSubscribeQuota(properties);
+			UserQuotaData userQuotas = services.getQuotaDbService().getQuota(properties, operation);
 
-			List<Restriction> restrictions = userConfig.getSubscribeRestrictions();
+			if (!userConfig.getManagePermission().canDoOperation(operation)) {
+				return false;
+			}
+
+			List<Restriction> restrictions = userConfig.getRestrictions(operation);
 
 			if (restrictions.isEmpty()) {
 				return true;
 			}
 
-			for (Restriction restriction : restrictions) {
-				if (!restriction.getWsdlUrl().isEmpty()) {
-					if (!services.getXmlSchemaValidationService()
-							.isValidXmlFileAccordingToSchema(properties.getMessage(), restriction.getWsdlUrl())) {
-						return false;
-					}
-				}
-			}
-
-			if (!quota.isValid(properties)) {
+			if(!isSchemaValid(properties, restrictions)){
 				return false;
 			}
 
-			quota.substractRequestFromQuota(properties);
-			String quotaJson = services.getJsonParser().serialize(quota);
-			// TODO lants1 could be a user quota or a everyone quota
-			services.getMqttService().publish(new ManagedTopic(properties.getTopic()).getUserTopicIdentifier(properties,
-					ManagedZone.MANAGED_QUOTA), quotaJson, true);
+			if (!userQuotas.isValid(properties)) {
+				return false;
+			}
+
+			userQuotas.substractRequestFromQuota(properties);
+			String quotaJson = services.getJsonParser().serialize(userQuotas);
+
+			String userTopicIdentifier = "";
+			if (!userQuotas.getUserIdentifier().isEmpty()) {
+				userTopicIdentifier = new ManagedTopic(properties.getTopic())
+						.getUserTopicIdentifier(properties, ManagedZone.MANAGED_QUOTA, operation);
+			
+			} else {
+				userTopicIdentifier = new ManagedTopic(properties.getTopic())
+						.getEveryoneTopicIdentifier(ManagedZone.MANAGED_QUOTA, operation);
+			}
+			
+			services.getQuotaDbService().put(userTopicIdentifier, userQuotas, false);
+			services.getMqttService().publish(userTopicIdentifier, quotaJson, true);
 
 			return true;
 		} catch (FceNoAuthorizationPossibleException e) {
@@ -129,6 +89,18 @@ public class PluginEventHandler {
 			// services.getMqttService().publish(topic, json, retained);
 			return false;
 		}
+	}
+
+	private boolean isSchemaValid(AuthorizationProperties properties, List<Restriction> restrictions) {
+		for (Restriction restriction : restrictions) {
+			if (!restriction.getWsdlUrl().isEmpty()) {
+				if (!services.getXmlSchemaValidationService()
+						.isValidXmlFileAccordingToSchema(properties.getMessage(), restriction.getWsdlUrl())) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private boolean isPluginClient(AuthorizationProperties properties) {

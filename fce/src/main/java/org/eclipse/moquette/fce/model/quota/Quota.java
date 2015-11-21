@@ -12,6 +12,10 @@ public abstract class Quota {
 	}
 
 	abstract boolean isValid(AuthorizationProperties prop);
+	
+	public void substractRequestFromQuota(AuthorizationProperties prop){
+		state.substractRequestFromQuota(prop);
+	}
 
 	public QuotaState getState() {
 		return state;
