@@ -4,14 +4,14 @@ import java.util.Properties;
 
 import org.eclipse.moquette.fce.service.AuthorizationService;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
 import org.eclipse.moquette.fce.service.QuotaDbService;
 import org.eclipse.moquette.plugin.BrokerOperator;
 import org.mockito.Mockito;
 
-public class FceServiceFactoryMockImpl implements FceServiceFactory {
+public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 
 	private BrokerOperator brokerOperator;
 
@@ -29,14 +29,14 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 		this.quotaDbService = quotaDbService;
 	}
 
-	public MqttService getMqttService() {
+	public MqttService getMqtt() {
 		if (dataStoreService == null) {
 			dataStoreService = Mockito.mock(MqttService.class);
 		}
 		return dataStoreService;
 	}
 
-	public AuthorizationService getAuthorizationService() {
+	public AuthorizationService getAuthorization() {
 		if (authorizationService == null) {
 			authorizationService = Mockito.mock(AuthorizationService.class);
 		}
@@ -50,14 +50,14 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 		return jsonParserService;
 	}
 
-	public QuotaDbService getQuotaDbService() {
+	public QuotaDbService getQuotaDb() {
 		if (quotaDbService == null) {
 			quotaDbService = Mockito.mock(QuotaDbService.class);
 		}
 		return quotaDbService;
 	}
 
-	public ConfigurationDbService getConfigDbService() {
+	public ConfigurationDbService getConfigDb() {
 		if (configDbService == null) {
 			configDbService = new ConfigurationDbService(brokerOperator);
 		}
@@ -65,7 +65,7 @@ public class FceServiceFactoryMockImpl implements FceServiceFactory {
 	}
 
 	public boolean isInitialized() {
-		return (getConfigDbService().isInitialized() && this.getQuotaDbService().isInitialized());
+		return (getConfigDb().isInitialized() && this.getQuotaDb().isInitialized());
 	}
 
 }

@@ -1,25 +1,25 @@
 package org.eclipse.moquette.fce.model.quota;
 
-import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.common.DataUnit;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
-public class TransmittedDataState implements QuotaState {
+public class TransmittedDataState implements IQuotaState {
 
 	private int maxQuota;
 	private int currentQuota;
 
-	private SizeUnit sizeUnit;
+	private DataUnit sizeUnit;
 
 	public TransmittedDataState(int maxQuota, int currentQuota) {
 		super();
 		this.maxQuota = maxQuota;
 		this.currentQuota = currentQuota;
-		this.sizeUnit = SizeUnit.B;
+		this.sizeUnit = DataUnit.B;
 	}
 
 	public int getMaxQuota() {
-		return maxQuota * sizeUnit.getMultiplikator();
+		return maxQuota * sizeUnit.getMultiplier();
 	}
 
 	public void setMaxQuota(int maxQuota) {
@@ -27,23 +27,23 @@ public class TransmittedDataState implements QuotaState {
 	}
 
 	public int getCurrentQuota() {
-		return currentQuota * sizeUnit.getMultiplikator();
+		return currentQuota * sizeUnit.getMultiplier();
 	}
 
 	public void setCurrentQuota(int currentQuota) {
 		this.currentQuota = currentQuota;
 	}
 
-	public SizeUnit getSizeUnit() {
+	public DataUnit getSizeUnit() {
 		return sizeUnit;
 	}
 
-	public void setSizeUnit(SizeUnit sizeUnit) {
+	public void setSizeUnit(DataUnit sizeUnit) {
 		this.sizeUnit = sizeUnit;
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		if (this.getCurrentQuota() + props.getMessage().position() < this.getMaxQuota()) {
 			return true;
 		}

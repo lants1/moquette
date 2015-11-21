@@ -2,9 +2,9 @@ package org.eclipse.moquette.fce.model.configuration;
 
 import java.util.Date;
 
-import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.common.DataUnit;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 /**
  * Timebased restriction from date to a date.
@@ -17,7 +17,7 @@ public class TimeframeRestriction extends Restriction {
 	private Date from;
 	private Date to;
 
-	public TimeframeRestriction(Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, SizeUnit sizeUnit, String wsdlUrl) {
+	public TimeframeRestriction(Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, DataUnit sizeUnit, String wsdlUrl) {
 		super(messageCount, maxMessageSize, totalMessageSize, sizeUnit, wsdlUrl);
 		this.from = from;
 		this.to = to;
@@ -40,7 +40,7 @@ public class TimeframeRestriction extends Restriction {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		Date now = new Date();
 		if (now.after(from) && now.before(to)) {
 			isValidCommon(props, operation);

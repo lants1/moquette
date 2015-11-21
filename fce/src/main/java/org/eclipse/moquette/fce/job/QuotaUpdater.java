@@ -9,9 +9,9 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 
@@ -19,9 +19,9 @@ public class QuotaUpdater implements Runnable {
 
 	private final static Logger log = Logger.getLogger(QuotaUpdater.class.getName());
 
-	private FceServiceFactory services;
+	private IFceServiceFactory services;
 
-	public QuotaUpdater(FceServiceFactory services) {
+	public QuotaUpdater(IFceServiceFactory services) {
 		super();
 		this.services = services;
 	}
@@ -38,9 +38,9 @@ public class QuotaUpdater implements Runnable {
 
 	private void updateQuota() throws FceNoAuthorizationPossibleException {
 
-		for (Entry<String, UserQuotaData> entry : services.getQuotaDbService().getAll()) {
+		for (Entry<String, UserQuota> entry : services.getQuotaDb().getAll()) {
 			String key = entry.getKey();
-			UserQuotaData quotaIn = entry.getValue();
+			UserQuota quotaIn = entry.getValue();
 			List<Quota> statesOut = new ArrayList<>();
 
 			for (Quota state : quotaIn.getQuotas()) {
@@ -56,9 +56,9 @@ public class QuotaUpdater implements Runnable {
 				}
 			}
 
-			UserQuotaData quotaOut = new UserQuotaData(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
-			services.getQuotaDbService().put(key, quotaOut, true);
-			services.getMqttService().publish(key, services.getJsonParser().serialize(quotaOut), true);
+			UserQuota quotaOut = new UserQuota(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
+			services.getQuotaDb().put(key, quotaOut, true);
+			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut), true);
 		}
 
 	}

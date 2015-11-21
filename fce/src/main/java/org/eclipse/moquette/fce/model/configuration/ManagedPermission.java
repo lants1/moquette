@@ -1,6 +1,6 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -34,11 +34,11 @@ public enum ManagedPermission {
         return(value);
     }
     
-    public boolean canDoOperation(MqttOperation operation){
-    	if(MqttOperation.PUBLISH == operation){
+    public boolean canDoOperation(MqttAction operation){
+    	if(MqttAction.PUBLISH == operation){
     		return canWrite;
     	}
-    	if(MqttOperation.SUBSCRIBE == operation){
+    	if(MqttAction.SUBSCRIBE == operation){
     		return canRead;
     	}
     	return false;

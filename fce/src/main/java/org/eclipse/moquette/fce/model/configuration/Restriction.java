@@ -1,10 +1,10 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import org.eclipse.moquette.fce.common.SizeUnit;
+import org.eclipse.moquette.fce.common.DataUnit;
 import org.eclipse.moquette.fce.common.XmlSchemaValidationUtil;
 import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 /**
  * Abstract class for all publish or subscribe restrictions with common methods.
@@ -17,10 +17,10 @@ public abstract class Restriction implements IValid {
 	private int messageCount;
 	private int maxMessageSize;
 	private int totalMessageSize;
-	private SizeUnit sizeUnit;
+	private DataUnit sizeUnit;
 	private String wsdlUrl;
 
-	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, SizeUnit sizeUnit,
+	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit,
 			String wsdlUrl) {
 		super();
 		this.messageCount = messageCount;
@@ -38,11 +38,11 @@ public abstract class Restriction implements IValid {
 		this.messageCount = messageCount;
 	}
 
-	public SizeUnit getSizeUnit() {
+	public DataUnit getDataUnit() {
 		return sizeUnit;
 	}
 
-	public void setSizeUnit(SizeUnit sizeUnit) {
+	public void setSizeUnit(DataUnit sizeUnit) {
 		this.sizeUnit = sizeUnit;
 	}
 
@@ -70,9 +70,9 @@ public abstract class Restriction implements IValid {
 		this.totalMessageSize = totalMessageSize;
 	}
 
-	public boolean isValidCommon(AuthorizationProperties props, MqttOperation operation){
+	public boolean isValidCommon(AuthorizationProperties props, MqttAction operation){
 		if(getMaxMessageSize() > 0){
-			if(!(props.getMessage().position() < (getMaxMessageSize() * sizeUnit.getMultiplikator()))){
+			if(!(props.getMessage().position() < (getMaxMessageSize() * sizeUnit.getMultiplier()))){
 				return false;
 			}
 		}

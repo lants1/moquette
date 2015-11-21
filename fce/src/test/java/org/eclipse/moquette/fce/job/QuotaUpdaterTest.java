@@ -11,7 +11,7 @@ import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
 import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
@@ -48,15 +48,15 @@ public class QuotaUpdaterTest {
 		quotaStates.add(hourlyState1);
 		quotaStates.add(hourlyState2);
 
-		UserQuotaData quota = new UserQuotaData(TESTUSER, TESTIDENTIFIER, quotaStates);
+		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota, true);
 		quotaService.put(TEST_TOPIC2, quota, true);
 		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, quotaService);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();
 
-		UserQuotaData result1 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
-		UserQuotaData result2 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC2);
+		UserQuota result1 = serviceFactoryMock.getQuotaDb().get(TEST_TOPIC1);
+		UserQuota result2 = serviceFactoryMock.getQuotaDb().get(TEST_TOPIC2);
 
 		assertTrue(result1.getQuotas().size() == 3);
 		assertTrue(result2.getQuotas().size() == 3);

@@ -7,28 +7,28 @@ import java.util.Set;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.quota.UserQuotaData;
+import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.BrokerOperator;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
-	private HashMap<String, UserQuotaData> quotaStore = new HashMap<>();
+	private HashMap<String, UserQuota> quotaStore = new HashMap<>();
 
 	public QuotaDbService(BrokerOperator brokerOperator) {
-		super(brokerOperator, ManagedZone.MANAGED_QUOTA);
+		super(brokerOperator, ManagedZone.QUOTA);
 	}
 
-	public UserQuotaData get(String topicIdentifier) {
+	public UserQuota get(String topicIdentifier) {
 		return quotaStore.get(topicIdentifier);
 	}
 
-	public Set<Entry<String, UserQuotaData>> getAll() {
+	public Set<Entry<String, UserQuota>> getAll() {
 		return quotaStore.entrySet();
 	}
 
-	public void put(String topicIdentifier, UserQuotaData quota, boolean ignoreTimestamp)
+	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp)
 			throws FceNoAuthorizationPossibleException {
 		if (ignoreTimestamp || quota.getTimestamp().after(get(topicIdentifier).getTimestamp())) {
 			quotaStore.put(topicIdentifier, quota);
@@ -44,16 +44,16 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	@Override
-	protected UserQuotaData get(ManagedTopic topic, AuthorizationProperties props, MqttOperation operation) {
-		if (quotaStore.get(topic.getUserTopicIdentifier(props, getZone(), operation)) != null) {
-			return quotaStore.get(topic.getUserTopicIdentifier(props, getZone()));
+	protected UserQuota get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation) {
+		if (quotaStore.get(topic.getIdentifier(props, getZone(), operation)) != null) {
+			return quotaStore.get(topic.getIdentifier(props, getZone()));
 		}
-		return quotaStore.get(topic.getEveryoneTopicIdentifier(getZone(), operation));
+		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
 	}
 
-	public UserQuotaData getQuota(AuthorizationProperties props, MqttOperation operation)
+	public UserQuota getQuota(AuthorizationProperties props, MqttAction operation)
 			throws FceNoAuthorizationPossibleException {
-		return (UserQuotaData) getManagedInformation(props, operation);
+		return (UserQuota) getManagedInformation(props, operation);
 	}
 
 }

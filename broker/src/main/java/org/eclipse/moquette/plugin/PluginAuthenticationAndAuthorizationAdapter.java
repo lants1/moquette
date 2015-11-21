@@ -16,13 +16,13 @@ public class PluginAuthenticationAndAuthorizationAdapter implements IAuthenticat
 	@Override
 	public boolean canWrite(String topic, String user, String clientId, Boolean anonymous, ByteBuffer msg) {
 		return plugin.canDoOperation(new AuthorizationProperties(topic, user, clientId, anonymous, msg),
-				MqttOperation.PUBLISH);
+				MqttAction.PUBLISH);
 	}
 
 	@Override
 	public boolean canRead(String topic, String user, String clientId, Boolean anonymous, ByteBuffer msg) {
 		return plugin.canDoOperation(new AuthorizationProperties(topic, user, clientId, anonymous, msg),
-				MqttOperation.SUBSCRIBE);
+				MqttAction.SUBSCRIBE);
 	}
 
 	@Override

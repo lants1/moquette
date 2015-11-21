@@ -1,9 +1,9 @@
 package org.eclipse.moquette.fce.model.quota;
 
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.MqttOperation;
+import org.eclipse.moquette.plugin.MqttAction;
 
-public class MessageCountState implements QuotaState {
+public class MessageCountState implements IQuotaState {
 
 	private int maxQuotaCount;
 	private int currentQuotaCount;
@@ -31,7 +31,7 @@ public class MessageCountState implements QuotaState {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttOperation operation) {
+	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		// TODO Auto-generated method stub
 		return false;
 	}
