@@ -10,8 +10,7 @@ import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.QuotaState;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -45,7 +44,7 @@ public class PluginEventHandler {
 		// --- it is managed and user needs to validated by configuration and
 		// quota
 		UserConfiguration userConfig;
-		Quota quota;
+		UserQuotaData quota;
 
 		try {
 			userConfig = services.getConfigDbService().getConfiguration(properties);
@@ -91,7 +90,7 @@ public class PluginEventHandler {
 		}
 
 		UserConfiguration userConfig;
-		Quota quota;
+		UserQuotaData quota;
 
 		try {
 			userConfig = services.getConfigDbService().getConfiguration(properties);

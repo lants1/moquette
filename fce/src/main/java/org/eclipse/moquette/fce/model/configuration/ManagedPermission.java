@@ -9,12 +9,12 @@ import com.google.gson.annotations.SerializedName;
  *
  */
 public enum ManagedPermission {
-	@SerializedName("NONE")
-	NONE("NONE"), 
-	@SerializedName("MYSELF")
-	MYSELF("MYSELF"),
-	@SerializedName("EVERYONE")
-	EVERYONE("EVERYONE");
+	@SerializedName("PUBLISH")
+	PUBLISH("PUBLISH"), 
+	@SerializedName("SUBSCRIBE")
+	SUBSCRIBE("SUBSCRIBE"),
+	@SerializedName("ALL")
+	ALL("ALL");
 	
 	private String value;
 

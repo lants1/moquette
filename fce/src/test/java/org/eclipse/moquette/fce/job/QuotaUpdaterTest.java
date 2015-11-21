@@ -10,10 +10,11 @@ import java.util.List;
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
 import org.eclipse.moquette.fce.common.SizeUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
-import org.eclipse.moquette.fce.model.quota.PeriodicQuotaState;
+import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.QuotaState;
-import org.eclipse.moquette.fce.model.quota.SpecificQuotaState;
+import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
+import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.eclipse.moquette.fce.service.QuotaDbService;
 import org.junit.Test;
 
@@ -30,44 +31,44 @@ public class QuotaUpdaterTest {
 		lastHour.add(Calendar.HOUR, -1);
 
 		QuotaDbService quotaService = new QuotaDbService(null);
-		List<QuotaState> quotaStates = new ArrayList<>();
+		List<Quota> quotaStates = new ArrayList<>();
 
-		PeriodicQuotaState hourlyState1 = new PeriodicQuotaState(ManagedCycle.HOURLY, 2, 2, 2, 2, SizeUnit.kB);
+		PeriodicQuota hourlyState1 = new PeriodicQuota(ManagedCycle.HOURLY,
+				new TransmittedDataState(2, 2, SizeUnit.B));
 		hourlyState1.setLastManagedTimestamp(lastHour.getTime());
 
-		PeriodicQuotaState hourlyState2 = new PeriodicQuotaState(ManagedCycle.WEEKLY, 2, 2, 2, 2, SizeUnit.kB);
+		PeriodicQuota hourlyState2 = new PeriodicQuota(ManagedCycle.WEEKLY,
+				new TransmittedDataState(2, 2, SizeUnit.B));
 		hourlyState2.setLastManagedTimestamp(lastHour.getTime());
 
-		SpecificQuotaState specState = new SpecificQuotaState(new Date(), new Date(), 2, 2, 2, 2, SizeUnit.kB);
+		TimeframeQuota specState = new TimeframeQuota(new Date(), new Date(),
+				new TransmittedDataState(2, 2, SizeUnit.B));
 
 		quotaStates.add(specState);
 		quotaStates.add(hourlyState1);
 		quotaStates.add(hourlyState2);
 
-		Quota quota = new Quota(TESTUSER, TESTIDENTIFIER, quotaStates);
+		UserQuotaData quota = new UserQuotaData(TESTUSER, TESTIDENTIFIER, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota);
 		quotaService.put(TEST_TOPIC2, quota);
 		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, quotaService);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();
 
-		Quota result1 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
-		Quota result2 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
+		UserQuotaData result1 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC1);
+		UserQuotaData result2 = serviceFactoryMock.getQuotaDbService().get(TEST_TOPIC2);
 
-		assertTrue(result1.getQuotaState().size() == 3);
-		assertTrue(result2.getQuotaState().size() == 3);
+		assertTrue(result1.getQuotas().size() == 3);
+		assertTrue(result2.getQuotas().size() == 3);
 
-		for (QuotaState resultState : result1.getQuotaState()) {
-			if (resultState instanceof PeriodicQuotaState) {
-				PeriodicQuotaState perResultState = (PeriodicQuotaState) resultState;
+		for (Quota resultState : result1.getQuotas()) {
+			if (resultState instanceof PeriodicQuota) {
+				PeriodicQuota perResultState = (PeriodicQuota) resultState;
 				if (perResultState.getCycle() == ManagedCycle.WEEKLY) {
-					assertTrue(perResultState.getCurrentQuotaBytes() == 2);
-					assertTrue(perResultState.getCurrentQuotaCount() == 2);
+					assertTrue(((TransmittedDataState) perResultState.getState()).getCurrentQuota() == 2);
 				} else {
 					assertTrue(perResultState.getCycle() == ManagedCycle.HOURLY);
-					assertTrue(perResultState.getCurrentQuotaBytes() == 0);
-					assertTrue(perResultState.getCurrentQuotaCount() == 0);
-
+					assertTrue(((TransmittedDataState) perResultState.getState()).getCurrentQuota() == 0);
 				}
 			}
 		}

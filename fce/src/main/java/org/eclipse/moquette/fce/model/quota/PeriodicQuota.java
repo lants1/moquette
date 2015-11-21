@@ -2,17 +2,16 @@ package org.eclipse.moquette.fce.model.quota;
 
 import java.util.Date;
 
-import org.eclipse.moquette.fce.common.SizeUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.plugin.AuthorizationProperties;
 
-public class PeriodicQuotaState extends QuotaState {
+public class PeriodicQuota extends Quota {
 
 	ManagedCycle cycle;
 	Date lastManagedTimestamp;
 
-	public PeriodicQuotaState(ManagedCycle cycle, int maxQuota, int currentQuota, int maxQuotaCount,
-			int currentQuotaCount, SizeUnit sizeUnit) {
-		super(maxQuota, currentQuota, maxQuotaCount, currentQuotaCount, sizeUnit);
+	public PeriodicQuota(ManagedCycle cycle, QuotaState state) {
+		super(state);
 		this.cycle = cycle;
 		this.lastManagedTimestamp = new Date();
 	}
@@ -31,5 +30,10 @@ public class PeriodicQuotaState extends QuotaState {
 
 	public void setLastManagedTimestamp(Date lastManagedTimestamp) {
 		this.lastManagedTimestamp = lastManagedTimestamp;
+	}
+
+	@Override
+	public boolean isValid(AuthorizationProperties props) {
+		return 	this.getState().isValid(props);
 	}
 }

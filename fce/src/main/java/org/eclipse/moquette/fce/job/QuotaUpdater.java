@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.model.quota.PeriodicQuotaState;
+import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
+import org.eclipse.moquette.fce.model.quota.UserQuotaData;
 import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.QuotaState;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 
@@ -33,17 +33,16 @@ public class QuotaUpdater implements Runnable {
 
 	private void updateQuota() {
 
-		for (Entry<String, Quota> entry : services.getQuotaDbService().getAll()) {
+		for (Entry<String, UserQuotaData> entry : services.getQuotaDbService().getAll()) {
 			String key = entry.getKey();
-			Quota quotaIn = entry.getValue();
-			List<QuotaState> statesOut = new ArrayList<>();
+			UserQuotaData quotaIn = entry.getValue();
+			List<Quota> statesOut = new ArrayList<>();
 
-			for (QuotaState state : quotaIn.getQuotaState()) {
-				if (state instanceof PeriodicQuotaState) {
-					PeriodicQuotaState newPeriodicState = (PeriodicQuotaState) state;
+			for (Quota state : quotaIn.getQuotas()) {
+				if (state instanceof PeriodicQuota) {
+					PeriodicQuota newPeriodicState = (PeriodicQuota) state;
 					if (isCycleExpired(newPeriodicState.getCycle(), newPeriodicState.getLastManagedTimestamp())) {
-						newPeriodicState.setCurrentQuotaBytes(0);
-						newPeriodicState.setCurrentQuotaCount(0);
+						newPeriodicState.flush();
 						newPeriodicState.setLastManagedTimestamp(new Date());
 					}
 					statesOut.add(newPeriodicState);
@@ -52,7 +51,7 @@ public class QuotaUpdater implements Runnable {
 				}
 			}
 
-			Quota quotaOut = new Quota(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
+			UserQuotaData quotaOut = new UserQuotaData(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
 			services.getQuotaDbService().put(key, quotaOut);
 			services.getMqttService().publish(key, services.getJsonParser().serialize(quotaOut), true);
 		}
