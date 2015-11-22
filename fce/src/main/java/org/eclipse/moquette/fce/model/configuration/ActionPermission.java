@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
  * @author lants1
  *
  */
-public enum ManagedPermission {
+public enum ActionPermission {
 	@SerializedName("PUBLISH")
 	PUBLISH("PUBLISH", false, true), 
 	@SerializedName("SUBSCRIBE")
@@ -22,7 +22,7 @@ public enum ManagedPermission {
 	private boolean canRead;
 	private boolean canWrite;
 
-    private ManagedPermission(String value, boolean canRead, boolean canWrite)
+    private ActionPermission(String value, boolean canRead, boolean canWrite)
     {
         this.value=value;
         this.canRead=canRead;

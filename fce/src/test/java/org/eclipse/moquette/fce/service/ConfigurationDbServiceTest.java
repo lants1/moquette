@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
+import org.eclipse.moquette.fce.model.configuration.ActionPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGet() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
@@ -41,7 +41,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test(expected = FceAuthorizationException.class)
 	public void testPutGetException() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getIdentifer(), null, ID, null,
 				null);
@@ -54,21 +54,21 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
 		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
 		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION), userConfig);
 
-		assertTrue(configService.isTopicFilterManaged(TOPIC));
-		assertFalse(configService.isTopicFilterManaged(TOPIC_INVALID));
+		assertTrue(configService.isManaged(TOPIC));
+		assertFalse(configService.isManaged(TOPIC_INVALID));
 	}
 
 	@Test
 	public void testPutGetEveryone() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ManagedPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
 
-		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ManagedPermission.ALL, null,
+		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ActionPermission.ALL, null,
 				null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);

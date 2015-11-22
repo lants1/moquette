@@ -70,10 +70,18 @@ public class ManagedTopic {
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + LEVEL_CHAR + operation.getValue() + ALL_TOPIC, zone);
 	}
 
+	public boolean isInManagedArea(){
+		return ManagedZoneUtil.isInManagedStore(topicIdentifer);
+	}
+	
 	public int getHierarchyDeep(ManagedZone managedZone) {
 		return StringUtils.countMatches(getIdentifier(managedZone), LEVEL_CHAR);
 	}
 
+	public boolean isAllowedForUser(AuthorizationProperties props){
+		return StringUtils.endsWithAny(topicIdentifer, ALL_TOPIC, USER_PREFIX+props.getClientId());
+	}
+	
 	@Override
 	public String toString() {
 		return topicIdentifer;

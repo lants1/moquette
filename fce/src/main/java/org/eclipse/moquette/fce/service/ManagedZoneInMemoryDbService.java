@@ -60,7 +60,7 @@ public abstract class ManagedZoneInMemoryDbService {
 		return null;
 	}
 
-	public boolean isTopicFilterManaged(ManagedTopic topic) {
+	public boolean isManaged(ManagedTopic topic) {
 		List<String> tokens = getTokens(topic);
 
 		for (Map.Entry<String, ?> entry : getStore().entrySet()) {

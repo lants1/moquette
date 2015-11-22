@@ -8,6 +8,16 @@ import org.eclipse.moquette.fce.exception.FceSystemException;
 
 public final class ManagedZoneUtil {
 
+	public static boolean isInManagedStore(String topic){
+		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
+		for(ManagedZone zone : zones) {
+		    if(topic.startsWith(zone.getTopicPrefix())){
+		    	return true;
+		    }
+		}
+		return false;
+	}
+	
 	public static ManagedZone getZoneForTopic(String topic){
 		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
 		for(ManagedZone zone : zones) {
@@ -27,5 +37,15 @@ public final class ManagedZoneUtil {
 		    }
 		}
 		return topicZone.getTopicPrefix() + topic;
+	}
+	
+	public static String removeZoneIdentifier(String topic){
+		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
+		for(ManagedZone zone : zones) {
+		    if(topic.startsWith(zone.getTopicPrefix())){
+		    	return StringUtils.removeStart(topic, zone.getTopicPrefix());
+		    }
+		}
+		return topic;
 	}
 }

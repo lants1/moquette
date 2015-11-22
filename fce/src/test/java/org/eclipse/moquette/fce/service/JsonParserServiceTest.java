@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.moquette.fce.common.DataUnit;
 import org.eclipse.moquette.fce.model.ManagedCycle;
-import org.eclipse.moquette.fce.model.configuration.ManagedPermission;
+import org.eclipse.moquette.fce.model.configuration.ActionPermission;
 import org.eclipse.moquette.fce.model.configuration.ManagedState;
 import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
@@ -61,7 +61,7 @@ public class JsonParserServiceTest {
 		subscribeRestriction.add(specificRestriction);
 		subscribeRestriction.add(periodicRestriction);
 
-		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ManagedPermission.PUBLISH,  ManagedState.UNMANAGED, publishRestriction,
+		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, ActionPermission.PUBLISH,  ManagedState.UNMANAGED, publishRestriction,
 				subscribeRestriction);
 
 		JsonParserService mJsonParser = new JsonParserService();
@@ -71,7 +71,7 @@ public class JsonParserServiceTest {
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
 		assertTrue(sampleUserConfigDeserialized.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
-		assertTrue(sampleUserConfigDeserialized.getManagePermission() == ManagedPermission.PUBLISH);
+		assertTrue(sampleUserConfigDeserialized.getActionPermission() == ActionPermission.PUBLISH);
 		assertTrue(sampleUserConfigDeserialized.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfigDeserialized.getSubscribeRestrictions().size() == 2);
 		
@@ -108,7 +108,7 @@ public class JsonParserServiceTest {
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
 		assertTrue(sampleUserConfig.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
-		assertTrue(sampleUserConfig.getManagePermission() == ManagedPermission.PUBLISH);
+		assertTrue(sampleUserConfig.getActionPermission() == ActionPermission.PUBLISH);
 		assertTrue(sampleUserConfig.getPublishRestrictions().size() == 2);
 		assertTrue(sampleUserConfig.getSubscribeRestrictions().size() == 2);
 		

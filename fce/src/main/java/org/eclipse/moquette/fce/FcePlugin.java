@@ -8,8 +8,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.FceTimeUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.event.PluginEventHandler;
+import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.event.AuthenticationHandler;
+import org.eclipse.moquette.fce.event.FceEventHandler;
+import org.eclipse.moquette.fce.event.ManagedStoreHandler;
+import org.eclipse.moquette.fce.event.ManagedTopicHandler;
+import org.eclipse.moquette.fce.event.UnmanagedTopicHandler;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
+import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
 import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
@@ -22,7 +28,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
-	
+
 	public static final String PROPS_PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
 	public static final String PROPS_PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
 	public static final String PROPS_PLUGIN_JKS_PATH = "plugin_jks_path";
@@ -30,7 +36,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	public static final String PROPS_PLUGIN_CLIENT_USERNAME = "plugin_client_username";
 	public static final String PROPS_PLUGIN_CLIENT_PASSWORD = "plugin_client_password";
 	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
-	
+
 	private String pluginClientIdentifier;
 	private IFceServiceFactory services;
 	ScheduledExecutorService scheduler;
@@ -46,7 +52,6 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 		services.getMqtt().subscribe(ManagedZone.QUOTA.getTopicFilter());
 		services.getMqtt().subscribe(ManagedZone.CONFIGURATION.getTopicFilter());
 
-		
 		pluginClientIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
@@ -61,7 +66,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	@Override
 	public boolean checkValid(AuthenticationProperties props) {
 		if (services.isInitialized()) {
-			PluginEventHandler handler = new PluginEventHandler(services, pluginClientIdentifier);
+			AuthenticationHandler handler = new AuthenticationHandler(services, pluginClientIdentifier);
 			return handler.checkValid(props);
 		}
 		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
@@ -71,11 +76,21 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	@Override
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		if (services.isInitialized()) {
-			PluginEventHandler handler = new PluginEventHandler(services, pluginClientIdentifier);
+
+			FceEventHandler handler;
+
+			if (ManagedZoneUtil.isInManagedStore(properties.getTopic())) {
+				handler = new ManagedStoreHandler(services, pluginClientIdentifier);
+			} else if (services.getConfigDb().isManaged(new ManagedTopic(properties.getTopic()))) {
+				handler = new ManagedTopicHandler(services, pluginClientIdentifier);
+			} else {
+				handler = new UnmanagedTopicHandler(services, pluginClientIdentifier);
+			}
+
 			return handler.canDoOperation(properties, operation);
 		}
 		log.info("configuration not yet fully loaded from retained messages, write not possible");
-		return false; 
+		return false;
 	}
 
 	@Override

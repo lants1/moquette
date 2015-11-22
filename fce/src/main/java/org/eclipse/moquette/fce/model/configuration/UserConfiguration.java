@@ -17,13 +17,15 @@ import org.eclipse.moquette.plugin.MqttAction;
 public class UserConfiguration extends ManagedInformation implements IValid{
 
 	private ManagedState managedState;
-	private ManagedPermission managePermission;
+	private AdminGroupPermission adminGroupPermission;
+	private AdminActionPermission adminActionPermission;
+	private ActionPermission actionPermission;
 	private List<Restriction> publishRestrictions;
 	private List<Restriction> subscribeRestrictions;
 	
-	public UserConfiguration(String userName, String userIdentifier, ManagedPermission managePermission, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
+	public UserConfiguration(String userName, String userIdentifier, ActionPermission actionPermission, ManagedState managedState, List<Restriction> publishRestrictions, List<Restriction> subscribeRestrictions){
 		super(userName, userIdentifier);
-		this.managePermission = managePermission;
+		this.actionPermission = actionPermission;
 		this.publishRestrictions = publishRestrictions;
 		this.subscribeRestrictions = subscribeRestrictions;
 		this.managedState = managedState;
@@ -71,19 +73,36 @@ public class UserConfiguration extends ManagedInformation implements IValid{
 		this.subscribeRestrictions.add(subscribeRestriction);
 	}
 
-	public ManagedPermission getManagePermission() {
-		return managePermission;
+
+	public AdminGroupPermission getAdminGroupPermission() {
+		return adminGroupPermission;
 	}
 
-	public void setManagePermission(ManagedPermission managePermission) {
-		this.managePermission = managePermission;
+	public void setAdminGroupPermission(AdminGroupPermission adminGroupPermission) {
+		this.adminGroupPermission = adminGroupPermission;
+	}
+
+	public AdminActionPermission getAdminActionPermission() {
+		return adminActionPermission;
+	}
+
+	public void setAdminActionPermission(AdminActionPermission adminActionPermission) {
+		this.adminActionPermission = adminActionPermission;
+	}
+
+	public ActionPermission getActionPermission() {
+		return actionPermission;
+	}
+
+	public void setActionPermission(ActionPermission actionPermission) {
+		this.actionPermission = actionPermission;
 	}
 
 	@Override
 	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		List<Restriction> restrictions = getRestrictions(operation);
 
-		if (!getManagePermission().canDoOperation(operation)) {
+		if (!getActionPermission().canDoOperation(operation)) {
 			return false;
 		}
 
