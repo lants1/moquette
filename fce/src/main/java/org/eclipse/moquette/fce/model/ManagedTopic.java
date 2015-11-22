@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
-import org.eclipse.moquette.fce.exception.FceSystemFailureException;
+import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -19,7 +19,7 @@ public class ManagedTopic {
 	public ManagedTopic(String topicIdentifer) {
 		super();
 		if (!topicIdentifer.startsWith(LEVEL_CHAR)) {
-			throw new FceSystemFailureException("invalid topicfilter which doesn't start with /");
+			throw new FceSystemException("invalid topicfilter which doesn't start with /");
 		}
 		this.topicIdentifer = topicIdentifer;
 	}

@@ -1,15 +1,15 @@
 package org.eclipse.moquette.fce.exception;
 
-public class FceSystemFailureException extends RuntimeException{
+public class FceSystemException extends RuntimeException{
 
 	private static final long serialVersionUID = 1730708539283481755L;
 
-	public FceSystemFailureException(String msg)
+	public FceSystemException(String msg)
     {
         super(msg);
     }
 	
-	public FceSystemFailureException(Exception e)
+	public FceSystemException(Exception e)
     {
         super(e);
     }

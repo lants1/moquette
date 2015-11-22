@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
-import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
@@ -37,10 +37,10 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		return configStore;
 	}
 
-	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceNoAuthorizationPossibleException{
+	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceAuthorizationException{
 		ManagedInformation information = getManagedInformation(props, null);
 		if(information == null){
-			throw new FceNoAuthorizationPossibleException("no userconfiguration found for topic: " + props.getTopic());
+			throw new FceAuthorizationException("no userconfiguration found for topic: " + props.getTopic());
 		}
 		
 		return (UserConfiguration) information;

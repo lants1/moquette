@@ -3,7 +3,7 @@ package org.eclipse.moquette.fce.common;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.exception.FceSystemFailureException;
+import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 
@@ -20,7 +20,7 @@ public final class FceHashUtil {
 		try {
 			return FceHashUtil.getFceHash(username, new String(pw, CharEncoding.UTF_8));
 		} catch (UnsupportedEncodingException e) {
-			new FceSystemFailureException(e);
+			new FceSystemException(e);
 		}
 		return null;
 	}

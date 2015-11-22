@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
-import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
@@ -26,7 +26,7 @@ public class QuotaUpdaterTest {
 	private final String TEST_TOPIC2 = "/test2";
 
 	@Test
-	public void testHourly() throws FceNoAuthorizationPossibleException {
+	public void testHourly() throws FceAuthorizationException {
 		Calendar lastHour = Calendar.getInstance();
 		lastHour.add(Calendar.HOUR, -1);
 

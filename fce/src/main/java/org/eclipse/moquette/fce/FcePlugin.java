@@ -32,19 +32,19 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
 	
 	private String pluginClientIdentifier;
-	private IFceServiceFactory serviceFactory;
+	private IFceServiceFactory services;
 	ScheduledExecutorService scheduler;
 
 	@Override
 	public void load(Properties config, BrokerOperator brokerOperator) {
-		serviceFactory = new FceServiceFactoryImpl(config, brokerOperator);
+		services = new FceServiceFactoryImpl(config, brokerOperator);
 
 		scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleAtFixedRate(new QuotaUpdater(serviceFactory), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
+		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 
-		serviceFactory.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
-		serviceFactory.getMqtt().subscribe(ManagedZone.QUOTA.getTopicFilter());
-		serviceFactory.getMqtt().subscribe(ManagedZone.CONFIGURATION.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.QUOTA.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.CONFIGURATION.getTopicFilter());
 
 		
 		pluginClientIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
@@ -54,14 +54,14 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	@Override
 	public void unload() {
 		scheduler.shutdownNow();
-		serviceFactory.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
 	@Override
 	public boolean checkValid(AuthenticationProperties props) {
-		if (serviceFactory.isInitialized()) {
-			PluginEventHandler handler = new PluginEventHandler(serviceFactory, pluginClientIdentifier);
+		if (services.isInitialized()) {
+			PluginEventHandler handler = new PluginEventHandler(services, pluginClientIdentifier);
 			return handler.checkValid(props);
 		}
 		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
@@ -70,8 +70,8 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
-		if (serviceFactory.isInitialized()) {
-			PluginEventHandler handler = new PluginEventHandler(serviceFactory, pluginClientIdentifier);
+		if (services.isInitialized()) {
+			PluginEventHandler handler = new PluginEventHandler(services, pluginClientIdentifier);
 			return handler.canDoOperation(properties, operation);
 		}
 		log.info("configuration not yet fully loaded from retained messages, write not possible");
