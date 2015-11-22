@@ -12,7 +12,7 @@ import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
-import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 
 public class QuotaUpdater implements Runnable {
@@ -30,13 +30,13 @@ public class QuotaUpdater implements Runnable {
 	public void run() {
 		try {
 			updateQuota();
-		} catch (FceNoAuthorizationPossibleException e) {
+		} catch (FceAuthorizationException e) {
 			log.warning(e.getMessage());
 		}
 		log.info("JOB: completed succefully");
 	}
 
-	private void updateQuota() throws FceNoAuthorizationPossibleException {
+	private void updateQuota() throws FceAuthorizationException {
 
 		for (Entry<String, UserQuota> entry : services.getQuotaDb().getAll()) {
 			String key = entry.getKey();
@@ -58,7 +58,7 @@ public class QuotaUpdater implements Runnable {
 
 			UserQuota quotaOut = new UserQuota(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
 			services.getQuotaDb().put(key, quotaOut, true);
-			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut), true);
+			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut));
 		}
 
 	}

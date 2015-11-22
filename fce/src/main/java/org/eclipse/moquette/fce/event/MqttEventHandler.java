@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
-import org.eclipse.moquette.fce.exception.FceSystemFailureException;
+import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
@@ -32,7 +32,7 @@ public class MqttEventHandler implements MqttCallback {
 			log.warning("internal plugin mqttclient conection to broker connection lost");
 			services.getMqtt().connect();
 		} catch (MqttException e) {
-			throw new FceSystemFailureException(e);
+			throw new FceSystemException(e);
 		}
 	}
 
@@ -53,7 +53,7 @@ public class MqttEventHandler implements MqttCallback {
 			UserConfiguration usrConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 	
 			services.getConfigDb().put(topic.getIdentifier(usrConfig, zone), usrConfig);
-			services.getMqtt().publish(topic.getIdentifier(usrConfig, zone), msgPayload, true);
+			services.getMqtt().publish(topic.getIdentifier(usrConfig, zone), msgPayload);
 			
 			UserQuota subQuota =  QuotaConverter.convertSubscribeConfiguration(usrConfig);
 			UserQuota pubQuota =  QuotaConverter.convertPublishConfiguration(usrConfig);
@@ -63,8 +63,8 @@ public class MqttEventHandler implements MqttCallback {
 			
 			services.getQuotaDb().put(subQuotaTopic, subQuota, true);
 			services.getQuotaDb().put(pubQuotaTopic, pubQuota, true);
-			services.getMqtt().publish(subQuotaTopic, services.getJsonParser().serialize(subQuota), true);
-			services.getMqtt().publish(pubQuotaTopic, services.getJsonParser().serialize(pubQuota), true);
+			services.getMqtt().publish(subQuotaTopic, services.getJsonParser().serialize(subQuota));
+			services.getMqtt().publish(pubQuotaTopic, services.getJsonParser().serialize(pubQuota));
 			
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
@@ -72,7 +72,7 @@ public class MqttEventHandler implements MqttCallback {
 			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 				services.getConfigDb().put(topic.getIdentifier(msgConfig, zone), msgConfig);
-				services.getMqtt().publish(topic.getIdentifier(msgConfig, zone), msgPayload, true);
+				services.getMqtt().publish(topic.getIdentifier(msgConfig, zone), msgPayload);
 				log.fine("received configuration message for topic: " + topicIdentifier);
 			}
 			break;
@@ -80,7 +80,7 @@ public class MqttEventHandler implements MqttCallback {
 			if (!services.isInitialized()) {
 				UserQuota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 				services.getQuotaDb().put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
-				services.getMqtt().publish(topic.getIdentifier(msgQuota, zone), msgPayload, true);
+				services.getMqtt().publish(topic.getIdentifier(msgQuota, zone), msgPayload);
 				log.fine("received quota message for topic: " + topicIdentifier);
 			}
 			break;

@@ -24,10 +24,7 @@ public final class XmlSchemaValidationUtil {
 			Schema schema = schemaFactory.newSchema(schemaFile);
 			Validator validator = schema.newValidator();
 			validator.validate(xmlFile);
-			System.out.println(xmlFile.getSystemId() + " is valid");
-
 		} catch (SAXException | IOException e) {
-			// TODO Auto-generated catch block
 			return false;
 		}
 

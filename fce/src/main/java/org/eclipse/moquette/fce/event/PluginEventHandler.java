@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import org.apache.commons.codec.binary.StringUtils;
 import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
@@ -54,11 +54,11 @@ public class PluginEventHandler {
 			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
 					ManagedZone.QUOTA, operation);
 
-			services.getQuotaDb().put(userTopicIdentifier, userQuotas, false);
-			services.getMqtt().publish(userTopicIdentifier, quotaJson, true);
+			services.getQuotaDb().put(userTopicIdentifier, userQuotas);
+			services.getMqtt().publish(userTopicIdentifier, quotaJson);
 
 			return true;
-		} catch (FceNoAuthorizationPossibleException e) {
+		} catch (FceAuthorizationException e) {
 			log.warning(e.toString());
 			// TODO lants1 publish info message
 			// services.getMqttService().publish(topic, json, retained);

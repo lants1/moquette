@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.exception.FceNoAuthorizationPossibleException;
+import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -28,13 +28,17 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return quotaStore.entrySet();
 	}
 
+	public void put(String topicIdentifier, UserQuota quota) throws FceAuthorizationException {
+		put(topicIdentifier, quota, false);
+	}
+
 	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp)
-			throws FceNoAuthorizationPossibleException {
+			throws FceAuthorizationException {
 		if (ignoreTimestamp || quota.getTimestamp().after(get(topicIdentifier).getTimestamp())) {
 			quotaStore.put(topicIdentifier, quota);
 
 		} else {
-			throw new FceNoAuthorizationPossibleException("outdateddata");
+			throw new FceAuthorizationException("outdateddata");
 		}
 	}
 
@@ -52,7 +56,7 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	public UserQuota getQuota(AuthorizationProperties props, MqttAction operation)
-			throws FceNoAuthorizationPossibleException {
+			throws FceAuthorizationException {
 		return (UserQuota) getManagedInformation(props, operation);
 	}
 

@@ -1,6 +1,6 @@
 package org.eclipse.moquette.fce.service;
 
-import org.eclipse.moquette.fce.exception.FceSystemFailureException;
+import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessage;
@@ -54,7 +54,7 @@ public class JsonParserService {
 			userConfigObject = gson.create().fromJson(quotaStateString, UserQuota.class);
 		} catch (Exception e) {
 			// something evil is wrong, stop plugin
-			throw new FceSystemFailureException(e);
+			throw new FceSystemException(e);
 		}
 		return userConfigObject;
 	}
@@ -66,7 +66,7 @@ public class JsonParserService {
 			userConfigObject = gson.create().fromJson(infoMessageString, InfoMessage.class);
 		} catch (Exception e) {
 			// something evil is wrong, stop plugin
-			throw new FceSystemFailureException(e);
+			throw new FceSystemException(e);
 		}
 		return userConfigObject;
 	}
