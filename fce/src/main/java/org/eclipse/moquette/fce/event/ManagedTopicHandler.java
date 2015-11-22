@@ -2,41 +2,28 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.apache.commons.codec.binary.StringUtils;
-import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
-import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
-public class PluginEventHandler {
+public class ManagedTopicHandler extends FceEventHandler {
 
-	private final static Logger log = Logger.getLogger(PluginEventHandler.class.getName());
-
-	IFceServiceFactory services;
-	String pluginClientIdentifer;
-
-	public PluginEventHandler(IFceServiceFactory services, String pluginClientIdentifier) {
-		this.services = services;
-		this.pluginClientIdentifer = pluginClientIdentifier;
-	}
-
-	public boolean checkValid(AuthenticationProperties props) {
-		log.fine("recieved checkValid Event for " + props.getUsername());
-
-		return FceHashUtil.validateClientIdHash(props);
+	private final static Logger log = Logger.getLogger(ManagedTopicHandler.class.getName());
+	
+	public ManagedTopicHandler(IFceServiceFactory services, String pluginClientIdentifier) {
+		super(services, pluginClientIdentifier);
 	}
 
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
-		Boolean preCheckResult = preCheckForManagedZone(properties);
-		if (preCheckResult != null) {
-			return preCheckResult.booleanValue();
+
+		if (properties.getAnonymous()) {
+			return Boolean.FALSE;
 		}
 
 		// we are in a managed zone
@@ -65,30 +52,5 @@ public class PluginEventHandler {
 			return false;
 		}
 	}
-
-	private boolean isPluginClient(AuthorizationProperties properties) {
-		if (!pluginClientIdentifer.isEmpty()) {
-			return StringUtils.equals(properties.getClientId(), pluginClientIdentifer);
-		}
-		return false;
-	}
-
-	private Boolean preCheckForManagedZone(AuthorizationProperties properties) {
-		if (isPluginClient(properties)) {
-			return Boolean.TRUE;
-		}
-
-		if (!services.getAuthorization().getBasicPermission(properties.getTopic()).isWriteable()) {
-			return Boolean.FALSE;
-		}
-
-		if (!services.getConfigDb().isTopicFilterManaged(new ManagedTopic(properties.getTopic()))) {
-			return Boolean.TRUE;
-		}
-
-		if (properties.getAnonymous()) {
-			return Boolean.FALSE;
-		}
-		return null;
-	}
+	
 }
