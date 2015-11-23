@@ -6,8 +6,7 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.AdminActionPermission;
-import org.eclipse.moquette.fce.model.configuration.AdminGroupPermission;
+import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -43,7 +42,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 					if (userConfig == null) {
 						return false;
 					}
-					if (AdminGroupPermission.NONE.equals(userConfig.getAdminGroupPermission())) {
+					if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
 						return false;
 					}
 
@@ -52,23 +51,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 							.deserializeUserConfiguration(new String(properties.getMessage().array(),
 									properties.getMessage().position(), properties.getMessage().limit()));
 
-					if (AdminGroupPermission.SELF.equals(userConfig.getAdminGroupPermission())) {
-						if (!parsedConfig.getUserIdentifier().equals(properties.getClientId())) {
-							return false;
-						}
-					}
 
-					if (AdminActionPermission.PUBLISH.equals(userConfig.getAdminActionPermission())) {
-						if (!parsedConfig.getSubscribeRestrictions().isEmpty()) {
-							return false;
-						}
-					}
-
-					if (AdminActionPermission.SUBSCRIBE.equals(userConfig.getAdminActionPermission())) {
-						if (!parsedConfig.getPublishRestrictions().isEmpty()) {
-							return false;
-						}
-					}
 				}
 				// TODO lants1 no need to set something in db store or mqtt store;)
 				return true;
