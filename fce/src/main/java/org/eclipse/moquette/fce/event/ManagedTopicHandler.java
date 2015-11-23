@@ -39,7 +39,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 			String quotaJson = services.getJsonParser().serialize(userQuotas);
 
 			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
-					ManagedZone.QUOTA, operation);
+					ManagedZone.QUOTA_GLOBAL, operation);
 
 			services.getQuotaDb().put(userTopicIdentifier, userQuotas);
 			services.getMqtt().publish(userTopicIdentifier, quotaJson);

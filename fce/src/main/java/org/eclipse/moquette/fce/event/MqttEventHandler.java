@@ -58,8 +58,8 @@ public class MqttEventHandler implements MqttCallback {
 			UserQuota subQuota =  QuotaConverter.convertSubscribeConfiguration(usrConfig);
 			UserQuota pubQuota =  QuotaConverter.convertPublishConfiguration(usrConfig);
 		
-			String subQuotaTopic = topic.getIdentifier(subQuota, ManagedZone.QUOTA, MqttAction.SUBSCRIBE);
-			String pubQuotaTopic = topic.getIdentifier(pubQuota, ManagedZone.QUOTA, MqttAction.PUBLISH);
+			String subQuotaTopic = topic.getIdentifier(subQuota, ManagedZone.QUOTA_GLOBAL, MqttAction.SUBSCRIBE);
+			String pubQuotaTopic = topic.getIdentifier(pubQuota, ManagedZone.QUOTA_GLOBAL, MqttAction.PUBLISH);
 			
 			services.getQuotaDb().put(subQuotaTopic, subQuota, true);
 			services.getQuotaDb().put(pubQuotaTopic, pubQuota, true);
@@ -68,7 +68,7 @@ public class MqttEventHandler implements MqttCallback {
 			
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
-		case CONFIGURATION:
+		case CONFIGURATION_GLOBAL:
 			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 				services.getConfigDb().put(topic.getIdentifier(msgConfig, zone), msgConfig);
@@ -76,7 +76,7 @@ public class MqttEventHandler implements MqttCallback {
 				log.fine("received configuration message for topic: " + topicIdentifier);
 			}
 			break;
-		case QUOTA:
+		case QUOTA_GLOBAL:
 			if (!services.isInitialized()) {
 				UserQuota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 				services.getQuotaDb().put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
