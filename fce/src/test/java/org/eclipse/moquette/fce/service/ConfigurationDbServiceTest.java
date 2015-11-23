@@ -30,7 +30,7 @@ public class ConfigurationDbServiceTest {
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION), userConfig);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 
@@ -47,7 +47,7 @@ public class ConfigurationDbServiceTest {
 				null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION), userConfig);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
@@ -58,7 +58,7 @@ public class ConfigurationDbServiceTest {
 		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION), userConfig);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
 
 		assertTrue(configService.isManaged(TOPIC));
 		assertFalse(configService.isManaged(TOPIC_INVALID));
@@ -74,7 +74,7 @@ public class ConfigurationDbServiceTest {
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
-		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIGURATION), everyoneConfig);
+		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIGURATION_GLOBAL), everyoneConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
@@ -82,7 +82,7 @@ public class ConfigurationDbServiceTest {
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION), userConfig);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
 
 		props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 

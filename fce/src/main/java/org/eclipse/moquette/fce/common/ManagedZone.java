@@ -2,10 +2,12 @@ package org.eclipse.moquette.fce.common;
 
 public enum ManagedZone {
 
-	CONFIGURATION("/$MANAGED_CONFIGURATION", TopicPermission.READ),
-	QUOTA("/$MANAGED_QUOTA", TopicPermission.READ),
-	INFO("/$MANAGED_INFO", TopicPermission.READ),
-	INTENT("/$MANAGED_INTENT", TopicPermission.WRITE);
+	CONFIGURATION_GLOBAL("/$MANAGED/CONFIGURATION/GLOBAL", TopicPermission.READ),
+	CONFIGURATION_PRIVATE("/$MANAGED/CONFIGURATION/PRIVATE", TopicPermission.READ),
+	QUOTA_GLOBAL("/$MANAGED/QUOTA/GLOBAL", TopicPermission.READ),
+	QUOTA_PRIVATE("/$MANAGED/QUOTA/PRIVATE", TopicPermission.READ),
+	INFO("/$MANAGED_/INFO", TopicPermission.READ),
+	INTENT("/$MANAGED/INTENT", TopicPermission.WRITE);
 
 	private String topicPrefix;
 	private TopicPermission basePerm;

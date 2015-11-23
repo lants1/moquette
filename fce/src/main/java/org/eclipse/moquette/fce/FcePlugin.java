@@ -49,9 +49,12 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 
 		services.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.QUOTA.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.CONFIGURATION.getTopicFilter());
-
+		services.getMqtt().subscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_GLOBAL.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_PRIVATE.getTopicFilter());
+		
+		
 		pluginClientIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
@@ -60,6 +63,10 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	public void unload() {
 		scheduler.shutdownNow();
 		services.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.CONFIGURATION_GLOBAL.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.CONFIGURATION_PRIVATE.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 

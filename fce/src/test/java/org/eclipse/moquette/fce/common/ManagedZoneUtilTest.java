@@ -9,16 +9,16 @@ public class ManagedZoneUtilTest {
 
 	@Test
 	public void getZoneForTopic() {
-		assertTrue(ManagedZone.QUOTA == ManagedZoneUtil
-				.getZoneForTopic(ManagedZone.QUOTA.getTopicPrefix() + "/asdfasf/asfas"));
+		assertTrue(ManagedZone.QUOTA_GLOBAL == ManagedZoneUtil
+				.getZoneForTopic(ManagedZone.QUOTA_GLOBAL.getTopicPrefix() + "/asdfasf/asfas"));
 	}
 
 	@Test
 	public void moveTopicIdentifierToZone() {
-		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone(ManagedZone.QUOTA.getTopicPrefix() + "/asdf",
-				ManagedZone.CONFIGURATION), ManagedZone.CONFIGURATION.getTopicPrefix() + "/asdf"));
+		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone(ManagedZone.QUOTA_GLOBAL.getTopicPrefix() + "/asdf",
+				ManagedZone.CONFIGURATION_GLOBAL), ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() + "/asdf"));
 
-		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone("/asdf", ManagedZone.CONFIGURATION),
-				ManagedZone.CONFIGURATION.getTopicPrefix() + "/asdf"));
+		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone("/asdf", ManagedZone.CONFIGURATION_GLOBAL),
+				ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() + "/asdf"));
 	}
 }
