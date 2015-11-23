@@ -14,13 +14,14 @@ import org.eclipse.moquette.plugin.MqttAction;
  */
 public abstract class Restriction implements IValid {
 
-	private int messageCount;
-	private int maxMessageSize;
-	private int totalMessageSize;
-	private DataUnit sizeUnit;
-	private String wsdlUrl;
+	private final FceAction mqttAction;
+	private final int messageCount;
+	private final int maxMessageSize;
+	private final int totalMessageSize;
+	private final DataUnit sizeUnit;
+	private final String wsdlUrl;
 
-	public Restriction(int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit,
+	public Restriction(FceAction mqttAction, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit,
 			String wsdlUrl) {
 		super();
 		this.messageCount = messageCount;
@@ -28,51 +29,41 @@ public abstract class Restriction implements IValid {
 		this.totalMessageSize = totalMessageSizeKb;
 		this.sizeUnit = sizeUnit;
 		this.wsdlUrl = wsdlUrl;
+		this.mqttAction = mqttAction;
 	}
 
 	public int getMessageCount() {
 		return messageCount;
 	}
 
-	public void setMessageCount(int messageCount) {
-		this.messageCount = messageCount;
-	}
 
 	public DataUnit getDataUnit() {
 		return sizeUnit;
-	}
-
-	public void setSizeUnit(DataUnit sizeUnit) {
-		this.sizeUnit = sizeUnit;
 	}
 
 	public String getWsdlUrl() {
 		return wsdlUrl;
 	}
 
-	public void setWsdlUrl(String wsdlUrl) {
-		this.wsdlUrl = wsdlUrl;
-	}
-
 	public int getMaxMessageSize() {
 		return maxMessageSize;
-	}
-
-	public void setMaxMessageSize(int maxMessageSize) {
-		this.maxMessageSize = maxMessageSize;
 	}
 
 	public int getTotalMessageSize() {
 		return totalMessageSize;
 	}
+	
+	public FceAction getMqttAction() {
+		return mqttAction;
+	}
 
-	public void setTotalMessageSize(int totalMessageSize) {
-		this.totalMessageSize = totalMessageSize;
+	public DataUnit getSizeUnit() {
+		return sizeUnit;
 	}
 
 	public boolean isValidCommon(AuthorizationProperties props, MqttAction operation){
 		if(getMaxMessageSize() > 0){
-			if(!(props.getMessage().position() < (getMaxMessageSize() * sizeUnit.getMultiplier()))){
+			if(!(props.getMessage().position() < (getMaxMessageSize() * getSizeUnit().getMultiplier()))){
 				return false;
 			}
 		}

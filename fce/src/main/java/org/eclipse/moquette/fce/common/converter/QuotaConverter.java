@@ -14,16 +14,17 @@ import org.eclipse.moquette.fce.model.quota.IQuotaState;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
 import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
+import org.eclipse.moquette.plugin.MqttAction;
 
 public final class QuotaConverter {
 
 	public static UserQuota convertSubscribeConfiguration(UserConfiguration config) {
-		List<Quota> subscribeState = convertRestrictions(config.getSubscribeRestrictions());
+		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.SUBSCRIBE));
 		return new UserQuota(config.getUserName(), config.getUserIdentifier(), subscribeState);
 	}
 	
 	public static UserQuota convertPublishConfiguration(UserConfiguration config) {
-		List<Quota> subscribeState = convertRestrictions(config.getPublishRestrictions());
+		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.PUBLISH));
 		return new UserQuota(config.getUserName(), config.getUserIdentifier(), subscribeState);
 	}
 	

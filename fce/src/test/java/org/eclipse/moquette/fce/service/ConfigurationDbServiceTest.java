@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.ActionPermission;
+import org.eclipse.moquette.fce.model.configuration.FceAction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGet() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
@@ -41,7 +41,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test(expected = FceAuthorizationException.class)
 	public void testPutGetException() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getIdentifer(), null, ID, null,
 				null);
@@ -54,7 +54,7 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
 		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null);
@@ -66,10 +66,10 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGetEveryone() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, ActionPermission.ALL, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
 
-		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, ActionPermission.ALL, null,
-				null, null);
+		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, FceAction.ALL, null,
+				null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
