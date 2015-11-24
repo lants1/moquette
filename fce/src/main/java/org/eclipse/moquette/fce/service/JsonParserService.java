@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.service;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.configuration.Restriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
@@ -20,14 +22,14 @@ public class JsonParserService {
 		gson.registerTypeAdapter(Restriction.class, new RestrictionAdapter());
 		return gson.create().toJson(userConfig);
 	}
-	
+
 	public String serialize(UserQuota quota) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(Quota.class, new QuotaAdapter());
 		gson.registerTypeAdapter(IQuotaState.class, new QuotaStateAdapter());
 		return gson.create().toJson(quota);
 	}
-	
+
 	public String serialize(InfoMessage infoMessage) {
 		GsonBuilder gson = new GsonBuilder();
 		return gson.create().toJson(infoMessage);
@@ -40,11 +42,16 @@ public class JsonParserService {
 		try {
 			userConfigObject = gson.create().fromJson(userConfigString, UserConfiguration.class);
 		} catch (Exception e) {
-			// could happen because the UserConfiguration comes from the user itself...
+			// could happen because the UserConfiguration comes from the user
+			// itself...
 		}
 		return userConfigObject;
 	}
-	
+
+	public UserConfiguration deserializeUserConfiguration(ByteBuffer msg) {
+		return deserializeUserConfiguration(convertToString(msg));
+	}
+
 	public UserQuota deserializeQuota(String quotaStateString) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(Quota.class, new QuotaAdapter());
@@ -58,6 +65,12 @@ public class JsonParserService {
 		}
 		return userConfigObject;
 	}
+
+	public UserQuota deserializeQuota(ByteBuffer msg) {
+		return deserializeQuota(convertToString(msg));
+	}
+
+	
 	
 	public InfoMessage deserializeInfoMessage(String infoMessageString) {
 		GsonBuilder gson = new GsonBuilder();
@@ -69,5 +82,9 @@ public class JsonParserService {
 			throw new FceSystemException(e);
 		}
 		return userConfigObject;
+	}
+
+	private String convertToString(ByteBuffer msg) {
+		return new String(msg.array(), msg.position(), msg.limit());
 	}
 }
