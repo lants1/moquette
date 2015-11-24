@@ -17,6 +17,7 @@ import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
 import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.eclipse.moquette.fce.service.QuotaDbService;
+import org.eclipse.moquette.plugin.MqttAction;
 import org.junit.Test;
 
 public class QuotaUpdaterTest {
@@ -49,7 +50,7 @@ public class QuotaUpdaterTest {
 		quotaStates.add(hourlyState1);
 		quotaStates.add(hourlyState2);
 
-		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, quotaStates);
+		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, MqttAction.SUBSCRIBE, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota, true);
 		quotaService.put(TEST_TOPIC2, quota, true);
 		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, quotaService, null,null);

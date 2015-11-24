@@ -26,6 +26,7 @@ import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
+import org.eclipse.moquette.plugin.MqttAction;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
 import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
@@ -84,7 +85,7 @@ public class JsonParserServiceTest {
 		quotas.add(specificQuotaState);
 		quotas.add(periodicQuotaState);
 		
-		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, quotas);
+		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, MqttAction.PUBLISH, quotas);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);

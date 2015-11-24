@@ -1,6 +1,9 @@
 package org.eclipse.moquette.fce.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -53,6 +56,16 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 			return quotaStore.get(topic.getIdentifier(props, getZone()));
 		}
 		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
+	}
+	
+	public List<UserQuota> getAllForTopic(ManagedTopic topic) {
+		List<UserQuota> result = new ArrayList<>();
+		for (Entry<String, UserQuota> entry : getAll()) {
+			if(entry.getKey().startsWith(topic.getIdentifier(getZone()))){
+				result.add(entry.getValue());
+			}
+		}
+		return result;
 	}
 
 	public UserQuota getQuota(AuthorizationProperties props, MqttAction operation)
