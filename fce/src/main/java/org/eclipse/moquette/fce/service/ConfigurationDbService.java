@@ -16,8 +16,8 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
 	private HashMap<String, UserConfiguration> configStore = new HashMap<>();
 
-	public ConfigurationDbService(BrokerOperator brokerOperator) {
-		super(brokerOperator, ManagedZone.CONFIGURATION_GLOBAL);
+	public ConfigurationDbService(BrokerOperator brokerOperator, ManagedZone zone) {
+		super(brokerOperator, zone);
 	}
 
 	@Override

@@ -2,12 +2,8 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
-import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedTopic;
-import org.eclipse.moquette.fce.model.configuration.AdminPermission;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
@@ -20,9 +16,10 @@ public class ManagedStoreHandler extends FceEventHandler {
 		super(services, pluginClientIdentifier);
 	}
 
-	// TODO lants1 to complicated....
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction action) {
 		if (isPluginClient(properties)) {
+			log.fine("can do operation:" + action + " for topic:" + properties.getTopic()
+					+ " because it's plugin client: " + properties.getUser());
 			return Boolean.TRUE;
 		}
 		if (!services.getAuthorization().getBasicPermission(properties.getTopic()).isAllowed(action)) {
@@ -33,37 +30,9 @@ public class ManagedStoreHandler extends FceEventHandler {
 			return Boolean.FALSE;
 		}
 
-		try {
-			ManagedZone zone = ManagedZoneUtil.getZoneForTopic(properties.getTopic());
-			ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(properties.getTopic()));
-			if (ManagedZone.INTENT.equals(zone)) {
-				if (services.getConfigDb().isManaged(topic)) {
-					UserConfiguration userConfig = services.getConfigDb().getConfiguration(properties);
-					if (userConfig == null) {
-						return false;
-					}
-					if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
-						return false;
-					}
+		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(properties.getTopic()));
 
-					// TODO lants1 better idea for handling manage permission...
-					UserConfiguration parsedConfig = services.getJsonParser()
-							.deserializeUserConfiguration(new String(properties.getMessage().array(),
-									properties.getMessage().position(), properties.getMessage().limit()));
-
-
-				}
-				// TODO lants1 no need to set something in db store or mqtt store;)
-				return true;
-			} else {
-				return topic.isAllowedForUser(properties);
-			}
-
-		} catch (FceAuthorizationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
+		return topic.isAllowedForUser(properties);
 	}
 
 }

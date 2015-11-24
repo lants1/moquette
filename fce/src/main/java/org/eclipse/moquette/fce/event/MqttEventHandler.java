@@ -6,6 +6,7 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.exception.FceSystemException;
+import org.eclipse.moquette.fce.model.ManagedScope;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
@@ -51,35 +52,50 @@ public class MqttEventHandler implements MqttCallback {
 		switch (zone) {
 		case INTENT:
 			UserConfiguration usrConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
-	
-			services.getConfigDb().put(topic.getIdentifier(usrConfig, zone), usrConfig);
-			services.getMqtt().publish(topic.getIdentifier(usrConfig, zone), msgPayload);
+
+			ManagedZone configurationZone;
+			ManagedZone quotaZone;
+			if (ManagedScope.GLOBAL.equals(usrConfig.getManagedScope())) {
+				configurationZone = ManagedZone.CONFIGURATION_GLOBAL;
+				quotaZone = ManagedZone.QUOTA_GLOBAL;
+			} else if (ManagedScope.PRIVATE.equals(usrConfig.getManagedScope())) {
+				configurationZone = ManagedZone.CONFIGURATION_PRIVATE;
+				quotaZone = ManagedZone.QUOTA_PRIVATE;
+			} else {
+				return;
+			}
 			
-			UserQuota subQuota =  QuotaConverter.convertSubscribeConfiguration(usrConfig);
-			UserQuota pubQuota =  QuotaConverter.convertPublishConfiguration(usrConfig);
-		
-			String subQuotaTopic = topic.getIdentifier(subQuota, ManagedZone.QUOTA_GLOBAL, MqttAction.SUBSCRIBE);
-			String pubQuotaTopic = topic.getIdentifier(pubQuota, ManagedZone.QUOTA_GLOBAL, MqttAction.PUBLISH);
-			
-			services.getQuotaDb().put(subQuotaTopic, subQuota, true);
-			services.getQuotaDb().put(pubQuotaTopic, pubQuota, true);
+			services.getConfigDb(usrConfig.getManagedScope()).put(topic.getIdentifier(usrConfig, configurationZone),
+					usrConfig);
+			services.getMqtt().publish(topic.getIdentifier(usrConfig, configurationZone), msgPayload);
+
+			UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
+			UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
+
+			String subQuotaTopic = topic.getIdentifier(subQuota, quotaZone, MqttAction.SUBSCRIBE);
+			String pubQuotaTopic = topic.getIdentifier(pubQuota, quotaZone, MqttAction.PUBLISH);
+
+			services.getQuotaDb(usrConfig.getManagedScope()).put(subQuotaTopic, subQuota, true);
+			services.getQuotaDb(usrConfig.getManagedScope()).put(pubQuotaTopic, pubQuota, true);
 			services.getMqtt().publish(subQuotaTopic, services.getJsonParser().serialize(subQuota));
 			services.getMqtt().publish(pubQuotaTopic, services.getJsonParser().serialize(pubQuota));
-			
+
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
+		case CONFIGURATION_PRIVATE:
 		case CONFIGURATION_GLOBAL:
 			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
-				services.getConfigDb().put(topic.getIdentifier(msgConfig, zone), msgConfig);
+				services.getConfigDb(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
 				services.getMqtt().publish(topic.getIdentifier(msgConfig, zone), msgPayload);
 				log.fine("received configuration message for topic: " + topicIdentifier);
 			}
 			break;
+		case QUOTA_PRIVATE:
 		case QUOTA_GLOBAL:
 			if (!services.isInitialized()) {
 				UserQuota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
-				services.getQuotaDb().put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
+				services.getQuotaDb(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
 				services.getMqtt().publish(topic.getIdentifier(msgQuota, zone), msgPayload);
 				log.fine("received quota message for topic: " + topicIdentifier);
 			}

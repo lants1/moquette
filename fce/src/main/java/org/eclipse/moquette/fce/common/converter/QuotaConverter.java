@@ -28,7 +28,7 @@ public final class QuotaConverter {
 		return new UserQuota(config.getUserName(), config.getUserIdentifier(), subscribeState);
 	}
 	
-	private static List<Quota> convertRestrictions(List<Restriction> restrictions) {
+	public static List<Quota> convertRestrictions(List<Restriction> restrictions) {
 		List<Quota> subscribeState = new ArrayList<>();
 		for (Restriction restriction : restrictions) {
 			List<IQuotaState> quotaStates = new ArrayList<>();

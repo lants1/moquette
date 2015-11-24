@@ -18,7 +18,7 @@ import org.eclipse.moquette.plugin.MqttAction;
  *
  */
 public class UserConfiguration extends ManagedInformation implements IValid {
-
+	
 	private final ManagedState managedState;
 	private final ManagedScope managedScope;
 	private final AdminPermission adminPermission;
