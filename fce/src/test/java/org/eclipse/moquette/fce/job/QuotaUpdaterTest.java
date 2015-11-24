@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
+import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
@@ -30,7 +31,7 @@ public class QuotaUpdaterTest {
 		Calendar lastHour = Calendar.getInstance();
 		lastHour.add(Calendar.HOUR, -1);
 
-		QuotaDbService quotaService = new QuotaDbService(null);
+		QuotaDbService quotaService = new QuotaDbService(null, ManagedZone.QUOTA_GLOBAL);
 		List<Quota> quotaStates = new ArrayList<>();
 
 		PeriodicQuota hourlyState1 = new PeriodicQuota(ManagedCycle.HOURLY,
@@ -51,12 +52,12 @@ public class QuotaUpdaterTest {
 		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota, true);
 		quotaService.put(TEST_TOPIC2, quota, true);
-		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, null, quotaService);
+		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, quotaService, null,null);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();
 
-		UserQuota result1 = serviceFactoryMock.getQuotaDb().get(TEST_TOPIC1);
-		UserQuota result2 = serviceFactoryMock.getQuotaDb().get(TEST_TOPIC2);
+		UserQuota result1 = serviceFactoryMock.getQuotaDb(ManagedZone.QUOTA_GLOBAL).get(TEST_TOPIC1);
+		UserQuota result2 = serviceFactoryMock.getQuotaDb(ManagedZone.QUOTA_GLOBAL).get(TEST_TOPIC2);
 
 		assertTrue(result1.getQuotas().size() == 3);
 		assertTrue(result2.getQuotas().size() == 3);

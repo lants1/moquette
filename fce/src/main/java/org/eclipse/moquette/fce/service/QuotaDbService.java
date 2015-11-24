@@ -16,8 +16,8 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
 	private HashMap<String, UserQuota> quotaStore = new HashMap<>();
 
-	public QuotaDbService(BrokerOperator brokerOperator) {
-		super(brokerOperator, ManagedZone.QUOTA_GLOBAL);
+	public QuotaDbService(BrokerOperator brokerOperator, ManagedZone zone) {
+		super(brokerOperator, zone);
 	}
 
 	public UserQuota get(String topicIdentifier) {

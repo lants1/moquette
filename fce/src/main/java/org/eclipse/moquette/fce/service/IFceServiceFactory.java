@@ -1,5 +1,8 @@
 package org.eclipse.moquette.fce.service;
 
+import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.model.ManagedScope;
+
 public interface IFceServiceFactory {
 
 	MqttService getMqtt();
@@ -8,9 +11,13 @@ public interface IFceServiceFactory {
 
 	JsonParserService getJsonParser();
 
-	QuotaDbService getQuotaDb();
+	ConfigurationDbService getConfigDb(ManagedZone zone);
+	
+	ConfigurationDbService getConfigDb(ManagedScope scope);
 
-	ConfigurationDbService getConfigDb();
+	QuotaDbService getQuotaDb(ManagedZone zone);
+	
+	QuotaDbService getQuotaDb(ManagedScope scope);
 	
 	boolean isInitialized();
 

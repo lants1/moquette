@@ -2,8 +2,11 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
+import org.eclipse.moquette.fce.model.ManagedScope;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
@@ -14,7 +17,7 @@ import org.eclipse.moquette.plugin.MqttAction;
 public class ManagedTopicHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(ManagedTopicHandler.class.getName());
-	
+
 	public ManagedTopicHandler(IFceServiceFactory services, String pluginClientIdentifier) {
 		super(services, pluginClientIdentifier);
 	}
@@ -28,21 +31,31 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 		// we are in a managed zone
 		try {
-			UserConfiguration userConfig = services.getConfigDb().getConfiguration(properties);
-			UserQuota userQuotas = services.getQuotaDb().getQuota(properties, operation);
+			UserConfiguration userConfigGlobal = services.getConfigDb(ManagedScope.GLOBAL).getConfiguration(properties);
+			UserQuota userQuotasGlobal = services.getQuotaDb(ManagedScope.GLOBAL).getQuota(properties, operation);
 
-			if (!userConfig.isValid(properties, operation) || !userQuotas.isValid(properties, operation)) {
+			if (StringUtils.isEmpty(userConfigGlobal.getUserIdentifier())) {
+				if(userQuotasGlobal == null){
+					userQuotasGlobal = new UserQuota(properties.getUser(), properties.getUser(), QuotaConverter.convertRestrictions(userConfigGlobal.getRestrictions(operation)));
+				}
+			}
+			
+			if (!userConfigGlobal.isValid(properties, operation) || !userQuotasGlobal.isValid(properties, operation)) {
 				return false;
 			}
 
-			userQuotas.substractRequestFromQuota(properties, operation);
-			String quotaJson = services.getJsonParser().serialize(userQuotas);
+			UserConfiguration userConfigPrivate = services.getConfigDb(ManagedScope.PRIVATE)
+					.getConfiguration(properties);
+			UserQuota userQuotasPrivate = services.getQuotaDb(ManagedScope.PRIVATE).getQuota(properties, operation);
 
-			String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
-					ManagedZone.QUOTA_GLOBAL, operation);
+			if (!userConfigPrivate.isValid(properties, operation)
+					|| !userQuotasPrivate.isValid(properties, operation)) {
+				return false;
+			}
 
-			services.getQuotaDb().put(userTopicIdentifier, userQuotas);
-			services.getMqtt().publish(userTopicIdentifier, quotaJson);
+		
+			substractQuota(properties, operation, ManagedZone.QUOTA_GLOBAL, userQuotasGlobal);
+			substractQuota(properties, operation, ManagedZone.QUOTA_PRIVATE, userQuotasPrivate);
 
 			return true;
 		} catch (FceAuthorizationException e) {
@@ -53,4 +66,16 @@ public class ManagedTopicHandler extends FceEventHandler {
 		}
 	}
 	
+	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone, UserQuota userQuotas) throws FceAuthorizationException{
+		userQuotas.substractRequestFromQuota(properties, operation);
+		String quotaJson = services.getJsonParser().serialize(userQuotas);
+
+		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
+				zone, operation);
+
+		services.getQuotaDb(zone.getScope()).put(userTopicIdentifier, userQuotas);
+		services.getMqtt().publish(userTopicIdentifier, quotaJson);
+
+	}
+
 }

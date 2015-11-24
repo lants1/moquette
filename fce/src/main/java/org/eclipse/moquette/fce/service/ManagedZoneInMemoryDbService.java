@@ -21,8 +21,8 @@ public abstract class ManagedZoneInMemoryDbService {
 	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryDbService.class.getName());
 	
 	private boolean initialized;
-	private BrokerOperator brokerOperator;
-	private ManagedZone correspondingZone;
+	private final BrokerOperator brokerOperator;
+	private final ManagedZone correspondingZone;
 	
 	public ManagedZoneInMemoryDbService(BrokerOperator brokerOperator, ManagedZone correspondingZone) {
 		super();

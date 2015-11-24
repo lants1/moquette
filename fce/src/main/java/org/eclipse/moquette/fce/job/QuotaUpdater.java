@@ -12,6 +12,7 @@ import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedCycle;
 
@@ -38,7 +39,13 @@ public class QuotaUpdater implements Runnable {
 
 	private void updateQuota() throws FceAuthorizationException {
 
-		for (Entry<String, UserQuota> entry : services.getQuotaDb().getAll()) {
+		updateQuotaZone(ManagedZone.QUOTA_GLOBAL);
+		updateQuotaZone(ManagedZone.QUOTA_PRIVATE);
+
+	}
+
+	private void updateQuotaZone(ManagedZone zone) throws FceAuthorizationException {
+		for (Entry<String, UserQuota> entry : services.getQuotaDb(zone).getAll()) {
 			String key = entry.getKey();
 			UserQuota quotaIn = entry.getValue();
 			List<Quota> statesOut = new ArrayList<>();
@@ -57,10 +64,9 @@ public class QuotaUpdater implements Runnable {
 			}
 
 			UserQuota quotaOut = new UserQuota(quotaIn.getUserName(), quotaIn.getUserIdentifier(), statesOut);
-			services.getQuotaDb().put(key, quotaOut, true);
+			services.getQuotaDb(zone).put(key, quotaOut, true);
 			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut));
 		}
-
 	}
 
 	private boolean isCycleExpired(ManagedCycle cycle, Date lastManagedTimestamp) {

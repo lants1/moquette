@@ -11,6 +11,7 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.event.AuthenticationHandler;
 import org.eclipse.moquette.fce.event.FceEventHandler;
+import org.eclipse.moquette.fce.event.ManagedIntentHandler;
 import org.eclipse.moquette.fce.event.ManagedStoreHandler;
 import org.eclipse.moquette.fce.event.ManagedTopicHandler;
 import org.eclipse.moquette.fce.event.UnmanagedTopicHandler;
@@ -37,7 +38,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	public static final String PROPS_PLUGIN_CLIENT_PASSWORD = "plugin_client_password";
 	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
 
-	private String pluginClientIdentifier;
+	private String pluginIdentifier;
 	private IFceServiceFactory services;
 	ScheduledExecutorService scheduler;
 
@@ -53,9 +54,8 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_GLOBAL.getTopicFilter());
 		services.getMqtt().subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
 		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_PRIVATE.getTopicFilter());
-		
-		
-		pluginClientIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
+
+		pluginIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 
@@ -73,7 +73,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	@Override
 	public boolean checkValid(AuthenticationProperties props) {
 		if (services.isInitialized()) {
-			AuthenticationHandler handler = new AuthenticationHandler(services, pluginClientIdentifier);
+			AuthenticationHandler handler = new AuthenticationHandler(services, pluginIdentifier);
 			return handler.checkValid(props);
 		}
 		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
@@ -86,12 +86,15 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
 			FceEventHandler handler;
 
-			if (ManagedZoneUtil.isInManagedStore(properties.getTopic())) {
-				handler = new ManagedStoreHandler(services, pluginClientIdentifier);
-			} else if (services.getConfigDb().isManaged(new ManagedTopic(properties.getTopic()))) {
-				handler = new ManagedTopicHandler(services, pluginClientIdentifier);
+			if (ManagedZone.INTENT.equals(ManagedZoneUtil.getZoneForTopic(properties.getTopic()))) {
+				handler = new ManagedIntentHandler(services, pluginIdentifier);
+			} else if (ManagedZoneUtil.isInManagedStore(properties.getTopic())) {
+				handler = new ManagedStoreHandler(services, pluginIdentifier);
+			} else if (services.getConfigDb(ManagedZone.CONFIGURATION_GLOBAL)
+					.isManaged(new ManagedTopic(properties.getTopic()))) {
+				handler = new ManagedTopicHandler(services, pluginIdentifier);
 			} else {
-				handler = new UnmanagedTopicHandler(services, pluginClientIdentifier);
+				handler = new UnmanagedTopicHandler(services, pluginIdentifier);
 			}
 
 			return handler.canDoOperation(properties, operation);
