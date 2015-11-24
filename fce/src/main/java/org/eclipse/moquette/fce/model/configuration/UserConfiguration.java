@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.model.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.ManagedScope;
@@ -83,5 +84,9 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 		}
 
 		return false;
+	}
+	
+	public boolean isValidForEveryone(){
+		return StringUtils.isEmpty(getUserIdentifier());
 	}
 }

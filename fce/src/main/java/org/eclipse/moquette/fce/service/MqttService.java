@@ -77,6 +77,18 @@ public class MqttService {
 			e.printStackTrace();
 		}
 	}
+	
+	public void delete(String topic) {
+		MqttMessage message = new MqttMessage();
+		message.setPayload(new byte[0]);
+		message.setRetained(true);
+		try {
+			client.publish(topic, message);
+			log.fine("topic: " + topic + " deleted.");
+		} catch (MqttException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void subscribe(String topicFilter) {
 		try {

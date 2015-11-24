@@ -2,7 +2,6 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
@@ -36,7 +35,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 			UserConfiguration userConfigGlobal = services.getConfigDb(ManagedScope.GLOBAL).getConfiguration(properties);
 			UserQuota userQuotasGlobal = services.getQuotaDb(ManagedScope.GLOBAL).getQuota(properties, operation);
 
-			if (StringUtils.isEmpty(userConfigGlobal.getUserIdentifier())) {
+			if (userConfigGlobal.isValidForEveryone()) {
 				if(userQuotasGlobal == null){
 					userQuotasGlobal = new UserQuota(properties.getUser(), properties.getUser(), operation, QuotaConverter.convertRestrictions(userConfigGlobal.getRestrictions(operation)));
 				}

@@ -3,7 +3,6 @@ package org.eclipse.moquette.fce.event;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
@@ -27,15 +26,14 @@ public class ManagedIntentHandler extends FceEventHandler {
 	// TODO lants1 to complicated....
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction action) {
 		Boolean preCheckState = preCheckManagedZone(properties, action);
-		if(preCheckState != null){
+		if (preCheckState != null) {
 			return preCheckState;
 		}
 
 		try {
 			ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(properties.getTopic()));
 			UserConfiguration newConfig = services.getJsonParser()
-					.deserializeUserConfiguration(new String(properties.getMessage().array(),
-							properties.getMessage().position(), properties.getMessage().limit()));
+					.deserializeUserConfiguration(properties.getMessage());
 
 			if (services.getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
@@ -49,27 +47,11 @@ public class ManagedIntentHandler extends FceEventHandler {
 				if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
 					return false;
 				}
-				if (StringUtils.isEmpty(userConfig.getUserIdentifier())) {
-					List<UserQuota> quotasToRemove = services.getQuotaDb(ManagedScope.GLOBAL).getAllForTopic(topic);
-					List<UserConfiguration> configs = services.getConfigDb(ManagedScope.GLOBAL).getAllForTopic(topic);
-					for (UserQuota quota : quotasToRemove) {
-						String quotaIdentifier = quota.getUserIdentifier();
-						for (UserConfiguration config : configs) {
-							if (config.getUserIdentifier().equals(quotaIdentifier)) {
-								quotasToRemove.remove(quota);
-							}
-						}
-
-					}
+				if (userConfig.isValidForEveryone()) {
+					List<UserQuota> quotasToRemove = getUnneededGlobalQuotas(topic);
 
 					for (UserQuota quotaToRemove : quotasToRemove) {
-						String quotaJson = services.getJsonParser().serialize(quotaToRemove);
-
-						String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserIdentifier(),
-								ManagedZone.QUOTA_GLOBAL, quotaToRemove.getAction());
-
-						services.getQuotaDb(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);
-						services.getMqtt().publish(userTopicIdentifier, quotaJson);
+						deleteQuota(topic, quotaToRemove);
 					}
 				}
 			}
@@ -79,6 +61,29 @@ public class ManagedIntentHandler extends FceEventHandler {
 			log.warning(e.toString());
 			return false;
 		}
+	}
+
+	private List<UserQuota> getUnneededGlobalQuotas(ManagedTopic topic) {
+		List<UserQuota> quotasToRemove = services.getQuotaDb(ManagedScope.GLOBAL).getAllForTopic(topic);
+		List<UserConfiguration> configs = services.getConfigDb(ManagedScope.GLOBAL).getAllForTopic(topic);
+		for (UserQuota quota : quotasToRemove) {
+			String quotaIdentifier = quota.getUserIdentifier();
+			for (UserConfiguration config : configs) {
+				if (config.getUserIdentifier().equals(quotaIdentifier)) {
+					quotasToRemove.remove(quota);
+				}
+			}
+
+		}
+		return quotasToRemove;
+	}
+
+	private void deleteQuota(ManagedTopic topic, UserQuota quotaToRemove) throws FceAuthorizationException {
+		String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserIdentifier(), ManagedZone.QUOTA_GLOBAL,
+				quotaToRemove.getAction());
+
+		services.getQuotaDb(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);
+		services.getMqtt().delete(userTopicIdentifier);
 	}
 
 }
