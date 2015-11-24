@@ -25,8 +25,10 @@ public class ManagedTopicHandler extends FceEventHandler {
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
 
-		if (properties.getAnonymous()) {
-			return Boolean.FALSE;
+		Boolean preCheckState = preCheckManagedZone(properties, operation);
+		
+		if(preCheckState != null){
+			return preCheckState;
 		}
 
 		// we are in a managed zone
@@ -36,7 +38,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 			if (StringUtils.isEmpty(userConfigGlobal.getUserIdentifier())) {
 				if(userQuotasGlobal == null){
-					userQuotasGlobal = new UserQuota(properties.getUser(), properties.getUser(), QuotaConverter.convertRestrictions(userConfigGlobal.getRestrictions(operation)));
+					userQuotasGlobal = new UserQuota(properties.getUser(), properties.getUser(), operation, QuotaConverter.convertRestrictions(userConfigGlobal.getRestrictions(operation)));
 				}
 			}
 			

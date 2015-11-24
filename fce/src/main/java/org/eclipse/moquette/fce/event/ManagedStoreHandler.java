@@ -17,17 +17,10 @@ public class ManagedStoreHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction action) {
-		if (isPluginClient(properties)) {
-			log.fine("can do operation:" + action + " for topic:" + properties.getTopic()
-					+ " because it's plugin client: " + properties.getUser());
-			return Boolean.TRUE;
-		}
-		if (!services.getAuthorization().getBasicPermission(properties.getTopic()).isAllowed(action)) {
-			return Boolean.FALSE;
-		}
-
-		if (properties.getAnonymous()) {
-			return Boolean.FALSE;
+		Boolean preCheckState = preCheckManagedZone(properties, action);
+		
+		if(preCheckState != null){
+			return preCheckState;
 		}
 
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(properties.getTopic()));

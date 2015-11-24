@@ -65,6 +65,11 @@ public class ManagedTopic {
 		return ManagedZoneUtil.moveTopicToZone(
 				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + authProps.getClientId(), zone);
 	}
+	
+	public String getIdentifier(String clientId, ManagedZone zone, MqttAction operation) {
+		return ManagedZoneUtil.moveTopicToZone(
+				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + clientId, zone);
+	}
 
 	public String getAllIdentifier(ManagedZone zone, MqttAction operation) {
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + LEVEL_CHAR + operation.getValue() + ALL_TOPIC, zone);
