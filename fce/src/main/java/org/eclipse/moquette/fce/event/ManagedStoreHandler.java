@@ -1,7 +1,5 @@
 package org.eclipse.moquette.fce.event;
 
-import java.util.logging.Logger;
-
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
@@ -9,8 +7,6 @@ import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
 public class ManagedStoreHandler extends FceEventHandler {
-
-	private final static Logger log = Logger.getLogger(ManagedStoreHandler.class.getName());
 
 	public ManagedStoreHandler(IFceServiceFactory services, String pluginClientIdentifier) {
 		super(services, pluginClientIdentifier);

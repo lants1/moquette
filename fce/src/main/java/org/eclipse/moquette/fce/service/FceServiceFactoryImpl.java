@@ -14,7 +14,6 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	private BrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
-	private AuthorizationService authorizationService;
 	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbServiceGlobal;
 	private QuotaDbService quotaDbServicePrivate;
@@ -38,20 +37,6 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 			dataStoreService.initializeInternalMqttClient();
 		}
 		return dataStoreService;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.moquette.fce.service.FceServiceFactory#
-	 * getAuthorizationService()
-	 */
-	@Override
-	public AuthorizationService getAuthorization() {
-		if (authorizationService == null) {
-			authorizationService = new AuthorizationService();
-		}
-		return authorizationService;
 	}
 
 	/*
@@ -97,12 +82,12 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	 */
 	@Override
 	public ConfigurationDbService getConfigDb(ManagedZone zone) {
-		if (ManagedZone.CONFIGURATION_GLOBAL.equals(zone)) {
+		if (ManagedZone.CONFIG_GLOBAL.equals(zone)) {
 			if (configDbServiceGlobal == null) {
 				configDbServiceGlobal = new ConfigurationDbService(brokerOperator, zone);
 			}
 			return configDbServiceGlobal;
-		} else if (ManagedZone.CONFIGURATION_PRIVATE.equals(zone)) {
+		} else if (ManagedZone.CONFIG_PRIVATE.equals(zone)) {
 			if (configDbServicePrivate == null) {
 				configDbServicePrivate = new ConfigurationDbService(brokerOperator, zone);
 			}
@@ -114,10 +99,10 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	@Override
 	public ConfigurationDbService getConfigDb(ManagedScope scope) {
 		if(ManagedScope.GLOBAL.equals(scope)){
-			return getConfigDb(ManagedZone.CONFIGURATION_GLOBAL);
+			return getConfigDb(ManagedZone.CONFIG_GLOBAL);
 		}
 		else if(ManagedScope.PRIVATE.equals(scope)){
-			return getConfigDb(ManagedZone.CONFIGURATION_PRIVATE);
+			return getConfigDb(ManagedZone.CONFIG_PRIVATE);
 		}
 		throw new FceSystemException("invalid scope for config db");
 	}
@@ -140,9 +125,9 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	 */
 	@Override
 	public boolean isInitialized() {
-		return (getConfigDb(ManagedZone.CONFIGURATION_GLOBAL).isInitialized()
+		return (getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaDb(ManagedZone.QUOTA_GLOBAL).isInitialized()
-				&& getConfigDb(ManagedZone.CONFIGURATION_GLOBAL).isInitialized()
+				&& getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized());
 	}
 }

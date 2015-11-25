@@ -51,9 +51,9 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 
 		services.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
 		services.getMqtt().subscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_GLOBAL.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
 		services.getMqtt().subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.CONFIGURATION_PRIVATE.getTopicFilter());
+		services.getMqtt().subscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
 
 		pluginIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
@@ -64,9 +64,9 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 		scheduler.shutdownNow();
 		services.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
 		services.getMqtt().unsubscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.CONFIGURATION_GLOBAL.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
 		services.getMqtt().unsubscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.CONFIGURATION_PRIVATE.getTopicFilter());
+		services.getMqtt().unsubscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
@@ -90,7 +90,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 				handler = new ManagedIntentHandler(services, pluginIdentifier);
 			} else if (ManagedZoneUtil.isInManagedStore(properties.getTopic())) {
 				handler = new ManagedStoreHandler(services, pluginIdentifier);
-			} else if (services.getConfigDb(ManagedZone.CONFIGURATION_GLOBAL)
+			} else if (services.getConfigDb(ManagedZone.CONFIG_GLOBAL)
 					.isManaged(new ManagedTopic(properties.getTopic()))) {
 				handler = new ManagedTopicHandler(services, pluginIdentifier);
 			} else {

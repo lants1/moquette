@@ -29,8 +29,8 @@ public class ConfigurationDbServiceTest {
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIGURATION_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
+		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 
@@ -46,8 +46,8 @@ public class ConfigurationDbServiceTest {
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getIdentifer(), null, ID, null,
 				null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIGURATION_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
+		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
@@ -57,8 +57,8 @@ public class ConfigurationDbServiceTest {
 		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
 		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIGURATION_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
+		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.isManaged(TOPIC));
 		assertFalse(configService.isManaged(TOPIC_INVALID));
@@ -73,8 +73,8 @@ public class ConfigurationDbServiceTest {
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIGURATION_GLOBAL);
-		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIGURATION_GLOBAL), everyoneConfig);
+		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIG_GLOBAL), everyoneConfig);
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
@@ -82,7 +82,7 @@ public class ConfigurationDbServiceTest {
 
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
 
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIGURATION_GLOBAL), userConfig);
+		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
 

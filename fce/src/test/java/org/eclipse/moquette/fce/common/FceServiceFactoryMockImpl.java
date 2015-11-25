@@ -2,7 +2,6 @@ package org.eclipse.moquette.fce.common;
 
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.ManagedScope;
-import org.eclipse.moquette.fce.service.AuthorizationService;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
@@ -16,7 +15,6 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	private BrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
-	private AuthorizationService authorizationService;
 	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbServiceGlobal;
 	private ConfigurationDbService configDbServiceGlobal;
@@ -41,16 +39,9 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 		return dataStoreService;
 	}
 
-	public AuthorizationService getAuthorization() {
-		if (authorizationService == null) {
-			authorizationService = Mockito.mock(AuthorizationService.class);
-		}
-		return authorizationService;
-	}
-
 	public JsonParserService getJsonParser() {
 		if (jsonParserService == null) {
-			jsonParserService = Mockito.mock(JsonParserService.class);
+			jsonParserService = new JsonParserService();
 		}
 		return jsonParserService;
 	}
@@ -85,12 +76,12 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	 */
 	@Override
 	public ConfigurationDbService getConfigDb(ManagedZone zone) {
-		if (ManagedZone.CONFIGURATION_GLOBAL.equals(zone)) {
+		if (ManagedZone.CONFIG_GLOBAL.equals(zone)) {
 			if (configDbServiceGlobal == null) {
 				configDbServiceGlobal = new ConfigurationDbService(brokerOperator, zone);
 			}
 			return configDbServiceGlobal;
-		} else if (ManagedZone.CONFIGURATION_PRIVATE.equals(zone)) {
+		} else if (ManagedZone.CONFIG_PRIVATE.equals(zone)) {
 			if (configDbServicePrivate == null) {
 				configDbServicePrivate = new ConfigurationDbService(brokerOperator, zone);
 			}
@@ -102,9 +93,9 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	@Override
 	public ConfigurationDbService getConfigDb(ManagedScope scope) {
 		if (ManagedScope.GLOBAL.equals(scope)) {
-			return getConfigDb(ManagedZone.CONFIGURATION_GLOBAL);
+			return getConfigDb(ManagedZone.CONFIG_GLOBAL);
 		} else if (ManagedScope.PRIVATE.equals(scope)) {
-			return getConfigDb(ManagedZone.CONFIGURATION_PRIVATE);
+			return getConfigDb(ManagedZone.CONFIG_PRIVATE);
 		}
 		throw new FceSystemException("invalid scope for config db");
 	}

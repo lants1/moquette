@@ -16,9 +16,9 @@ public class ManagedZoneUtilTest {
 	@Test
 	public void moveTopicIdentifierToZone() {
 		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone(ManagedZone.QUOTA_GLOBAL.getTopicPrefix() + "/asdf",
-				ManagedZone.CONFIGURATION_GLOBAL), ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() + "/asdf"));
+				ManagedZone.CONFIG_GLOBAL), ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/asdf"));
 
-		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone("/asdf", ManagedZone.CONFIGURATION_GLOBAL),
-				ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() + "/asdf"));
+		assertTrue(StringUtils.equals(ManagedZoneUtil.moveTopicToZone("/asdf", ManagedZone.CONFIG_GLOBAL),
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/asdf"));
 	}
 }

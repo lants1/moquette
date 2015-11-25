@@ -8,10 +8,13 @@ import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
 
 public final class FceHashUtil {
 
+	private final static Logger log = Logger.getLogger(FceHashUtil.class.getName());
+	
 	public static String getFceHash(ManagedInformation managedInfo) {
 		return FceHashUtil.getFceHash(managedInfo.getUserIdentifier(), "");
 	}
@@ -31,7 +34,9 @@ public final class FceHashUtil {
 	
 	public static boolean validateClientIdHash(AuthenticationProperties props){
 		try {
-			return StringUtils.equals(DigestUtils.sha256Hex(props.getUsername()+new String(props.getPassword(), CharEncoding.UTF_8)),props.getClientId());
+			boolean result = StringUtils.equals(DigestUtils.sha256Hex(props.getUsername()+new String(props.getPassword(), CharEncoding.UTF_8)),props.getClientId());
+			log.fine("client id validated:" + result);
+			return result;
 		} catch (UnsupportedEncodingException e) {
 			return false;
 		}

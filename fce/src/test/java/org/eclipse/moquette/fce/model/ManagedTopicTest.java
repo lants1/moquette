@@ -10,7 +10,7 @@ public class ManagedTopicTest {
 
 	private static final String TESTIDENTIFIER = "TESTIDENTIFIER";
 	private static final String SAMPLE1_HOUSE_LIGHT = "/sample1/house/light";
-	private static final String SAMPLE2_HOUSE_LIGHT = ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() +"/sample1/house/light";
+	private static final String SAMPLE2_HOUSE_LIGHT = ManagedZone.CONFIG_GLOBAL.getTopicPrefix() +"/sample1/house/light";
 
 	@Test
 	public void testEveryoneTopic() {

@@ -4,8 +4,8 @@ import org.eclipse.moquette.fce.model.ManagedScope;
 
 public enum ManagedZone {
 
-	CONFIGURATION_GLOBAL("/$MANAGED/CONFIGURATION/GLOBAL", TopicPermission.READ, ManagedScope.GLOBAL),
-	CONFIGURATION_PRIVATE("/$MANAGED/CONFIGURATION/PRIVATE", TopicPermission.READ, ManagedScope.PRIVATE),
+	CONFIG_GLOBAL("/$MANAGED/CONFIGURATION/GLOBAL", TopicPermission.READ, ManagedScope.GLOBAL),
+	CONFIG_PRIVATE("/$MANAGED/CONFIGURATION/PRIVATE", TopicPermission.READ, ManagedScope.PRIVATE),
 	QUOTA_GLOBAL("/$MANAGED/QUOTA/GLOBAL", TopicPermission.READ, ManagedScope.GLOBAL),
 	QUOTA_PRIVATE("/$MANAGED/QUOTA/PRIVATE", TopicPermission.READ, ManagedScope.PRIVATE),
 	INFO("/$MANAGED_/INFO", TopicPermission.READ, ManagedScope.GLOBAL),
