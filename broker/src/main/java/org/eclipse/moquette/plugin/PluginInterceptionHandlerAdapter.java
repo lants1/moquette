@@ -8,9 +8,9 @@ import org.eclipse.moquette.interception.messages.InterceptUnsubscribeMessage;
 
 public class PluginInterceptionHandlerAdapter implements InterceptHandler {
 
-	InterceptionPlugin plugin;
+	IBrokerInterceptionPlugin plugin;
 	
-	public PluginInterceptionHandlerAdapter(InterceptionPlugin p){
+	public PluginInterceptionHandlerAdapter(IBrokerInterceptionPlugin p){
 		this.plugin = p;
 	}
 	

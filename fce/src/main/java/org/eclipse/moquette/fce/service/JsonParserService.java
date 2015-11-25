@@ -70,8 +70,6 @@ public class JsonParserService {
 		return deserializeQuota(convertToString(msg));
 	}
 
-	
-	
 	public InfoMessage deserializeInfoMessage(String infoMessageString) {
 		GsonBuilder gson = new GsonBuilder();
 		InfoMessage userConfigObject = null;

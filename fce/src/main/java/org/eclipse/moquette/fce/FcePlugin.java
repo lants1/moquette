@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce;
 
-import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -19,13 +18,14 @@ import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
-import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
+import org.eclipse.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
+import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
-public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
+public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
@@ -43,7 +43,7 @@ public class FcePlugin implements AuthenticationAndAuthorizationPlugin {
 	ScheduledExecutorService scheduler;
 
 	@Override
-	public void load(Properties config, BrokerOperator brokerOperator) {
+	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		services = new FceServiceFactoryImpl(config, brokerOperator);
 
 		scheduler = Executors.newScheduledThreadPool(1);

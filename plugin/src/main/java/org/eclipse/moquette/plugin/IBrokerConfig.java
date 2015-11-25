@@ -13,16 +13,14 @@
  *
  * You may elect to redistribute this code under either of these licenses.
  */
-package org.eclipse.moquette.server.config;
-
-import org.eclipse.moquette.plugin.IBrokerConfig;
+package org.eclipse.moquette.plugin;
 
 /**
  * Base interface for all configuration implementations (filesystem, memory or classpath)
  *
  * @author andrea
  */
-public interface IConfig extends IBrokerConfig {
+public interface IBrokerConfig {
     void setProperty(String name, String value);
 
     String getProperty(String name);

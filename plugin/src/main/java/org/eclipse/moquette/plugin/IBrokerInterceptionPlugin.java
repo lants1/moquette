@@ -7,7 +7,7 @@ package org.eclipse.moquette.plugin;
  * @author lants1
  *
  */
-public interface InterceptionPlugin extends BrokerPlugin {
+public interface IBrokerInterceptionPlugin extends IBrokerPlugin {
 	
     void onConnect(BrokerInterceptionMessage msg);
 

@@ -56,7 +56,7 @@ public class MoquetteOperatorTest {
     SubscriptionsStore subscriptions;
     MockAuthenticator m_mockAuthenticator;
     
-    BrokerOperator brokerOperator;
+    IBrokerOperator brokerOperator;
     
     @Before
     public void setUp() throws InterruptedException {

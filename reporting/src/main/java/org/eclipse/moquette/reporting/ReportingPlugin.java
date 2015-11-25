@@ -1,17 +1,16 @@
 package org.eclipse.moquette.reporting;
 
-import java.util.Properties;
-
 import org.eclipse.moquette.plugin.BrokerInterceptionMessage;
-import org.eclipse.moquette.plugin.InterceptionPlugin;
-import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.IBrokerConfig;
+import org.eclipse.moquette.plugin.IBrokerInterceptionPlugin;
+import org.eclipse.moquette.plugin.IBrokerOperator;
 
-public class ReportingPlugin implements InterceptionPlugin {
+public class ReportingPlugin implements IBrokerInterceptionPlugin {
 
 	private static final String PLUGIN_IDENTIFIER = "Reporting-Plugin";
 	
 	@Override
-	public void load(Properties config, BrokerOperator brokerOperator) {
+	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		// TODO Auto-generated method stub
 		
 	}

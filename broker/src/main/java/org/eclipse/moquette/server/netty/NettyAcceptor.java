@@ -234,13 +234,13 @@ public class NettyAcceptor implements ServerAcceptor {
     }
 
     private void initializeWSSTransport(final NettyMQTTHandler handler, IConfig props, final SslHandlerFactory sslHandlerFactory) throws IOException {
-        String sslPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
-        if (sslPortProp == null) {
-            //Do nothing no SSL configured
-            LOG.info("SSL is disabled");
+        String wssPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
+        if (wssPortProp == null) {
+            //Do nothing no WSSL configured
+            LOG.info("WSS is disabled");
             return;
         }
-        int sslPort = Integer.parseInt(sslPortProp);
+        int sslPort = Integer.parseInt(wssPortProp);
         final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         initFactory(host, sslPort, new PipelineInitializer() {

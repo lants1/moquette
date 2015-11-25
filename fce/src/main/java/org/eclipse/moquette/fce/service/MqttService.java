@@ -12,7 +12,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -24,6 +23,7 @@ import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.moquette.fce.FcePlugin;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
+import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -35,10 +35,10 @@ public class MqttService {
 	private final static Logger log = Logger.getLogger(MqttService.class.getName());
 
 	MqttClient client;
-	Properties config;
+	IBrokerConfig config;
 	MqttEventHandler eventHandler;
 
-	public MqttService(Properties config, MqttEventHandler eventHandler) {
+	public MqttService(IBrokerConfig config, MqttEventHandler eventHandler) {
 		this.config = config;
 		this.eventHandler = eventHandler;
 	}
@@ -127,7 +127,7 @@ public class MqttService {
 	 * to import an existing certificate: keytool -keystore clientkeystore.jks
 	 * -import -alias testclient -file testclient.crt -trustcacerts
 	 */
-	private SSLSocketFactory configureSSLSocketFactory(Properties config) throws KeyManagementException,
+	private SSLSocketFactory configureSSLSocketFactory(IBrokerConfig config) throws KeyManagementException,
 			NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 

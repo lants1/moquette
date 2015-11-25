@@ -94,7 +94,7 @@ public class ManagedIntentHandlerTest {
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
-		assertTrue(handler.canDoOperation(authPropsPlugin, null));
+		assertFalse(handler.canDoOperation(authPropsPlugin, null));
 	}
 	
 	

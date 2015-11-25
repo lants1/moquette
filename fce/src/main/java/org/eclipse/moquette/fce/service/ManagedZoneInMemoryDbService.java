@@ -13,7 +13,7 @@ import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
 public abstract class ManagedZoneInMemoryDbService {
@@ -21,10 +21,10 @@ public abstract class ManagedZoneInMemoryDbService {
 	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryDbService.class.getName());
 	
 	private boolean initialized;
-	private final BrokerOperator brokerOperator;
+	private final IBrokerOperator brokerOperator;
 	private final ManagedZone correspondingZone;
 	
-	public ManagedZoneInMemoryDbService(BrokerOperator brokerOperator, ManagedZone correspondingZone) {
+	public ManagedZoneInMemoryDbService(IBrokerOperator brokerOperator, ManagedZone correspondingZone) {
 		super();
 		this.initialized = false;
 		this.brokerOperator = brokerOperator;

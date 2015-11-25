@@ -1,17 +1,16 @@
 package org.eclipse.moquette.fce.service;
 
-import java.util.Properties;
-
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.ManagedScope;
-import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.IBrokerConfig;
+import org.eclipse.moquette.plugin.IBrokerOperator;
 
 public class FceServiceFactoryImpl implements IFceServiceFactory {
 
-	private Properties pluginConfig;
-	private BrokerOperator brokerOperator;
+	private IBrokerConfig pluginConfig;
+	private IBrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
 	private JsonParserService jsonParserService;
@@ -20,7 +19,7 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	private ConfigurationDbService configDbServiceGlobal;
 	private ConfigurationDbService configDbServicePrivate;
 
-	public FceServiceFactoryImpl(Properties config, BrokerOperator brokerOperator) {
+	public FceServiceFactoryImpl(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		this.pluginConfig = config;
 		this.brokerOperator = brokerOperator;
 	}
