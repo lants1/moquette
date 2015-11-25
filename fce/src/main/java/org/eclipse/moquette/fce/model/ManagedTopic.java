@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.model;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
@@ -10,6 +12,8 @@ import org.eclipse.moquette.plugin.MqttAction;
 
 public class ManagedTopic {
 
+	private final static Logger log = Logger.getLogger(ManagedTopic.class.getName());
+	
 	public static final String USER_PREFIX = "/_";
 	public static final String LEVEL_CHAR = "/";
 	public static final String ALL_TOPIC = "/_all";
@@ -84,7 +88,9 @@ public class ManagedTopic {
 	}
 
 	public boolean isAllowedForUser(AuthorizationProperties props){
-		return StringUtils.endsWithAny(topicIdentifer, ALL_TOPIC, USER_PREFIX+props.getClientId());
+		boolean result = StringUtils.endsWithAny(topicIdentifer, ALL_TOPIC, USER_PREFIX+props.getClientId());
+		log.fine(props.getTopic()+" isAllowedForUser="+result);
+		return result;
 	}
 	
 	@Override

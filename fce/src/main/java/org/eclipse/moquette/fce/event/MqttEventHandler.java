@@ -56,10 +56,10 @@ public class MqttEventHandler implements MqttCallback {
 			ManagedZone configurationZone;
 			ManagedZone quotaZone;
 			if (ManagedScope.GLOBAL.equals(usrConfig.getManagedScope())) {
-				configurationZone = ManagedZone.CONFIGURATION_GLOBAL;
+				configurationZone = ManagedZone.CONFIG_GLOBAL;
 				quotaZone = ManagedZone.QUOTA_GLOBAL;
 			} else if (ManagedScope.PRIVATE.equals(usrConfig.getManagedScope())) {
-				configurationZone = ManagedZone.CONFIGURATION_PRIVATE;
+				configurationZone = ManagedZone.CONFIG_PRIVATE;
 				quotaZone = ManagedZone.QUOTA_PRIVATE;
 			} else {
 				return;
@@ -82,8 +82,8 @@ public class MqttEventHandler implements MqttCallback {
 
 			log.fine("received configuration message for topic: " + topicIdentifier);
 			break;
-		case CONFIGURATION_PRIVATE:
-		case CONFIGURATION_GLOBAL:
+		case CONFIG_PRIVATE:
+		case CONFIG_GLOBAL:
 			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 				services.getConfigDb(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);

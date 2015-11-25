@@ -8,6 +8,7 @@ import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedScope;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
+import org.eclipse.moquette.fce.model.info.InfoMessageType;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -21,61 +22,60 @@ public class ManagedTopicHandler extends FceEventHandler {
 		super(services, pluginClientIdentifier);
 	}
 
-	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
-		log.fine("recieved canRead Event on " + properties.getTopic() + "from client" + properties.getClientId());
+	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
+		log.fine("recieved canRead Event on " + props.getTopic() + "from client" + props.getClientId());
 
-		Boolean preCheckState = preCheckManagedZone(properties, operation);
-		
-		if(preCheckState != null){
+		Boolean preCheckState = preCheckManagedZone(props, action);
+
+		if (preCheckState != null) {
 			return preCheckState;
 		}
 
 		// we are in a managed zone
 		try {
-			UserConfiguration userConfigGlobal = services.getConfigDb(ManagedScope.GLOBAL).getConfiguration(properties);
-			UserQuota userQuotasGlobal = services.getQuotaDb(ManagedScope.GLOBAL).getQuota(properties, operation);
+			UserConfiguration configGlobal = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props);
+			UserQuota quotasGlobal = getServices().getQuotaDb(ManagedScope.GLOBAL).getQuota(props, action);
 
-			if (userConfigGlobal.isValidForEveryone()) {
-				if(userQuotasGlobal == null){
-					userQuotasGlobal = new UserQuota(properties.getUser(), properties.getUser(), operation, QuotaConverter.convertRestrictions(userConfigGlobal.getRestrictions(operation)));
+			if (configGlobal.isValidForEveryone()) {
+				if (quotasGlobal == null) {
+					quotasGlobal = new UserQuota(props.getUser(), props.getUser(), action,
+							QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
 				}
 			}
-			
-			if (!userConfigGlobal.isValid(properties, operation) || !userQuotasGlobal.isValid(properties, operation)) {
+
+			if (!configGlobal.isValid(props, action) || !quotasGlobal.isValid(props, action)) {
+				logAndSendInfoMsg(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
 				return false;
 			}
 
-			UserConfiguration userConfigPrivate = services.getConfigDb(ManagedScope.PRIVATE)
-					.getConfiguration(properties);
-			UserQuota userQuotasPrivate = services.getQuotaDb(ManagedScope.PRIVATE).getQuota(properties, operation);
+			UserConfiguration configPrivate = getServices().getConfigDb(ManagedScope.PRIVATE).getConfiguration(props);
+			UserQuota quotasPrivate = getServices().getQuotaDb(ManagedScope.PRIVATE).getQuota(props, action);
 
-			if (!userConfigPrivate.isValid(properties, operation)
-					|| !userQuotasPrivate.isValid(properties, operation)) {
+			if (!configPrivate.isValid(props, action) || !quotasPrivate.isValid(props, action)) {
+				logAndSendInfoMsg(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
 				return false;
 			}
 
-		
-			substractQuota(properties, operation, ManagedZone.QUOTA_GLOBAL, userQuotasGlobal);
-			substractQuota(properties, operation, ManagedZone.QUOTA_PRIVATE, userQuotasPrivate);
+			substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, quotasGlobal);
+			substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate);
 
 			return true;
 		} catch (FceAuthorizationException e) {
-			log.warning(e.toString());
-			// TODO lants1 publish info message
-			// services.getMqttService().publish(topic, json, retained);
+			logAndSendInfoMsg(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
 			return false;
 		}
 	}
-	
-	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone, UserQuota userQuotas) throws FceAuthorizationException{
+
+
+	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
+			UserQuota userQuotas) throws FceAuthorizationException {
 		userQuotas.substractRequestFromQuota(properties, operation);
-		String quotaJson = services.getJsonParser().serialize(userQuotas);
+		String quotaJson = getServices().getJsonParser().serialize(userQuotas);
 
-		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties,
-				zone, operation);
+		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties, zone, operation);
 
-		services.getQuotaDb(zone.getScope()).put(userTopicIdentifier, userQuotas);
-		services.getMqtt().publish(userTopicIdentifier, quotaJson);
+		getServices().getQuotaDb(zone.getScope()).put(userTopicIdentifier, userQuotas);
+		getServices().getMqtt().publish(userTopicIdentifier, quotaJson);
 
 	}
 

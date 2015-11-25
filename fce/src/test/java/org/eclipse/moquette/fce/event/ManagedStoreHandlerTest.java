@@ -16,7 +16,7 @@ public class ManagedStoreHandlerTest {
 	public void testUserValidationClient() {
 		ManagedStoreHandler handler = mock(ManagedStoreHandler.class);
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIGURATION_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, USER_IDENTIFIER,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, USER_IDENTIFIER,
 				false, null);
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();

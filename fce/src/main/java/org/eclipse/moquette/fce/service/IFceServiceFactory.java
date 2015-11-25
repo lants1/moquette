@@ -7,8 +7,6 @@ public interface IFceServiceFactory {
 
 	MqttService getMqtt();
 
-	AuthorizationService getAuthorization();
-
 	JsonParserService getJsonParser();
 
 	ConfigurationDbService getConfigDb(ManagedZone zone);
