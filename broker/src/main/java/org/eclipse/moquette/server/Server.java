@@ -15,9 +15,9 @@
  */
 package org.eclipse.moquette.server;
 
-import org.eclipse.moquette.plugin.AuthenticationAndAuthorizationPlugin;
-import org.eclipse.moquette.plugin.InterceptionPlugin;
-import org.eclipse.moquette.plugin.BrokerPlugin;
+import org.eclipse.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
+import org.eclipse.moquette.plugin.IBrokerInterceptionPlugin;
+import org.eclipse.moquette.plugin.IBrokerPlugin;
 import org.eclipse.moquette.plugin.MoquetteOperator;
 import org.eclipse.moquette.plugin.PluginAuthenticationAndAuthorizationAdapter;
 import org.eclipse.moquette.plugin.PluginInterceptionHandlerAdapter;
@@ -50,7 +50,7 @@ public class Server {
 
 	private ServerAcceptor m_acceptor;
 
-	private List<BrokerPlugin> loadedPlugins = new ArrayList<>();
+	private List<IBrokerPlugin> loadedPlugins = new ArrayList<>();
 
 	public static void main(String[] args) throws IOException {
 		final Server server = new Server();
@@ -111,10 +111,11 @@ public class Server {
 		LOG.info("Persistent store file: " + config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
 		final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config);
 
-		loadPlugins(config, processor);
-
 		m_acceptor = new NettyAcceptor();
 		m_acceptor.initialize(processor, config);
+		
+		loadPlugins(config, processor);
+
 		LOG.info("Server started.");
 	}
 
@@ -127,16 +128,17 @@ public class Server {
 	}
 
 	private void loadPlugins(IConfig config, final ProtocolProcessor processor) {
-		ServiceLoader<BrokerPlugin> loader = ServiceLoader.load(BrokerPlugin.class);
+		LOG.info("Try to load plugins...");
+		ServiceLoader<IBrokerPlugin> loader = ServiceLoader.load(IBrokerPlugin.class);
 
 		boolean alreadyLoadedAuthenticationAndAuthorizationPlugin = false;
 
-		for (BrokerPlugin p : loader) {
-			if (p instanceof AuthenticationAndAuthorizationPlugin) {
+		for (IBrokerPlugin p : loader) {
+			if (p instanceof IAuthenticationAndAuthorizationPlugin) {
 				// Only one Authentication and Authorization Plugin allowed.
 				if (!alreadyLoadedAuthenticationAndAuthorizationPlugin) {
-					AuthenticationAndAuthorizationPlugin currentPlugin = (AuthenticationAndAuthorizationPlugin) p;
-					currentPlugin.load((Properties) config, new MoquetteOperator(processor));
+					IAuthenticationAndAuthorizationPlugin currentPlugin = (IAuthenticationAndAuthorizationPlugin) p;
+					currentPlugin.load(config, new MoquetteOperator(processor));
 					PluginAuthenticationAndAuthorizationAdapter pluginAdapter = new PluginAuthenticationAndAuthorizationAdapter(
 							currentPlugin);
 					// plugin replaces already defined Authenticator and Authorizator
@@ -147,9 +149,9 @@ public class Server {
 				}
 				alreadyLoadedAuthenticationAndAuthorizationPlugin = true;
 			}
-			if (p instanceof InterceptionPlugin) {
-				InterceptionPlugin currentPlugin = (InterceptionPlugin) p;
-				currentPlugin.load((Properties) config, new MoquetteOperator(processor));
+			if (p instanceof IBrokerInterceptionPlugin) {
+				IBrokerInterceptionPlugin currentPlugin = (IBrokerInterceptionPlugin) p;
+				currentPlugin.load(config, new MoquetteOperator(processor));
 				processor.addInterceptionHandler(new PluginInterceptionHandlerAdapter(currentPlugin));
 				loadedPlugins.add(currentPlugin);
 				LOG.info("Loaded BrokerInterceptionPlugin: " + currentPlugin.getPluginIdentifier());
@@ -158,7 +160,7 @@ public class Server {
 	}
 
 	private void unloadPlugins() {
-		for (BrokerPlugin plugin : loadedPlugins) {
+		for (IBrokerPlugin plugin : loadedPlugins) {
 			plugin.unload();
 			loadedPlugins.remove(plugin);
 			LOG.info("Unloaded Broker Plugin: " + plugin.getPluginIdentifier());

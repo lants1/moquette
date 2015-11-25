@@ -38,6 +38,16 @@
         </file>
         
         <file>
+            <source>src/main/resources/serverkeystore.jks</source>
+            <outputDirectory>bin/</outputDirectory>
+        </file>
+        
+         <file>
+            <source>src/main/resources/pluginkeystore.jks</source>
+            <outputDirectory>bin/</outputDirectory>
+        </file>
+        
+        <file>
             <source>src/main/resources/README.txt</source>
         </file>
     </files>     

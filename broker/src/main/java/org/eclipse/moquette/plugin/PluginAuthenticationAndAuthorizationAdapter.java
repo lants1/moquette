@@ -7,9 +7,9 @@ import org.eclipse.moquette.spi.impl.security.IAuthorizator;
 
 public class PluginAuthenticationAndAuthorizationAdapter implements IAuthenticator, IAuthorizator {
 
-	AuthenticationAndAuthorizationPlugin plugin;
+	IAuthenticationAndAuthorizationPlugin plugin;
 
-	public PluginAuthenticationAndAuthorizationAdapter(AuthenticationAndAuthorizationPlugin p) {
+	public PluginAuthenticationAndAuthorizationAdapter(IAuthenticationAndAuthorizationPlugin p) {
 		this.plugin = p;
 	}
 

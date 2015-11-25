@@ -6,7 +6,7 @@ package org.eclipse.moquette.plugin;
  * @author lants1
  *
  */
-public interface AuthenticationAndAuthorizationPlugin extends BrokerPlugin {
+public interface IAuthenticationAndAuthorizationPlugin extends IBrokerPlugin {
 	
     boolean canDoOperation(AuthorizationProperties props, MqttAction operation);
     

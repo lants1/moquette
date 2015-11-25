@@ -1,18 +1,16 @@
 package org.eclipse.moquette.plugin;
 
-import java.util.Properties;
-
 /**
  * General Interface for broker-plugins.
  * 
  * @author lants1
  *
  */
-public interface BrokerPlugin {
+public interface IBrokerPlugin {
 	
 	public String getPluginIdentifier();
 	
-	public void load(Properties config, BrokerOperator brokerOperator);
+	public void load(IBrokerConfig config, IBrokerOperator brokerOperator);
 	
 	public void unload();
 }

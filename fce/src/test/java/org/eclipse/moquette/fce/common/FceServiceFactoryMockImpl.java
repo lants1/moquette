@@ -7,12 +7,12 @@ import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
 import org.eclipse.moquette.fce.service.QuotaDbService;
-import org.eclipse.moquette.plugin.BrokerOperator;
+import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.mockito.Mockito;
 
 public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 
-	private BrokerOperator brokerOperator;
+	private IBrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
 	private JsonParserService jsonParserService;
@@ -21,7 +21,7 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServicePrivate;
 
-	public FceServiceFactoryMockImpl(BrokerOperator brokerOperator, ConfigurationDbService configDbServiceGlobal,
+	public FceServiceFactoryMockImpl(IBrokerOperator brokerOperator, ConfigurationDbService configDbServiceGlobal,
 			QuotaDbService quotaDbServiceGlobal, ConfigurationDbService configDbServicePrivate,
 			QuotaDbService quotaDbServicePrivate) {
 		super();

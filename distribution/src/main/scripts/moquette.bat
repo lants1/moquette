@@ -13,6 +13,16 @@ echo "  \_|  |_/\___/ \__, |\__,_|\___|\__|\__\___| \_|  |_/\_/\_\ \_/   \_/   "
 echo "                   | |                                                   "
 echo "                   |_|                                                   "
 echo "                                                                         "
+echo "                                                                         "                                                                      
+echo "           _.====.._                                                     " 
+echo "         ,:._       ~-_                                                  " 
+echo "              \        ~-_                                               " 
+echo "               / _  _  |  .                                              " 
+echo "              / /_)/ | |    ~-_                                          " 
+echo "    -..__..-''  \_ \_\ _      ~~--..__...----... FCE by lants1 ...       "                                                          
+echo "                                                                         "     
+echo "                                                                         " 
+
 
 set "CURRENT_DIR=%cd%"
 if not "%MOQUETTE_HOME%" == "" goto gotHome

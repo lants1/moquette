@@ -7,7 +7,7 @@ import org.eclipse.moquette.spi.IMessagesStore;
 import org.eclipse.moquette.spi.impl.ProtocolProcessor;
 import org.eclipse.moquette.spi.impl.subscriptions.SubscriptionsStore;
 
-public class MoquetteOperator implements BrokerOperator {
+public class MoquetteOperator implements IBrokerOperator {
 
 	final ProtocolProcessor processor;
 	
