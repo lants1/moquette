@@ -45,7 +45,7 @@ public class MqttService {
 
 	public void initializeInternalMqttClient() {
 		String ssl_port = config.getProperty("ssl_port");
-
+		log.info("try to connect to ssl://localhost:" + ssl_port);
 		try {
 			client = new MqttClient("ssl://localhost:" + ssl_port,
 					config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER));
@@ -131,6 +131,8 @@ public class MqttService {
 			NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 
+		log.info("configure PROPS_PLUGIN_JKS_PATH"+config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
+	
 		InputStream jksInputStream = jksDatastore(config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
 		ks.load(jksInputStream, config.getProperty(FcePlugin.PROPS_PLUGIN_KEY_STORE_PASSWORD).toCharArray());
 
