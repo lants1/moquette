@@ -1,10 +1,13 @@
 package org.eclipse.moquette.fce;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.FceTimeUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.common.ManagedZoneUtil;
@@ -38,19 +41,32 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	public static final String PROPS_PLUGIN_CLIENT_PASSWORD = "plugin_client_password";
 	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
 
+	private SecureRandom random = new SecureRandom();
+
 	private String pluginIdentifier;
 	private IFceServiceFactory services;
 	ScheduledExecutorService scheduler;
 
 	@Override
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
+		String pluginUsr = randomString();
+		String pluginPw = randomString();
+		pluginIdentifier = FceHashUtil.getFceHash(pluginUsr, pluginPw);
+
+		config.setProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER, pluginIdentifier);
+		config.setProperty(PROPS_PLUGIN_CLIENT_USERNAME, pluginUsr);
+		config.setProperty(PROPS_PLUGIN_CLIENT_PASSWORD, pluginPw);
+
 		services = new FceServiceFactoryImpl(config, brokerOperator);
 
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 
-		pluginIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
+	}
+
+	private String randomString() {
+		return new BigInteger(130, random).toString(16);
 	}
 
 	@Override
@@ -66,23 +82,22 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	}
 
 	@Override
-	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
+	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
+		if (ManagedZoneUtil.isInManagedReadableStore(props.getTopic())) {
+			return new ManagedStoreHandler(services, pluginIdentifier).canDoOperation(props, action);
+		}
+
 		if (services.isInitialized()) {
-
 			FceEventHandler handler;
-
-			if (ManagedZone.INTENT.equals(ManagedZoneUtil.getZoneForTopic(properties.getTopic()))) {
+			if (ManagedZone.INTENT.equals(ManagedZoneUtil.getZoneForTopic(props.getTopic()))) {
 				handler = new ManagedIntentHandler(services, pluginIdentifier);
-			} else if (ManagedZoneUtil.isInManagedStore(properties.getTopic())) {
-				handler = new ManagedStoreHandler(services, pluginIdentifier);
-			} else if (services.getConfigDb(ManagedZone.CONFIG_GLOBAL)
-					.isManaged(new ManagedTopic(properties.getTopic()))) {
+			} else if (services.getConfigDb(ManagedZone.CONFIG_GLOBAL).isManaged(new ManagedTopic(props.getTopic()))) {
 				handler = new ManagedTopicHandler(services, pluginIdentifier);
 			} else {
 				handler = new UnmanagedTopicHandler(services, pluginIdentifier);
 			}
 
-			return handler.canDoOperation(properties, operation);
+			return handler.canDoOperation(props, action);
 		}
 		log.warning("configuration not yet fully loaded from retained messages, write not possible");
 		return false;

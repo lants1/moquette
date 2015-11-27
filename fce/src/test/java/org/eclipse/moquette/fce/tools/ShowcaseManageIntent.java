@@ -25,7 +25,6 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.moquette.fce.common.FceHashUtil;
 import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.tools.callback.SampleFceClientCallback;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -63,7 +62,7 @@ public class ShowcaseManageIntent {
 		String inputJson = readFile("/showcase_manage.json");
 		
 		
-		client.publish(ManagedZone.INTENT.getTopicPrefix()+"/test1", inputJson.getBytes(), 2, false);
+		client.publish(ManagedZone.INTENT.getTopicPrefix()+"/test1", inputJson.getBytes(), 1, true);
 
 	}
 

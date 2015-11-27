@@ -37,6 +37,7 @@ public class ManagedTopic {
 	}
 
 	public String getIdentifier(ManagedInformation managedInfo, ManagedZone zone) {
+		// TODO lants1 user identifier wird verdoppelt o_O sicherstellen das zuhinterst nicht /_ ist......
 		if (StringUtils.isEmpty(managedInfo.getUserIdentifier())) {
 			return getAllIdentifier(zone);
 		}

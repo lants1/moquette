@@ -122,9 +122,9 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	 */
 	@Override
 	public boolean isInitialized() {
-		return (getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
+		return (getMqtt() != null && getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaDb(ManagedZone.QUOTA_GLOBAL).isInitialized()
 				&& getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
-				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized() && getMqtt() != null);
+				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized());
 	}
 }

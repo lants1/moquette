@@ -17,6 +17,16 @@ public final class ManagedZoneUtil {
 		return false;
 	}
 	
+	public static boolean isInManagedReadableStore(String topic){
+		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
+		for(ManagedZone zone : zones) {
+		    if(topic.startsWith(zone.getTopicPrefix()) && zone.getPermission().isReadable()){
+		    	return true;
+		    }
+		}
+		return false;
+	}
+	
 	public static ManagedZone getZoneForTopic(String topic){
 		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
 		for(ManagedZone zone : zones) {
