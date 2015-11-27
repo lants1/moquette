@@ -8,7 +8,7 @@ public enum ManagedZone {
 	CONFIG_PRIVATE("/$MANAGED/CONFIGURATION/PRIVATE", TopicPermission.READ, ManagedScope.PRIVATE),
 	QUOTA_GLOBAL("/$MANAGED/QUOTA/GLOBAL", TopicPermission.READ, ManagedScope.GLOBAL),
 	QUOTA_PRIVATE("/$MANAGED/QUOTA/PRIVATE", TopicPermission.READ, ManagedScope.PRIVATE),
-	INFO("/$MANAGED_/INFO", TopicPermission.READ, ManagedScope.GLOBAL),
+	INFO("/$MANAGED/INFO", TopicPermission.READ, ManagedScope.GLOBAL),
 	INTENT("/$MANAGED/INTENT", TopicPermission.WRITE, ManagedScope.GLOBAL);
 
 	private final String topicPrefix;

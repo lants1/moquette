@@ -47,7 +47,7 @@ public class MqttEventHandler implements MqttCallback {
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
 		log.fine("received internal message for topic:"+topicIdentifier);
 		ManagedZone zone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
-		String msgPayload = String.valueOf(message.getPayload());
+		String msgPayload = message.toString();
 		ManagedTopic topic = new ManagedTopic(topicIdentifier);
 
 		switch (zone) {
@@ -85,21 +85,17 @@ public class MqttEventHandler implements MqttCallback {
 			break;
 		case CONFIG_PRIVATE:
 		case CONFIG_GLOBAL:
-			if (!services.isInitialized()) {
 				UserConfiguration msgConfig = services.getJsonParser().deserializeUserConfiguration(msgPayload);
 				services.getConfigDb(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
 				services.getMqtt().publish(topic.getIdentifier(msgConfig, zone), msgPayload);
 				log.fine("received configuration message for topic: " + topicIdentifier);
-			}
 			break;
 		case QUOTA_PRIVATE:
 		case QUOTA_GLOBAL:
-			if (!services.isInitialized()) {
 				UserQuota msgQuota = services.getJsonParser().deserializeQuota(msgPayload);
 				services.getQuotaDb(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
 				services.getMqtt().publish(topic.getIdentifier(msgQuota, zone), msgPayload);
 				log.fine("received quota message for topic: " + topicIdentifier);
-			}
 			break;
 		default:
 			break;

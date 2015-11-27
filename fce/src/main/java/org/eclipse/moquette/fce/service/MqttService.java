@@ -80,6 +80,7 @@ public class MqttService {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
 		message.setRetained(true);
+		message.setQos(1);
 		try {
 			client.publish(topic, message);
 			log.fine("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");

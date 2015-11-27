@@ -60,7 +60,7 @@ public abstract class FceEventHandler {
 	protected void logAndSendInfoMsg(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
 		log.fine(msgType + " for topic:" + props.getTopic() + " user: " + props.getUser() + " action:" + action);
 		InfoMessage infoMsg = new InfoMessage(props.getUser(), props.getClientId(), msgType, "mqttaction: " + action);
-		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(ManagedZone.INFO),
+		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(props, ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
 	}
 
