@@ -40,7 +40,7 @@ public class ManagedTopic {
 		if (StringUtils.isEmpty(managedInfo.getUserIdentifier())) {
 			return getAllIdentifier(zone);
 		}
-		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
+		return ManagedZoneUtil.moveTopicToZone(topicIdentifer + USER_PREFIX + FceHashUtil.getFceHashWithPepper(managedInfo),
 				zone);
 	}
 
@@ -61,7 +61,7 @@ public class ManagedTopic {
 		}
 
 		return ManagedZoneUtil.moveTopicToZone(
-				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + FceHashUtil.getFceHash(managedInfo),
+				topicIdentifer + LEVEL_CHAR + operation.getValue() + USER_PREFIX + FceHashUtil.getFceHashWithPepper(managedInfo),
 				zone);
 	}
 

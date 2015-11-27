@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.exception.FceSystemException;
 
 public final class ManagedZoneUtil {
 
@@ -25,7 +24,7 @@ public final class ManagedZoneUtil {
 		    	return zone;
 		    }
 		}
-		throw new FceSystemException("no managed zone for topic found");
+		return null;
 	}
 	
 	public static String moveTopicToZone(String topic, ManagedZone topicZone){

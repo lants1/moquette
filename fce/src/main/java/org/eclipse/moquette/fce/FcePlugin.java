@@ -49,12 +49,6 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 
-		services.getMqtt().subscribe(ManagedZone.INTENT.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
-		services.getMqtt().subscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
-
 		pluginIdentifier = config.getProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
@@ -62,22 +56,13 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	@Override
 	public void unload() {
 		scheduler.shutdownNow();
-		services.getMqtt().unsubscribe(ManagedZone.INTENT.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
-		services.getMqtt().unsubscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
 	@Override
 	public boolean checkValid(AuthenticationProperties props) {
-		if (services.isInitialized()) {
-			AuthenticationHandler handler = new AuthenticationHandler(services, pluginIdentifier);
-			return handler.checkValid(props);
-		}
-		log.info("configuration not yet fully loaded from retained messages, validity check not possible");
-		return false;
+		AuthenticationHandler handler = new AuthenticationHandler(services, pluginIdentifier);
+		return handler.checkValid(props);
 	}
 
 	@Override
@@ -99,7 +84,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 			return handler.canDoOperation(properties, operation);
 		}
-		log.info("configuration not yet fully loaded from retained messages, write not possible");
+		log.warning("configuration not yet fully loaded from retained messages, write not possible");
 		return false;
 	}
 

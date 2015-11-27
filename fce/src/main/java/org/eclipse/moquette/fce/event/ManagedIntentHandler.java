@@ -26,6 +26,9 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 	// TODO lants1 to complicated....
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
+		log.fine("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+				+ action);
+
 		Boolean preCheckState = preCheckManagedZone(props, action);
 		if (preCheckState != null) {
 			return preCheckState;
@@ -38,6 +41,8 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 			if (getServices().getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
+					log.fine("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
+							+ " and action:" + action);
 					return true;
 				}
 
@@ -57,6 +62,9 @@ public class ManagedIntentHandler extends FceEventHandler {
 					}
 				}
 			}
+			log.fine("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+					+ action);
+
 			return true;
 
 		} catch (FceAuthorizationException e) {

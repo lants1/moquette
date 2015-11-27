@@ -13,18 +13,18 @@ public class FceHashUtilTest {
 		InfoMessage infoMsg = new InfoMessage("user", "pw", null, null);
 		InfoMessage infoMsg2 = new InfoMessage("user2", "pw2", null, null);
 	
-		String pw = FceHashUtil.getFceHash(infoMsg);
-		String pw2 = FceHashUtil.getFceHash(infoMsg2);
+		String pw = FceHashUtil.getFceHashWithPepper(infoMsg);
+		String pw2 = FceHashUtil.getFceHashWithPepper(infoMsg2);
 
 		assertFalse(pw.equalsIgnoreCase(pw2));
 
-		String pw3 = FceHashUtil.getFceHash(infoMsg);
+		String pw3 = FceHashUtil.getFceHashWithPepper(infoMsg);
 
 		assertTrue(pw3.equalsIgnoreCase(pw));
 		
 		
 		InfoMessage infoMsg3 = new InfoMessage("fceplugin", "samplepw", null, null);
-		System.out.println(FceHashUtil.getFceHash(infoMsg3));
+		System.out.println(FceHashUtil.getFceHashWithPepper(infoMsg3));
 	}
 
 }

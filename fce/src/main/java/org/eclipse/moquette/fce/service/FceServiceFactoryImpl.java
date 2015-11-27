@@ -97,10 +97,9 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 
 	@Override
 	public ConfigurationDbService getConfigDb(ManagedScope scope) {
-		if(ManagedScope.GLOBAL.equals(scope)){
+		if (ManagedScope.GLOBAL.equals(scope)) {
 			return getConfigDb(ManagedZone.CONFIG_GLOBAL);
-		}
-		else if(ManagedScope.PRIVATE.equals(scope)){
+		} else if (ManagedScope.PRIVATE.equals(scope)) {
 			return getConfigDb(ManagedZone.CONFIG_PRIVATE);
 		}
 		throw new FceSystemException("invalid scope for config db");
@@ -108,15 +107,14 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 
 	@Override
 	public QuotaDbService getQuotaDb(ManagedScope scope) {
-		if(ManagedScope.GLOBAL.equals(scope)){
+		if (ManagedScope.GLOBAL.equals(scope)) {
 			return getQuotaDb(ManagedZone.QUOTA_GLOBAL);
-		}
-		else if(ManagedScope.PRIVATE.equals(scope)){
+		} else if (ManagedScope.PRIVATE.equals(scope)) {
 			return getQuotaDb(ManagedZone.QUOTA_PRIVATE);
 		}
 		throw new FceSystemException("invalid scope for quota db");
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -127,6 +125,6 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 		return (getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaDb(ManagedZone.QUOTA_GLOBAL).isInitialized()
 				&& getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
-				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized());
+				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized() && getMqtt() != null);
 	}
 }

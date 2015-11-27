@@ -121,9 +121,9 @@ public class Server {
 
 	public void stopServer() {
 		LOG.info("Server stopping...");
+		unloadPlugins();
 		m_acceptor.close();
 		SimpleMessaging.getInstance().shutdown();
-		unloadPlugins();
 		LOG.info("Server stopped");
 	}
 
@@ -162,7 +162,6 @@ public class Server {
 	private void unloadPlugins() {
 		for (IBrokerPlugin plugin : loadedPlugins) {
 			plugin.unload();
-			loadedPlugins.remove(plugin);
 			LOG.info("Unloaded Broker Plugin: " + plugin.getPluginIdentifier());
 		}
 	}
