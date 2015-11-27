@@ -21,6 +21,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.moquette.fce.FcePlugin;
+import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.plugin.IBrokerConfig;
@@ -37,6 +38,7 @@ public class MqttService {
 	MqttClient client;
 	IBrokerConfig config;
 	MqttEventHandler eventHandler;
+	MqttConnectOptions options = new MqttConnectOptions();
 
 	public MqttService(IBrokerConfig config, MqttEventHandler eventHandler) {
 		this.config = config;
@@ -52,13 +54,13 @@ public class MqttService {
 
 			SSLSocketFactory ssf = configureSSLSocketFactory(config);
 
-			MqttConnectOptions options = new MqttConnectOptions();
 			options.setUserName(config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_USERNAME));
 			options.setPassword(config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_PASSWORD).toCharArray());
 			options.setSocketFactory(ssf);
 
-			client.connect();
 			client.setCallback(eventHandler);
+			client.connect(options);
+			registerTopics();
 			log.info("internal mqtt client connected to broker");
 
 		} catch (Exception e) {
@@ -66,6 +68,14 @@ public class MqttService {
 		}
 	}
 
+	public void registerTopics(){
+		subscribe(ManagedZone.INTENT.getTopicFilter());
+		subscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
+		subscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
+		subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
+		subscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
+	}
+	
 	public void publish(String topic, String json) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
@@ -108,7 +118,8 @@ public class MqttService {
 	}
 
 	public void connect() throws MqttSecurityException, MqttException {
-		client.connect();
+		client.setCallback(eventHandler);
+		client.connect(options);
 	}
 
 	/**

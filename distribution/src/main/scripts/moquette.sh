@@ -57,7 +57,7 @@ LOG_FILE=$MOQUETTE_HOME/config/moquette-log.properties
 MOQUETTE_PATH=$MOQUETTE_HOME/
 #LOG_CONSOLE_LEVEL=info
 #LOG_FILE_LEVEL=fine
-JAVA_OPTS_SCRIPT="-XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true"
+JAVA_OPTS_SCRIPT="-XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
 
 $JAVA -server $JAVA_OPTS $JAVA_OPTS_SCRIPT -Dlog4j.configuration="file:$LOG_FILE" -Dmoquette.path="$MOQUETTE_PATH" -cp "$MOQUETTE_HOME/lib/*" org.eclipse.moquette.server.Server
 

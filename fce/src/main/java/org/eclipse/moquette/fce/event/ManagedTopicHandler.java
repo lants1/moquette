@@ -23,7 +23,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.fine("recieved canRead Event on " + props.getTopic() + "from client" + props.getClientId());
+		log.fine("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId()+" and action:"+action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
 
@@ -58,7 +58,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 			substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, quotasGlobal);
 			substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate);
-
+			log.fine("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()+" and action:"+action);
 			return true;
 		} catch (FceAuthorizationException e) {
 			logAndSendInfoMsg(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);

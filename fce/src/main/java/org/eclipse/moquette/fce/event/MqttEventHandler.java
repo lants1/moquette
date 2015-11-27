@@ -45,6 +45,7 @@ public class MqttEventHandler implements MqttCallback {
 	// TODO lants1 better implementation
 	@Override
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
+		log.fine("received internal message for topic:"+topicIdentifier);
 		ManagedZone zone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
 		String msgPayload = String.valueOf(message.getPayload());
 		ManagedTopic topic = new ManagedTopic(topicIdentifier);
@@ -80,7 +81,7 @@ public class MqttEventHandler implements MqttCallback {
 			services.getMqtt().publish(subQuotaTopic, services.getJsonParser().serialize(subQuota));
 			services.getMqtt().publish(pubQuotaTopic, services.getJsonParser().serialize(pubQuota));
 
-			log.fine("received configuration message for topic: " + topicIdentifier);
+			log.fine("received intent message for topic: " + topicIdentifier);
 			break;
 		case CONFIG_PRIVATE:
 		case CONFIG_GLOBAL:
