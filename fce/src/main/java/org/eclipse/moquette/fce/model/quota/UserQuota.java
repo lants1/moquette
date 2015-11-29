@@ -1,5 +1,6 @@
 package org.eclipse.moquette.fce.model.quota;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.model.IValid;
@@ -41,6 +42,7 @@ public class UserQuota extends ManagedInformation implements IValid{
 	}
 
 	public void substractRequestFromQuota(AuthorizationProperties props, MqttAction operation){
+		setTimestamp(new Date());
 		for(Quota quota : quotas){
 			quota.substractRequestFromQuota(props);
 		}

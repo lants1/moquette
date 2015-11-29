@@ -19,7 +19,7 @@ import org.eclipse.moquette.plugin.MqttAction;
  *
  */
 public class UserConfiguration extends ManagedInformation implements IValid {
-	
+
 	private final ManagedState managedState;
 	private final ManagedScope managedScope;
 	private final AdminPermission adminPermission;
@@ -51,8 +51,8 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 
 	public List<Restriction> getRestrictions(MqttAction operation) {
 		List<Restriction> results = new ArrayList<>();
-		for(Restriction restriction : getRestrictions()){
-			if(restriction.getMqttAction().canDoOperation(operation)){
+		for (Restriction restriction : getRestrictions()) {
+			if (restriction.getMqttAction().canDoOperation(operation)) {
 				results.add(restriction);
 			}
 		}
@@ -83,10 +83,16 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 			return true;
 		}
 
-		return false;
+		for (Restriction restriction : restrictions) {
+			if (!restriction.isValid(props, operation)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
-	
-	public boolean isValidForEveryone(){
+
+	public boolean isValidForEveryone() {
 		return StringUtils.isEmpty(getUserIdentifier());
 	}
 }

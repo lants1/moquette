@@ -33,11 +33,11 @@ public final class QuotaConverter {
 		for (Restriction restriction : restrictions) {
 			List<IQuotaState> quotaStates = new ArrayList<>();
 			if (restriction.getMessageCount() > 0) {
-				quotaStates.add(new MessageCountState(0, restriction.getMessageCount()));
+				quotaStates.add(new MessageCountState(restriction.getMessageCount(),0));
 			}
 
 			if (restriction.getTotalMessageSize() > 0) {
-				quotaStates.add(new TransmittedDataState(0, restriction.getTotalMessageSize() * restriction.getDataUnit().getMultiplier()));
+				quotaStates.add(new TransmittedDataState(restriction.getTotalMessageSize() * restriction.getDataUnit().getMultiplier(),0));
 			}
 
 			if (restriction instanceof PeriodicRestriction) {

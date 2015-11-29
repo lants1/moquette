@@ -5,24 +5,11 @@
   "actionPermission": "ALL",
   "restrictions": [
     {
-      "type": "TimeframeRestriction",
-      "properties": {
-        "from": "Jan 18, 2015 12:00:00 AM",
-        "to": "Jan 18, 2015 12:00:00 AM",
-        "mqttAction": "ALL",
-        "messageCount": 11,
-        "maxMessageSize": 1024,
-        "totalMessageSize": 2048,
-        "sizeUnit": "kB",
-        "wsdlUrl": ""
-      }
-    },
-    {
       "type": "PeriodicRestriction",
       "properties": {
         "cyle": "DAILY",
         "mqttAction": "ALL",
-        "messageCount": 11,
+        "messageCount": 3,
         "maxMessageSize": 1024,
         "totalMessageSize": 2048,
         "sizeUnit": "kB",

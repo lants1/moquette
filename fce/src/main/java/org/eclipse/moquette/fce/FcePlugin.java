@@ -27,6 +27,7 @@ import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
@@ -71,6 +72,12 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 	@Override
 	public void unload() {
+		try {
+			services.getMqtt().unregisterSubscriptions();
+		} catch (MqttException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		scheduler.shutdownNow();
 		log.info(PLUGIN_IDENTIFIER + " unloaded");
 	}

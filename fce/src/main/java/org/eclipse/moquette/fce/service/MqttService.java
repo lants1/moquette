@@ -12,6 +12,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -25,7 +27,9 @@ import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.plugin.IBrokerConfig;
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -35,10 +39,12 @@ public class MqttService {
 
 	private final static Logger log = Logger.getLogger(MqttService.class.getName());
 
-	MqttClient client;
-	IBrokerConfig config;
-	MqttEventHandler eventHandler;
-	MqttConnectOptions options = new MqttConnectOptions();
+	private MqttAsyncClient client;
+	private IBrokerConfig config;
+	private MqttEventHandler eventHandler;
+	private MqttConnectOptions options = new MqttConnectOptions();
+	private List<String> registeredTopics = new ArrayList<>(); 
+	boolean initialized = false;
 
 	public MqttService(IBrokerConfig config, MqttEventHandler eventHandler) {
 		this.config = config;
@@ -47,9 +53,15 @@ public class MqttService {
 
 	public void initializeInternalMqttClient() {
 		String ssl_port = config.getProperty("ssl_port");
+		
+		registeredTopics.add(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
+		registeredTopics.add(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
+		registeredTopics.add(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
+		registeredTopics.add(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
+		
 		log.info("try to connect to ssl://localhost:" + ssl_port);
 		try {
-			client = new MqttClient("ssl://localhost:" + ssl_port,
+			client = new MqttAsyncClient("ssl://localhost:" + ssl_port,
 					config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER));
 
 			SSLSocketFactory ssf = configureSSLSocketFactory(config);
@@ -59,23 +71,66 @@ public class MqttService {
 			options.setSocketFactory(ssf);
 
 			client.setCallback(eventHandler);
-			client.connect(options);
-			registerTopics();
-			log.info("internal mqtt client connected to broker");
+			client.connect(options, null, new IMqttActionListener() {
+				@Override
+				public void onSuccess(IMqttToken asyncActionToken) {
+					try {
+						registerTopics();
+					} catch (MqttException e) {
+						e.printStackTrace();
+					}
+					log.info("client connected");
+				}
+
+				@Override
+				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+					log.warning("internal mqtt client can't connect to broker");
+				}
+			});
 
 		} catch (Exception e) {
 			throw new FceSystemException(e);
 		}
 	}
-
-	public void registerTopics(){
-		subscribe(ManagedZone.INTENT.getTopicFilter());
-		subscribe(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
-		subscribe(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
-		subscribe(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
-		subscribe(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
+	
+	public void setInitialized(){
+		this.initialized = true;
 	}
 	
+	public boolean isInitialized(){
+		return this.initialized;
+	}
+
+	public void registerTopics() throws MqttException {
+		client.subscribe(registeredTopics.toArray(new String[registeredTopics.size()]), new int[]{1,1,1,1}, null, new IMqttActionListener() {
+			@Override
+			public void onSuccess(IMqttToken asyncActionToken) {
+				setInitialized();
+				log.info("topics registered,client initialized");
+			}
+
+			@Override
+			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+				log.warning("internal mqtt client can't connect to broker");
+			}
+		});
+	}
+
+	public void unregisterSubscriptions() throws MqttException {
+		client.unsubscribe(registeredTopics.toArray(new String[registeredTopics.size()]), null, new IMqttActionListener() {
+			@Override
+			public void onSuccess(IMqttToken asyncActionToken) {
+				setInitialized();
+				log.info("topics registered,client initialized");
+			}
+
+			@Override
+			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+				log.warning("internal mqtt client can't connect to broker");
+			}
+		});
+	}
+
 	public void publish(String topic, String json) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
@@ -83,36 +138,19 @@ public class MqttService {
 		message.setQos(1);
 		try {
 			client.publish(topic, message);
-			log.fine("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
+			log.info("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void delete(String topic) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(new byte[0]);
 		message.setRetained(true);
 		try {
 			client.publish(topic, message);
-			log.fine("topic: " + topic + " deleted.");
-		} catch (MqttException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void subscribe(String topicFilter) {
-		try {
-			client.subscribe(topicFilter);
-			log.info("internal mqtt client subscribed for: " + topicFilter);
-		} catch (MqttException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void unsubscribe(String topicFilter) {
-		try {
-			client.unsubscribe(topicFilter);
+			log.info("topic: " + topic + " deleted.");
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
@@ -143,8 +181,8 @@ public class MqttService {
 			NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 
-		log.info("configure PROPS_PLUGIN_JKS_PATH"+config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
-	
+		log.info("configure PROPS_PLUGIN_JKS_PATH" + config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
+
 		InputStream jksInputStream = jksDatastore(config.getProperty(FcePlugin.PROPS_PLUGIN_JKS_PATH));
 		ks.load(jksInputStream, config.getProperty(FcePlugin.PROPS_PLUGIN_KEY_STORE_PASSWORD).toCharArray());
 
