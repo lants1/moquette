@@ -7,9 +7,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.ManagedTopic;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -37,7 +35,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	public void put(String topicIdentifier, UserConfiguration userConfig) {
-		configStore.put(ManagedZoneUtil.moveTopicToZone(topicIdentifier, getZone()), userConfig);
+		configStore.put(topicIdentifier, userConfig);
 	}
 
 	@Override
@@ -46,12 +44,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceAuthorizationException{
-		ManagedInformation information = getManagedInformation(props, null);
-		if(information == null){
-			throw new FceAuthorizationException("no userconfiguration found for topic: " + props.getTopic());
-		}
-		
-		return (UserConfiguration) information;
+		return (UserConfiguration) getManagedInformation(props, null);
 	}
 	
 	public List<UserConfiguration> getAllForTopic(ManagedTopic topic) {

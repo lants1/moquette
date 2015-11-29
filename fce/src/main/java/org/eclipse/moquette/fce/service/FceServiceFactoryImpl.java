@@ -1,5 +1,6 @@
 package org.eclipse.moquette.fce.service;
 
+import org.eclipse.moquette.fce.FcePlugin;
 import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
@@ -32,7 +33,7 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	@Override
 	public MqttService getMqtt() {
 		if (dataStoreService == null) {
-			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this));
+			dataStoreService = new MqttService(pluginConfig, new MqttEventHandler(this, pluginConfig.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER)));
 			dataStoreService.initializeInternalMqttClient();
 		}
 		return dataStoreService;
@@ -125,6 +126,6 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 		return (getMqtt() != null && getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaDb(ManagedZone.QUOTA_GLOBAL).isInitialized()
 				&& getConfigDb(ManagedZone.CONFIG_GLOBAL).isInitialized()
-				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized());
+				&& getQuotaDb(ManagedZone.QUOTA_PRIVATE).isInitialized() && getMqtt().isInitialized());
 	}
 }

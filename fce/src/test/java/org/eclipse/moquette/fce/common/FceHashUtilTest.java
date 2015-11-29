@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce.common;
 
-import org.eclipse.moquette.fce.model.info.InfoMessage;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,23 +7,22 @@ import static org.junit.Assert.*;
 
 public class FceHashUtilTest {
 	
+	public static String USER1 = "user";
+	public static String USER2 = "user2";
+	
+	public static String PW1 = "pw";
+	public static String PW2 = "pw2";
+	
 	@Test
 	public void testHashing() throws Exception {
-		InfoMessage infoMsg = new InfoMessage("user", "pw", null, null);
-		InfoMessage infoMsg2 = new InfoMessage("user2", "pw2", null, null);
-	
-		String pw = FceHashUtil.getFceHashWithPepper(infoMsg);
-		String pw2 = FceHashUtil.getFceHashWithPepper(infoMsg2);
+		String pw1hash = FceHashUtil.getFceHash(USER1, PW1);
+		String pw2hash = FceHashUtil.getFceHash(USER2, PW2);
 
-		assertFalse(pw.equalsIgnoreCase(pw2));
+		assertFalse(pw1hash.equalsIgnoreCase(pw2hash));
 
-		String pw3 = FceHashUtil.getFceHashWithPepper(infoMsg);
+		String pw3hash = FceHashUtil.getFceHash(USER1, PW1);
 
-		assertTrue(pw3.equalsIgnoreCase(pw));
-		
-		
-		InfoMessage infoMsg3 = new InfoMessage("fceplugin", "samplepw", null, null);
-		System.out.println(FceHashUtil.getFceHashWithPepper(infoMsg3));
+		assertTrue(pw3hash.equalsIgnoreCase(pw1hash));
 	}
 
 }

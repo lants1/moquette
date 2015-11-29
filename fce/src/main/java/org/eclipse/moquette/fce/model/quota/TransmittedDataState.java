@@ -44,7 +44,7 @@ public class TransmittedDataState implements IQuotaState {
 
 	@Override
 	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
-		if (this.getCurrentQuota() + props.getMessage().position() < this.getMaxQuota()) {
+		if (getCurrentQuota() + props.getMessage().position() < getMaxQuota()) {
 			return true;
 		}
 		return false;
@@ -57,7 +57,7 @@ public class TransmittedDataState implements IQuotaState {
 
 	@Override
 	public void substractRequestFromQuota(AuthorizationProperties props) {
-		this.setCurrentQuota(getCurrentQuota()+props.getMessage().position());
+		setCurrentQuota(getCurrentQuota()+props.getMessage().limit());
 		
 	}
 	

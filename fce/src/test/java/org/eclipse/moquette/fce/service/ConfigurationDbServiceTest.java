@@ -39,19 +39,6 @@ public class ConfigurationDbServiceTest {
 		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
 	}
 
-	@Test(expected = FceAuthorizationException.class)
-	public void testPutGetException() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
-
-		AuthorizationProperties props = new AuthorizationProperties(TOPIC_INVALID.getIdentifer(), null, ID, null,
-				null);
-
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
-
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
-	}
-
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
 		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);

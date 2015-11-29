@@ -19,7 +19,7 @@ public class AuthenticationHandler {
 	}
 
 	public boolean checkValid(AuthenticationProperties props) {
-		log.fine("recieved checkValid Event for " + props.getUsername());
+		log.info("recieved checkValid Event for " + props.getUsername());
 		return FceHashUtil.validateClientIdHash(props);
 	}
 }

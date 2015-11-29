@@ -32,7 +32,9 @@ public class MessageCountState implements IQuotaState {
 
 	@Override
 	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
-		// TODO Auto-generated method stub
+		if(maxQuotaCount >= currentQuotaCount+1){
+			return true;
+		}
 		return false;
 	}
 

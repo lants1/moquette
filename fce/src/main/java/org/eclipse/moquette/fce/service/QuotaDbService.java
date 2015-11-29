@@ -36,7 +36,7 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
 	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp)
 			throws FceAuthorizationException {
-		if (ignoreTimestamp || quota.getTimestamp().after(get(topicIdentifier).getTimestamp())) {
+		if (ignoreTimestamp || quota.getTimestamp().compareTo(get(topicIdentifier).getTimestamp()) >= 0) {
 			quotaStore.put(topicIdentifier, quota);
 
 		} else {
@@ -52,7 +52,7 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	@Override
 	protected UserQuota get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation) {
 		if (quotaStore.get(topic.getIdentifier(props, getZone(), operation)) != null) {
-			return quotaStore.get(topic.getIdentifier(props, getZone()));
+			return quotaStore.get(topic.getIdentifier(props, getZone(), operation));
 		}
 		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
 	}

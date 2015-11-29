@@ -17,7 +17,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.fine("recieved Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		log.info("recieved Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
@@ -29,7 +29,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(props.getTopic()));
 		boolean result = topic.isAllowedForUser(props);
 
-		log.fine("result for Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		log.info("result for Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action + " is:" + result);
 		return result;
 	}

@@ -26,7 +26,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 	// TODO lants1 to complicated....
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.fine("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		log.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
@@ -41,7 +41,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 			if (getServices().getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					log.fine("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
+					log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
 							+ " and action:" + action);
 					return true;
 				}
@@ -61,9 +61,29 @@ public class ManagedIntentHandler extends FceEventHandler {
 						deleteQuota(topic, quotaToRemove);
 					}
 				}
+			} else {
+
+				ManagedZone configurationZone;
+				ManagedZone quotaZone;
+				if (ManagedScope.GLOBAL.equals(newConfig.getManagedScope())) {
+					configurationZone = ManagedZone.CONFIG_GLOBAL;
+					quotaZone = ManagedZone.QUOTA_GLOBAL;
+				} else if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
+					configurationZone = ManagedZone.CONFIG_PRIVATE;
+					quotaZone = ManagedZone.QUOTA_PRIVATE;
+				} else {
+					return false;
+				}
+
+				getServices().getConfigDb(newConfig.getManagedScope())
+						.put(topic.getIdentifier(newConfig, configurationZone), newConfig);
+				getServices().getMqtt().publish(topic.getIdentifier(newConfig, configurationZone),
+						getServices().getJsonParser().serialize(newConfig));
+
+				storeNewQuotaForUserConfiguration(topic, newConfig, quotaZone);
 			}
-			log.fine("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
-					+ action);
+			log.info("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId()
+					+ " and action:" + action);
 
 			return true;
 

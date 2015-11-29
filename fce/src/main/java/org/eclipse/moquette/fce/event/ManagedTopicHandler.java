@@ -23,7 +23,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.fine("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId()+" and action:"+action);
+		log.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+				+ action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
 
@@ -43,7 +44,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 				}
 			}
 
-			if (!configGlobal.isValid(props, action) || !quotasGlobal.isValid(props, action)) {
+			if (!configGlobal.isValid(props, action)) {
+				logAndSendInfoMsg(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
+				return false;
+			}
+
+			if (!quotasGlobal.isValid(props, action)) {
 				logAndSendInfoMsg(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
 				return false;
 			}
@@ -51,21 +57,28 @@ public class ManagedTopicHandler extends FceEventHandler {
 			UserConfiguration configPrivate = getServices().getConfigDb(ManagedScope.PRIVATE).getConfiguration(props);
 			UserQuota quotasPrivate = getServices().getQuotaDb(ManagedScope.PRIVATE).getQuota(props, action);
 
-			if (!configPrivate.isValid(props, action) || !quotasPrivate.isValid(props, action)) {
-				logAndSendInfoMsg(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
-				return false;
+			if (configPrivate != null) {
+				if (!configPrivate.isValid(props, action)) {
+					logAndSendInfoMsg(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
+					return false;
+				}
+
+				if (!quotasPrivate.isValid(props, action)) {
+					logAndSendInfoMsg(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
+					return false;
+				}
+				substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate);
 			}
 
 			substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, quotasGlobal);
-			substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate);
-			log.fine("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()+" and action:"+action);
+			log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+					+ action);
 			return true;
 		} catch (FceAuthorizationException e) {
 			logAndSendInfoMsg(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
 			return false;
 		}
 	}
-
 
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
 			UserQuota userQuotas) throws FceAuthorizationException {

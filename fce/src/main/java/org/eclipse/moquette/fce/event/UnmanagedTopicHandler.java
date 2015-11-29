@@ -16,7 +16,7 @@ public class UnmanagedTopicHandler extends FceEventHandler {
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
-		log.fine("unmanaged action:"+operation +  " for topic:"+properties.getTopic()+ " received");
+		log.info("unmanaged action:"+operation +  " for topic:"+properties.getTopic()+ " received");
 		return true;
 	}
 
