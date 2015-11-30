@@ -21,6 +21,7 @@ package org.eclipse.moquette.plugin;
  * @author andrea
  */
 public interface IBrokerConfig {
+	
     void setProperty(String name, String value);
 
     String getProperty(String name);

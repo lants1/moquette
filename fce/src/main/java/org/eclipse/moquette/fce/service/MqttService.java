@@ -14,6 +14,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -23,9 +24,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.moquette.fce.FcePlugin;
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.event.MqttEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -35,15 +36,23 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
+/**
+ * Internal Plugin MqttClient which connects to the broker. Provides method for
+ * publishing retained messages to store plugin information on the broker.
+ * 
+ * @author lants1
+ *
+ */
 public class MqttService {
 
-	private final static Logger log = Logger.getLogger(MqttService.class.getName());
+	private static final int OOS_AT_LEAST_ONCE = 1;
+	private static final Logger log = Logger.getLogger(MqttService.class.getName());
 
 	private MqttAsyncClient client;
 	private IBrokerConfig config;
 	private MqttEventHandler eventHandler;
 	private MqttConnectOptions options = new MqttConnectOptions();
-	private List<String> registeredTopics = new ArrayList<>(); 
+	private List<String> registeredTopics = new ArrayList<>();
 	boolean initialized = false;
 
 	public MqttService(IBrokerConfig config, MqttEventHandler eventHandler) {
@@ -53,13 +62,13 @@ public class MqttService {
 
 	public void initializeInternalMqttClient() {
 		String ssl_port = config.getProperty("ssl_port");
-		
+		log.info("try to connect to ssl://localhost:" + ssl_port);
+
 		registeredTopics.add(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
 		registeredTopics.add(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
 		registeredTopics.add(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
 		registeredTopics.add(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
-		
-		log.info("try to connect to ssl://localhost:" + ssl_port);
+
 		try {
 			client = new MqttAsyncClient("ssl://localhost:" + ssl_port,
 					config.getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER));
@@ -75,16 +84,17 @@ public class MqttService {
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					try {
-						registerTopics();
+						registerSubscriptions();
 					} catch (MqttException e) {
-						e.printStackTrace();
+						log.log(Level.SEVERE, "subscriptions could not be registered, plugin excecution failed", e);
+						throw new FceSystemException(e);
 					}
 					log.info("client connected");
 				}
 
 				@Override
 				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-					log.warning("internal mqtt client can't connect to broker");
+					log.log(Level.WARNING, "internal mqtt client can't connect to broker", exception);
 				}
 			});
 
@@ -92,55 +102,65 @@ public class MqttService {
 			throw new FceSystemException(e);
 		}
 	}
-	
-	public void setInitialized(){
+
+	private void setInitialized() {
 		this.initialized = true;
 	}
-	
-	public boolean isInitialized(){
+
+	public boolean isInitialized() {
 		return this.initialized;
 	}
 
-	public void registerTopics() throws MqttException {
-		client.subscribe(registeredTopics.toArray(new String[registeredTopics.size()]), new int[]{1,1,1,1}, null, new IMqttActionListener() {
-			@Override
-			public void onSuccess(IMqttToken asyncActionToken) {
-				setInitialized();
-				log.info("topics registered,client initialized");
-			}
+	public void registerSubscriptions() throws MqttException {
+		client.subscribe(registeredTopics.toArray(new String[registeredTopics.size()]),
+				new int[] { OOS_AT_LEAST_ONCE, OOS_AT_LEAST_ONCE, OOS_AT_LEAST_ONCE, OOS_AT_LEAST_ONCE }, null,
+				new IMqttActionListener() {
+					@Override
+					public void onSuccess(IMqttToken asyncActionToken) {
+						setInitialized();
+						log.info("topics registered,client initialized");
+					}
 
-			@Override
-			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-				log.warning("internal mqtt client can't connect to broker");
-			}
-		});
+					@Override
+					public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+						log.log(Level.SEVERE, "subscriptions could not be registered, plugin excecution failed",
+								exception);
+						throw new FceSystemException("plugin could not subscribe to management topics");
+					}
+				});
 	}
 
 	public void unregisterSubscriptions() throws MqttException {
-		client.unsubscribe(registeredTopics.toArray(new String[registeredTopics.size()]), null, new IMqttActionListener() {
-			@Override
-			public void onSuccess(IMqttToken asyncActionToken) {
-				setInitialized();
-				log.info("topics registered,client initialized");
-			}
+		client.unsubscribe(registeredTopics.toArray(new String[registeredTopics.size()]), null,
+				new IMqttActionListener() {
+					@Override
+					public void onSuccess(IMqttToken asyncActionToken) {
+						try {
+							client.disconnect();
+						} catch (MqttException e) {
+							log.warning("internal client could not disconnect...");
+						}
+						log.info("topics unregistered,client disconnected");
+					}
 
-			@Override
-			public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-				log.warning("internal mqtt client can't connect to broker");
-			}
-		});
+					@Override
+					public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+						log.log(Level.WARNING, "could not unregister subscriptions", exception);
+					}
+				});
 	}
 
 	public void publish(String topic, String json) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
 		message.setRetained(true);
-		message.setQos(1);
+		message.setQos(OOS_AT_LEAST_ONCE);
 		try {
 			client.publish(topic, message);
 			log.info("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
 		} catch (MqttException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "mqtt message for topic: " + topic + " with content: " + json
+					+ " could not published to internal broker", e);
 		}
 	}
 
@@ -148,11 +168,12 @@ public class MqttService {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(new byte[0]);
 		message.setRetained(true);
+		message.setQos(OOS_AT_LEAST_ONCE);
 		try {
 			client.publish(topic, message);
 			log.info("topic: " + topic + " deleted.");
 		} catch (MqttException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "delete retained message on topic: " + topic + " failed", e);
 		}
 	}
 

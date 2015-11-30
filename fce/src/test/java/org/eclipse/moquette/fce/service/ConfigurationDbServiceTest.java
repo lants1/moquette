@@ -3,9 +3,9 @@ package org.eclipse.moquette.fce.service;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.FceAction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;

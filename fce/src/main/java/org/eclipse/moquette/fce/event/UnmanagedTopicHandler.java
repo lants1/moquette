@@ -6,6 +6,12 @@ import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Unmanaged Handler when no Managed Zone is involved....
+ * 
+ * @author lants1
+ *
+ */
 public class UnmanagedTopicHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(UnmanagedTopicHandler.class.getName());

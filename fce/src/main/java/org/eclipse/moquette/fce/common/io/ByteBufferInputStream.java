@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
+ * ByteBufferInputStream Wrapper
  * 
+ * acording to:
  * http://stackoverflow.com/questions/4332264/wrapping-a-bytebuffer-with-an-inputstream/6603018#6603018
  *
  */

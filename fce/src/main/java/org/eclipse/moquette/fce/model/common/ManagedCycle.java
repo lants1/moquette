@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.model;
+package org.eclipse.moquette.fce.model.common;
 
 import java.util.Calendar;
 

@@ -1,13 +1,14 @@
 package org.eclipse.moquette.fce.event;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedScope;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessageType;
@@ -16,6 +17,12 @@ import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Handler which is used for each publish intent.
+ * 
+ * @author lants1
+ *
+ */
 public class ManagedIntentHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(ManagedIntentHandler.class.getName());
@@ -24,7 +31,6 @@ public class ManagedIntentHandler extends FceEventHandler {
 		super(services, pluginClientIdentifier);
 	}
 
-	// TODO lants1 to complicated....
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		log.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
@@ -41,9 +47,13 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 			if (getServices().getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
-							+ " and action:" + action);
-					return true;
+					if (props.getClientId().equals(newConfig.getUserIdentifier())) {
+						log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
+								+ " and action:" + action);
+						storeUserConfiguration(topic, newConfig);
+						return true;
+					}
+					return false;
 				}
 
 				UserConfiguration userConfig = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props);
@@ -61,36 +71,40 @@ public class ManagedIntentHandler extends FceEventHandler {
 						deleteQuota(topic, quotaToRemove);
 					}
 				}
-			} else {
-
-				ManagedZone configurationZone;
-				ManagedZone quotaZone;
-				if (ManagedScope.GLOBAL.equals(newConfig.getManagedScope())) {
-					configurationZone = ManagedZone.CONFIG_GLOBAL;
-					quotaZone = ManagedZone.QUOTA_GLOBAL;
-				} else if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					configurationZone = ManagedZone.CONFIG_PRIVATE;
-					quotaZone = ManagedZone.QUOTA_PRIVATE;
-				} else {
-					return false;
-				}
-
-				getServices().getConfigDb(newConfig.getManagedScope())
-						.put(topic.getIdentifier(newConfig, configurationZone), newConfig);
-				getServices().getMqtt().publish(topic.getIdentifier(newConfig, configurationZone),
-						getServices().getJsonParser().serialize(newConfig));
-
-				storeNewQuotaForUserConfiguration(topic, newConfig, quotaZone);
 			}
+			storeUserConfiguration(topic, newConfig);
+
 			log.info("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId()
 					+ " and action:" + action);
 
 			return true;
 
 		} catch (FceAuthorizationException e) {
-			log.warning(e.toString());
+			log.log(Level.WARNING, "could not authorize request", e);
 			return false;
 		}
+	}
+
+	private void storeUserConfiguration(ManagedTopic topic, UserConfiguration newConfig)
+			throws FceAuthorizationException {
+		ManagedZone configurationZone;
+		ManagedZone quotaZone;
+		if (ManagedScope.GLOBAL.equals(newConfig.getManagedScope())) {
+			configurationZone = ManagedZone.CONFIG_GLOBAL;
+			quotaZone = ManagedZone.QUOTA_GLOBAL;
+		} else if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
+			configurationZone = ManagedZone.CONFIG_PRIVATE;
+			quotaZone = ManagedZone.QUOTA_PRIVATE;
+		} else {
+			throw new FceAuthorizationException("invalid managed scope");
+		}
+
+		getServices().getConfigDb(newConfig.getManagedScope()).put(topic.getIdentifier(newConfig, configurationZone),
+				newConfig);
+		getServices().getMqtt().publish(topic.getIdentifier(newConfig, configurationZone),
+				getServices().getJsonParser().serialize(newConfig));
+
+		storeNewQuotaForUserConfiguration(topic, newConfig, quotaZone);
 	}
 
 	private List<UserQuota> getUnneededGlobalQuotas(ManagedTopic topic) {

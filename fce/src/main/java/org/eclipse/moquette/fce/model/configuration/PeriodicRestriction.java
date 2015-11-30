@@ -1,7 +1,7 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import org.eclipse.moquette.fce.common.DataUnit;
-import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.DataUnit;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 

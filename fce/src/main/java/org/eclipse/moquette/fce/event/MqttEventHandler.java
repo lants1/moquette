@@ -2,10 +2,10 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceSystemException;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
@@ -30,6 +30,7 @@ public class MqttEventHandler extends FceEventHandler implements MqttCallback {
 			log.warning("internal plugin mqttclient conection to broker connection lost");
 			getServices().getMqtt().connect();
 		} catch (MqttException e) {
+			log.severe("internal plugin mqttclient could not reconnect to broker");
 			throw new FceSystemException(e);
 		}
 	}
@@ -62,12 +63,11 @@ public class MqttEventHandler extends FceEventHandler implements MqttCallback {
 		default:
 			break;
 		}
-
 	}
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
-		throw new FceSystemException("not avaiable method");
+		throw new FceSystemException("not implemented");
 	}
 
 }

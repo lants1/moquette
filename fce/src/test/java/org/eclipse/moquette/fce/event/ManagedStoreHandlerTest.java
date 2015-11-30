@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 

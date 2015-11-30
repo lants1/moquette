@@ -1,8 +1,8 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import org.eclipse.moquette.fce.common.DataUnit;
-import org.eclipse.moquette.fce.common.XmlSchemaValidationUtil;
-import org.eclipse.moquette.fce.model.IValid;
+import org.eclipse.moquette.fce.common.util.XmlSchemaValidationUtil;
+import org.eclipse.moquette.fce.model.common.DataUnit;
+import org.eclipse.moquette.fce.model.common.IValid;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 

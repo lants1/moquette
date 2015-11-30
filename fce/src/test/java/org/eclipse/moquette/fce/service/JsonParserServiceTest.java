@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.moquette.fce.common.DataUnit;
-import org.eclipse.moquette.fce.model.ManagedCycle;
-import org.eclipse.moquette.fce.model.ManagedScope;
+import org.eclipse.moquette.fce.model.common.DataUnit;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.FceAction;
 import org.eclipse.moquette.fce.model.configuration.ManagedState;

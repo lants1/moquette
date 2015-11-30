@@ -6,14 +6,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Configuration DB Service singleton which provides storage and utility methods
+ * for UserConfigurations a defined ManagedScope.
+ * 
+ * @author lants1
+ *
+ */
 public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 
 	private HashMap<String, UserConfiguration> configStore = new HashMap<>();
@@ -21,7 +28,7 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	public ConfigurationDbService(IBrokerOperator brokerOperator, ManagedZone zone) {
 		super(brokerOperator, zone);
 	}
-	
+
 	public Set<Entry<String, UserConfiguration>> getAll() {
 		return configStore.entrySet();
 	}
@@ -43,14 +50,14 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		return configStore;
 	}
 
-	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceAuthorizationException{
+	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceAuthorizationException {
 		return (UserConfiguration) getManagedInformation(props, null);
 	}
-	
+
 	public List<UserConfiguration> getAllForTopic(ManagedTopic topic) {
 		List<UserConfiguration> result = new ArrayList<>();
 		for (Entry<String, UserConfiguration> entry : getAll()) {
-			if(entry.getKey().startsWith(topic.getIdentifier(getZone()))){
+			if (entry.getKey().startsWith(topic.getIdentifier(getZone()))) {
 				result.add(entry.getValue());
 			}
 		}

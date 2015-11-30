@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.common.util;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,6 +14,12 @@ import javax.xml.validation.Validator;
 import org.eclipse.moquette.fce.common.io.ByteBufferInputStream;
 import org.xml.sax.SAXException;
 
+/**
+ * Utility class for xml schema validation.
+ * 
+ * @author lants1
+ *
+ */
 public final class XmlSchemaValidationUtil {
 
 	public static boolean isValidXmlFileAccordingToSchema(ByteBuffer fileMsg, String schemaUrl) {

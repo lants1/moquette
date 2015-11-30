@@ -1,8 +1,10 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.common.util;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+
+import org.eclipse.moquette.fce.common.util.FceHashUtil;
 
 
 public class FceHashUtilTest {

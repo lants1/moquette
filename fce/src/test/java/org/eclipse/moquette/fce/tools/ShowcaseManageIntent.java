@@ -8,8 +8,8 @@ import java.nio.file.Paths;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.eclipse.moquette.fce.common.FceHashUtil;
-import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.common.util.FceHashUtil;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.tools.callback.SampleFceClientCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

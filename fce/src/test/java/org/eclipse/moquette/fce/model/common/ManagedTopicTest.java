@@ -1,8 +1,9 @@
-package org.eclipse.moquette.fce.model;
+package org.eclipse.moquette.fce.model.common;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 

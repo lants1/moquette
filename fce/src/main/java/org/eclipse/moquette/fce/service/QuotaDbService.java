@@ -6,14 +6,21 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * QuotaDbService singleton which provides storage and utility methods
+ * for UserQuota a defined ManagedScope.
+ * 
+ * @author lants1
+ *
+ */
 public class QuotaDbService extends ManagedZoneInMemoryDbService {
 
 	private HashMap<String, UserQuota> quotaStore = new HashMap<>();

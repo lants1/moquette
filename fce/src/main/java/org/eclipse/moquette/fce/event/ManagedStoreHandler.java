@@ -2,12 +2,18 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Handler which is used when the request goes into the plugin store on the broker.
+ * 
+ * @author lants1
+ *
+ */
 public class ManagedStoreHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(ManagedStoreHandler.class.getName());
@@ -17,8 +23,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.info("recieved Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
-				+ action);
+		log.info("store-event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:" + action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
 
@@ -29,7 +34,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(props.getTopic()));
 		boolean result = topic.isAllowedForUser(props);
 
-		log.info("result for Store-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		log.info("store-event result on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action + " is:" + result);
 		return result;
 	}

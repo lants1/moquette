@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.model.IValid;
 import org.eclipse.moquette.fce.model.ManagedInformation;
-import org.eclipse.moquette.fce.model.ManagedScope;
+import org.eclipse.moquette.fce.model.common.IValid;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -42,6 +42,9 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 	}
 
 	public List<Restriction> getRestrictions() {
+		if(restrictions == null || restrictions.isEmpty()){
+			return new ArrayList<>();
+		}
 		return restrictions;
 	}
 

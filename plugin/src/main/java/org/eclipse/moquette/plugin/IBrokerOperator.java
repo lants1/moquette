@@ -9,6 +9,12 @@ package org.eclipse.moquette.plugin;
  */
 public interface IBrokerOperator {
 	
+	/** 
+	 * Counts retained messages in a area of the broker.
+	 * 
+	 * @param String topicFilter
+	 * @return int count of retained messages within the given topicFilter Parameter
+	 */
 	public int countRetainedMessages(String topicFilter);
 	
 }
