@@ -1,7 +1,8 @@
 package org.eclipse.moquette.fce.common;
 
 import org.eclipse.moquette.fce.exception.FceSystemException;
-import org.eclipse.moquette.fce.model.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;

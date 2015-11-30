@@ -13,10 +13,10 @@ import java.nio.charset.CharsetEncoder;
 import static org.mockito.Mockito.any;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedScope;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
@@ -70,10 +70,10 @@ public class ManagedIntentHandlerTest {
 		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 
-		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.PRIVATE, null);
+		UserConfiguration userConfig = new UserConfiguration(null, USER_IDENTIFIER, null, null, null, ManagedScope.PRIVATE, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, null, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, USER_IDENTIFIER, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);

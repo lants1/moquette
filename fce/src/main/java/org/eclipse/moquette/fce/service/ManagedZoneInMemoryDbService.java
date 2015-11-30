@@ -7,15 +7,21 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedInformation;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Abstract class which implements common operations for InMemory Mqtt datastores...
+ * 
+ * @author lants1
+ *
+ */
 public abstract class ManagedZoneInMemoryDbService {
 	
 	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryDbService.class.getName());

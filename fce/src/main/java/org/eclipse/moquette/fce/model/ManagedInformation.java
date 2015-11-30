@@ -2,6 +2,12 @@ package org.eclipse.moquette.fce.model;
 
 import java.util.Date;
 
+/**
+ * Abstract class for every ManagedInformation and it's common fields.
+ * 
+ * @author lants1
+ *
+ */
 public abstract class ManagedInformation {
 
 	private String userName;

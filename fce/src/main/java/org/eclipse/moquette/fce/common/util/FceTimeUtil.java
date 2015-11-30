@@ -1,10 +1,16 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.common.util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+/**
+ * Utility class for time functions in fce.
+ * 
+ * @author lants1
+ *
+ */
 public final class FceTimeUtil {
 	
 	public static long delayTo(int targetMin, int targetSec) {

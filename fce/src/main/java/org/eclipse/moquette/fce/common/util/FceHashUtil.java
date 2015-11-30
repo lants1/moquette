@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.common.util;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -9,7 +9,12 @@ import org.eclipse.moquette.plugin.AuthenticationProperties;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
-
+/**
+ * Utility class for hashing and validating hashes....
+ * 
+ * @author lants1
+ *
+ */
 public final class FceHashUtil {
 
 	private final static Logger log = Logger.getLogger(FceHashUtil.class.getName());

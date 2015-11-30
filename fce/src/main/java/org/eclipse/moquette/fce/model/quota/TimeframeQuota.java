@@ -5,6 +5,12 @@ import java.util.Date;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Quota from a date to a date.
+ * 
+ * @author lants1
+ *
+ */
 public class TimeframeQuota extends Quota {
 
 	private Date from;

@@ -1,8 +1,10 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.common.util;
 
 import static org.junit.Assert.*;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.junit.Test;
 
 public class ManagedZoneUtilTest {

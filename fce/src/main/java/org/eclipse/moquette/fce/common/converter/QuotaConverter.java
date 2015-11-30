@@ -16,6 +16,12 @@ import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Converts UserConfiguration to QuotaModel.
+ * 
+ * @author lants1
+ *
+ */
 public final class QuotaConverter {
 
 	public static UserQuota convertSubscribeConfiguration(UserConfiguration config) {

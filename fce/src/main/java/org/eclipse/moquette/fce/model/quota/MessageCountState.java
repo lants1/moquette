@@ -3,6 +3,12 @@ package org.eclipse.moquette.fce.model.quota;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * State of a Quota for count of transmitted messages.
+ * 
+ * @author lants1
+ *
+ */
 public class MessageCountState implements IQuotaState {
 
 	private int maxQuotaCount;

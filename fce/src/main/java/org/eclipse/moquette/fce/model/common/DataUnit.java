@@ -1,7 +1,13 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.model.common;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Enum which describes DataUnit's and these internal representation.
+ * 
+ * @author lants1
+ *
+ */
 public enum DataUnit {
 	@SerializedName("B")
 	B("B", 1), 

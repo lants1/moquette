@@ -2,6 +2,12 @@ package org.eclipse.moquette.fce.model.info;
 
 import org.eclipse.moquette.fce.model.ManagedInformation;
 
+/**
+ * Model for a managed info message. 
+ * 
+ * @author lants1
+ *
+ */
 public class InfoMessage extends ManagedInformation{
 
 	private InfoMessageType messageType;

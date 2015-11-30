@@ -1,6 +1,4 @@
-package org.eclipse.moquette.fce.common;
-
-import org.eclipse.moquette.fce.model.ManagedScope;
+package org.eclipse.moquette.fce.model.common;
 
 public enum ManagedZone {
 

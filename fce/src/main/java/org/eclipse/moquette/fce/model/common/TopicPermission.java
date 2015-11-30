@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.common;
+package org.eclipse.moquette.fce.model.common;
 
 import java.util.EnumSet;
 import java.util.Set;

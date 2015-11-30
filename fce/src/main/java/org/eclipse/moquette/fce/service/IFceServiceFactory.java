@@ -1,8 +1,14 @@
 package org.eclipse.moquette.fce.service;
 
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.model.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedScope;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 
+/**
+ * Interface for the FceServiceFactory...
+ * 
+ * @author lants1
+ *
+ */
 public interface IFceServiceFactory {
 
 	MqttService getMqtt();

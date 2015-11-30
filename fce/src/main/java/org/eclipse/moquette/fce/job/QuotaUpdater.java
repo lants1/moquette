@@ -12,10 +12,17 @@ import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 
+/**
+ * QuotaUpdater job which is triggered by s scheduled executor service.
+ * The updater flushes periodic quotas if managed cycle expires...
+ * 
+ * @author lants1
+ *
+ */
 public class QuotaUpdater implements Runnable {
 
 	private final static Logger log = Logger.getLogger(QuotaUpdater.class.getName());

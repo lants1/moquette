@@ -5,12 +5,12 @@ import java.security.SecureRandom;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.FceHashUtil;
-import org.eclipse.moquette.fce.common.FceTimeUtil;
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.util.FceHashUtil;
+import org.eclipse.moquette.fce.common.util.FceTimeUtil;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.event.AuthenticationHandler;
 import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.event.ManagedIntentHandler;
@@ -18,7 +18,8 @@ import org.eclipse.moquette.fce.event.ManagedStoreHandler;
 import org.eclipse.moquette.fce.event.ManagedTopicHandler;
 import org.eclipse.moquette.fce.event.UnmanagedTopicHandler;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
 import org.eclipse.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
@@ -29,6 +30,13 @@ import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+/**
+ * Main of the plugin, loaded and called by the broker over it's interface methods. Registered
+ * by the META-INF/org.eclipse.moquette.plugin.IBrokerPlugin File.
+ * 
+ * @author lants1
+ *
+ */
 public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
@@ -75,8 +83,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 		try {
 			services.getMqtt().unregisterSubscriptions();
 		} catch (MqttException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
 		}
 		scheduler.shutdownNow();
 		log.info(PLUGIN_IDENTIFIER + " unloaded");

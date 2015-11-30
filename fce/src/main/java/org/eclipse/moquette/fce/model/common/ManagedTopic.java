@@ -1,11 +1,11 @@
-package org.eclipse.moquette.fce.model;
+package org.eclipse.moquette.fce.model.common;
 
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.ManagedZoneUtil;
+import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.exception.FceSystemException;
+import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 

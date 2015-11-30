@@ -2,10 +2,16 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.FceHashUtil;
+import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 
+/**
+ * Handler which checks authentication.
+ * 
+ * @author lants1
+ *
+ */
 public class AuthenticationHandler {
 
 	private final static Logger log = Logger.getLogger(FceEventHandler.class.getName());

@@ -1,9 +1,15 @@
 package org.eclipse.moquette.fce.model.quota;
 
-import org.eclipse.moquette.fce.common.DataUnit;
+import org.eclipse.moquette.fce.model.common.DataUnit;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * State of a quota for transmitted data.
+ * 
+ * @author lants1
+ *
+ */
 public class TransmittedDataState implements IQuotaState {
 
 	private int maxQuota;

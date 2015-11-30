@@ -15,6 +15,12 @@ import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
 import com.google.gson.GsonBuilder;
 
+/**
+ * Parsing Service from Model to Json / Json to Model serialization and deserialisation.
+ * 
+ * @author lants1
+ *
+ */
 public class JsonParserService {
 
 	public String serialize(UserConfiguration userConfig) {

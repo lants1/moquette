@@ -8,9 +8,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
-import org.eclipse.moquette.fce.common.ManagedZone;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;

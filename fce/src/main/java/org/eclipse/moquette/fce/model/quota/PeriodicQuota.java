@@ -2,10 +2,16 @@ package org.eclipse.moquette.fce.model.quota;
 
 import java.util.Date;
 
-import org.eclipse.moquette.fce.model.ManagedCycle;
+import org.eclipse.moquette.fce.model.common.ManagedCycle;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * PeriodicQuota for a ManagedCycle e.g. Weekly or Daily...
+ * 
+ * @author lants1
+ *
+ */
 public class PeriodicQuota extends Quota {
 
 	ManagedCycle cycle;

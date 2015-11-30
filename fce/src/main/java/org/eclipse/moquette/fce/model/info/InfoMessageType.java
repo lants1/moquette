@@ -2,6 +2,12 @@ package org.eclipse.moquette.fce.model.info;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Enum which describes every type of info message.
+ * 
+ * @author lants1
+ *
+ */
 public enum InfoMessageType {
 	@SerializedName("GLOBAL_QUOTA_DEPLETED")
 	GLOBAL_QUOTA_DEPLETED("GLOBAL_QUOTA_DEPLETED"),

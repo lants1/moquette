@@ -3,11 +3,11 @@ package org.eclipse.moquette.fce.event;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.eclipse.moquette.fce.common.ManagedZone;
-import org.eclipse.moquette.fce.common.TopicPermission;
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedTopic;
+import org.eclipse.moquette.fce.model.common.ManagedZone;
+import org.eclipse.moquette.fce.model.common.TopicPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessage;
 import org.eclipse.moquette.fce.model.info.InfoMessageType;
@@ -16,6 +16,12 @@ import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
+/**
+ * Abstract handler for each Managed Event with common methods... 
+ * 
+ * @author lants1
+ *
+ */
 public abstract class FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(FceEventHandler.class.getName());
