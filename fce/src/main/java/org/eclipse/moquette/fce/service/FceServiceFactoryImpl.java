@@ -25,6 +25,7 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServiceGlobal;
 	private ConfigurationDbService configDbServicePrivate;
+	private HashClientIdAssignmentService hashAssignment;
 
 	public FceServiceFactoryImpl(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		this.pluginConfig = config;
@@ -122,6 +123,14 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 		throw new FceSystemException("invalid scope for quota db");
 	}
 
+	@Override
+	public HashClientIdAssignmentService getHashAssignmentService() {
+		if (hashAssignment == null) {
+			hashAssignment = new HashClientIdAssignmentService();
+		}
+		return hashAssignment;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

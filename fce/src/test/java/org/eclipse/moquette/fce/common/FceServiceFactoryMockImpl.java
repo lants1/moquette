@@ -4,6 +4,7 @@ import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
+import org.eclipse.moquette.fce.service.HashClientIdAssignmentService;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
@@ -21,6 +22,7 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	private ConfigurationDbService configDbServiceGlobal;
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServicePrivate;
+	private HashClientIdAssignmentService hashAssignment;
 
 	public FceServiceFactoryMockImpl(IBrokerOperator brokerOperator, ConfigurationDbService configDbServiceGlobal,
 			QuotaDbService quotaDbServiceGlobal, ConfigurationDbService configDbServicePrivate,
@@ -47,6 +49,14 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 		return jsonParserService;
 	}
 
+	@Override
+	public HashClientIdAssignmentService getHashAssignmentService() {
+		if (hashAssignment == null) {
+			hashAssignment = new HashClientIdAssignmentService();
+		}
+		return hashAssignment;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
