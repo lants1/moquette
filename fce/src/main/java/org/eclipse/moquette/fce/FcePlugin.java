@@ -17,6 +17,7 @@ import org.eclipse.moquette.fce.event.ManagedIntentHandler;
 import org.eclipse.moquette.fce.event.ManagedStoreHandler;
 import org.eclipse.moquette.fce.event.ManagedTopicHandler;
 import org.eclipse.moquette.fce.event.UnmanagedTopicHandler;
+import org.eclipse.moquette.fce.job.Heartbeat;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -55,7 +56,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	private String pluginIdentifier;
 	private IFceServiceFactory services;
 	ScheduledExecutorService scheduler;
-
+	
 	@Override
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		String pluginUsr = randomString();
@@ -68,9 +69,9 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 		services = new FceServiceFactoryImpl(config, brokerOperator);
 
-		scheduler = Executors.newScheduledThreadPool(1);
+		scheduler = Executors.newScheduledThreadPool(2);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
-
+		scheduler.scheduleAtFixedRate(new Heartbeat(services), 3, 60, TimeUnit.SECONDS);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 

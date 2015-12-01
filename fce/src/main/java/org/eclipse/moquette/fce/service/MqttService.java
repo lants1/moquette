@@ -110,6 +110,10 @@ public class MqttService {
 	public boolean isInitialized() {
 		return this.initialized;
 	}
+	
+	public boolean isConnected(){
+		return client.isConnected();
+	}
 
 	public void registerSubscriptions() throws MqttException {
 		client.subscribe(registeredTopics.toArray(new String[registeredTopics.size()]),
