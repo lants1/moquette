@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 
 public class ManagedTopicTest {
@@ -34,8 +33,7 @@ public class ManagedTopicTest {
 	public void testGetUserTopicIdentifier() {
 		ManagedTopic sample1 = new ManagedTopic(SAMPLE1_HOUSE_LIGHT);
 		
-		AuthorizationProperties authProps = new AuthorizationProperties(null, null, TESTIDENTIFIER, null, null);
-		assertTrue(sample1.getIdentifier(authProps, ManagedZone.QUOTA_GLOBAL).equals(ManagedZone.QUOTA_GLOBAL.getTopicPrefix()+SAMPLE1_HOUSE_LIGHT+ManagedTopic.USER_PREFIX+TESTIDENTIFIER));
+		assertTrue(sample1.getIdentifier(TESTIDENTIFIER, ManagedZone.QUOTA_GLOBAL).equals(ManagedZone.QUOTA_GLOBAL.getTopicPrefix()+SAMPLE1_HOUSE_LIGHT+ManagedTopic.USER_PREFIX+TESTIDENTIFIER));
 	}
 
 }

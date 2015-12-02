@@ -12,19 +12,16 @@ public class FceHashUtilTest {
 	public static String USER1 = "user";
 	public static String USER2 = "user2";
 	
-	public static String PW1 = "pw";
-	public static String PW2 = "pw2";
-	
 	@Test
 	public void testHashing() throws Exception {
-		String pw1hash = FceHashUtil.getFceHash(USER1, PW1);
-		String pw2hash = FceHashUtil.getFceHash(USER2, PW2);
+		String usr1hash = FceHashUtil.getFceHash(USER1);
+		String usr2hash = FceHashUtil.getFceHash(USER2);
 
-		assertFalse(pw1hash.equalsIgnoreCase(pw2hash));
+		assertFalse(usr1hash.equalsIgnoreCase(usr2hash));
 
-		String pw3hash = FceHashUtil.getFceHash(USER1, PW1);
+		String pw3hash = FceHashUtil.getFceHash(USER1);
 
-		assertTrue(pw3hash.equalsIgnoreCase(pw1hash));
+		assertTrue(pw3hash.equalsIgnoreCase(usr1hash));
 	}
 
 }

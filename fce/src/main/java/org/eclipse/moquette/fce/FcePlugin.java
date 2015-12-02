@@ -60,8 +60,8 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	@Override
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		String pluginUsr = randomString();
-		String pluginPw = randomString();
-		pluginIdentifier = FceHashUtil.getFceHash(pluginUsr, pluginPw);
+		String pluginPw = FceHashUtil.getFceHash(pluginUsr);
+		pluginIdentifier = randomString();
 
 		config.setProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER, pluginIdentifier);
 		config.setProperty(PROPS_PLUGIN_CLIENT_USERNAME, pluginUsr);

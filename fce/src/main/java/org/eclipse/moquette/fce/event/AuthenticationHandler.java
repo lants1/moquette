@@ -2,6 +2,7 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
@@ -26,6 +27,20 @@ public class AuthenticationHandler {
 
 	public boolean checkValid(AuthenticationProperties props) {
 		log.info("recieved checkValid Event for " + props.getUsername());
-		return FceHashUtil.validateClientIdHash(props);
+
+		// Allow anonymous access / anonymous flag is setted...
+		if (StringUtils.isEmpty(props.getUsername()) && props.getPassword() == null) {
+			services.getHashAssignment().remove(props.getClientId());
+			return true;
+		}
+
+		boolean usernameHashValidation = FceHashUtil.validateUsernameHash(props);
+		if (usernameHashValidation) {
+			// if a user with a valid hash login and a user with the same clientid already exists the other session is dropped by the broker...
+			services.getHashAssignment().put(props.getClientId(), FceHashUtil.getFceHash(props.getUsername()));
+		}
+		
+		// if the plugin is active only users with usr:username, pw:hash(username) could login to the broker
+		return usernameHashValidation;
 	}
 }

@@ -20,8 +20,8 @@ public class UserQuota extends ManagedInformation implements IValid{
 	private final MqttAction action;
 	private List<Quota> quotas;
 	
-	public UserQuota(String userName, String userIdentifier, MqttAction action, List<Quota> quotaStates) {
-		super(userName, userIdentifier);
+	public UserQuota(String alias, String usernameHash, MqttAction action, List<Quota> quotaStates) {
+		super(alias, usernameHash);
 		this.quotas = quotaStates;
 		this.action = action;
 	}

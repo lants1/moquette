@@ -10,7 +10,6 @@ import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -34,9 +33,9 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	@Override
-	protected UserConfiguration get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation) {
-		if (configStore.get(topic.getIdentifier(props, getZone())) != null) {
-			return configStore.get(topic.getIdentifier(props, getZone()));
+	protected UserConfiguration get(ManagedTopic topic, String usernameHash, MqttAction operation) {
+		if (configStore.get(topic.getIdentifier(usernameHash, getZone())) != null) {
+			return configStore.get(topic.getIdentifier(usernameHash, getZone()));
 		}
 		return configStore.get(topic.getAllIdentifier(getZone()));
 	}
@@ -50,8 +49,8 @@ public class ConfigurationDbService extends ManagedZoneInMemoryDbService {
 		return configStore;
 	}
 
-	public UserConfiguration getConfiguration(AuthorizationProperties props) throws FceAuthorizationException {
-		return (UserConfiguration) getManagedInformation(props, null);
+	public UserConfiguration getConfiguration(String topicStr, String usernameHash) throws FceAuthorizationException {
+		return (UserConfiguration) getManagedInformation(topicStr, usernameHash, null);
 	}
 
 	public List<UserConfiguration> getAllForTopic(ManagedTopic topic) {

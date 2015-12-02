@@ -29,6 +29,9 @@ public class ManagedTopicHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
+		String usernameHashFromRequest = getServices().getHashAssignment().get(props.getClientId());
+		
+		
 		log.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
@@ -39,8 +42,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 		}
 
 		try {
-			UserConfiguration configGlobal = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props);
-			UserQuota quotasGlobal = getServices().getQuotaDb(ManagedScope.GLOBAL).getQuota(props, action);
+			UserConfiguration configGlobal = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasGlobal = getServices().getQuotaDb(ManagedScope.GLOBAL).getQuota(props.getTopic(), usernameHashFromRequest, action);
 
 			if (configGlobal.isValidForEveryone()) {
 				if (quotasGlobal == null) {
@@ -59,8 +62,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 				return false;
 			}
 
-			UserConfiguration configPrivate = getServices().getConfigDb(ManagedScope.PRIVATE).getConfiguration(props);
-			UserQuota quotasPrivate = getServices().getQuotaDb(ManagedScope.PRIVATE).getQuota(props, action);
+			UserConfiguration configPrivate = getServices().getConfigDb(ManagedScope.PRIVATE).getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasPrivate = getServices().getQuotaDb(ManagedScope.PRIVATE).getQuota(props.getTopic(), usernameHashFromRequest, action);
 
 			if (configPrivate != null) {
 				if (!configPrivate.isValid(props, action)) {
@@ -87,10 +90,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
 			UserQuota userQuotas) throws FceAuthorizationException {
+		String usernameHashFromRequest = getServices().getHashAssignment().get(properties.getClientId());
+		
 		userQuotas.substractRequestFromQuota(properties, operation);
 		String quotaJson = getServices().getJsonParser().serialize(userQuotas);
 
-		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(properties, zone, operation);
+		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(usernameHashFromRequest, zone, operation);
 
 		getServices().getQuotaDb(zone.getScope()).put(userTopicIdentifier, userQuotas);
 		getServices().getMqtt().publish(userTopicIdentifier, quotaJson);

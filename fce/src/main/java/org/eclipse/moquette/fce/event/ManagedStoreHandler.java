@@ -32,7 +32,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 		}
 
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(props.getTopic()));
-		boolean result = topic.isAllowedForUser(props);
+		boolean result = topic.isAllowedForUser(getServices().getHashAssignment().get(props.getClientId()));
 
 		log.info("store-event result on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action + " is:" + result);

@@ -70,7 +70,7 @@ public class QuotaUpdater implements Runnable {
 				}
 			}
 
-			UserQuota quotaOut = new UserQuota(quotaIn.getUserName(), quotaIn.getUserIdentifier(), quotaIn.getAction(), statesOut);
+			UserQuota quotaOut = new UserQuota(quotaIn.getAlias(), quotaIn.getUserHash(), quotaIn.getAction(), statesOut);
 			services.getQuotaDb(zone).put(key, quotaOut, true);
 			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut));
 		}

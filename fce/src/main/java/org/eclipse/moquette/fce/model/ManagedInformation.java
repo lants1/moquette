@@ -10,31 +10,31 @@ import java.util.Date;
  */
 public abstract class ManagedInformation {
 
-	private String userName;
-	private String userIdentifier;
+	private String alias;
+	private String userHash;
 	private Date timestamp;
 	
-	public ManagedInformation(String userName, String userIdentifier) {
+	public ManagedInformation(String alias, String userHash) {
 		super();
-		this.userName = userName;
-		this.userIdentifier = userIdentifier;
+		this.alias = alias;
+		this.userHash = userHash;
 		this.timestamp = new Date();
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getAlias() {
+		return alias;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 
-	public String getUserIdentifier() {
-		return userIdentifier;
+	public String getUserHash() {
+		return userHash;
 	}
 
-	public void setUserIdentifier(String userIdentifier) {
-		this.userIdentifier = userIdentifier;
+	public void setUserHash(String userHash) {
+		this.userHash = userHash;
 	}
 
 	public Date getTimestamp() {

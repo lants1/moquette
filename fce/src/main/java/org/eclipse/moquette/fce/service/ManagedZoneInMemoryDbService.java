@@ -12,7 +12,6 @@ import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -52,12 +51,12 @@ public abstract class ManagedZoneInMemoryDbService {
 		return correspondingZone;
 	}
 	
-	protected ManagedInformation getManagedInformation(AuthorizationProperties props, MqttAction operation)
+	protected ManagedInformation getManagedInformation(String topicStr, String usernameHash, MqttAction operation)
 			throws FceAuthorizationException {
-		ManagedTopic topic = new ManagedTopic(props.getTopic());
+		ManagedTopic topic = new ManagedTopic(topicStr);
 		String reducedTopicFilter = topic.getIdentifer();
 		while (!reducedTopicFilter.isEmpty()) {
-			ManagedInformation userConfig = get(new ManagedTopic(reducedTopicFilter), props, operation);
+			ManagedInformation userConfig = get(new ManagedTopic(reducedTopicFilter), usernameHash, operation);
 			if (userConfig != null) {
 				return userConfig;
 			}
@@ -93,5 +92,5 @@ public abstract class ManagedZoneInMemoryDbService {
 
 	abstract protected HashMap<String, ?> getStore();
 
-	abstract protected ManagedInformation get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation);
+	abstract protected ManagedInformation get(ManagedTopic topic, String usernameHash, MqttAction operation);
 }

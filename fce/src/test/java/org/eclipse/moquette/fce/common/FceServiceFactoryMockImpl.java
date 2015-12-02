@@ -4,7 +4,7 @@ import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.ConfigurationDbService;
-import org.eclipse.moquette.fce.service.HashClientIdAssignmentService;
+import org.eclipse.moquette.fce.service.HashAssignmentService;
 import org.eclipse.moquette.fce.service.IFceServiceFactory;
 import org.eclipse.moquette.fce.service.JsonParserService;
 import org.eclipse.moquette.fce.service.MqttService;
@@ -22,7 +22,7 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	private ConfigurationDbService configDbServiceGlobal;
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServicePrivate;
-	private HashClientIdAssignmentService hashAssignment;
+	private HashAssignmentService hashAssignment;
 
 	public FceServiceFactoryMockImpl(IBrokerOperator brokerOperator, ConfigurationDbService configDbServiceGlobal,
 			QuotaDbService quotaDbServiceGlobal, ConfigurationDbService configDbServicePrivate,
@@ -50,9 +50,9 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	}
 
 	@Override
-	public HashClientIdAssignmentService getHashAssignmentService() {
+	public HashAssignmentService getHashAssignment() {
 		if (hashAssignment == null) {
-			hashAssignment = new HashClientIdAssignmentService();
+			hashAssignment = Mockito.mock(HashAssignmentService.class);
 		}
 		return hashAssignment;
 	}

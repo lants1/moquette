@@ -10,7 +10,6 @@ import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -57,9 +56,9 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 	}
 
 	@Override
-	protected UserQuota get(ManagedTopic topic, AuthorizationProperties props, MqttAction operation) {
-		if (quotaStore.get(topic.getIdentifier(props, getZone(), operation)) != null) {
-			return quotaStore.get(topic.getIdentifier(props, getZone(), operation));
+	protected UserQuota get(ManagedTopic topic, String userHash, MqttAction operation) {
+		if (quotaStore.get(topic.getIdentifier(userHash, getZone(), operation)) != null) {
+			return quotaStore.get(topic.getIdentifier(userHash, getZone(), operation));
 		}
 		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
 	}
@@ -74,9 +73,9 @@ public class QuotaDbService extends ManagedZoneInMemoryDbService {
 		return result;
 	}
 
-	public UserQuota getQuota(AuthorizationProperties props, MqttAction operation)
+	public UserQuota getQuota(String topicStr, String usernameHash, MqttAction operation)
 			throws FceAuthorizationException {
-		return (UserQuota) getManagedInformation(props, operation);
+		return (UserQuota) getManagedInformation(topicStr, usernameHash, operation);
 	}
 
 }

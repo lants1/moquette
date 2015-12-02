@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class ConfigurationDbServiceTest {
 
-	private static final String ID = "testidentifier";
+	private static final String USERHASH = "testidentifier";
 	private static final String USER = "testuser";
 
 	private static final String ALL_ID = "allidentifier";
@@ -25,27 +25,25 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGet() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
+		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
+		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
 
-		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, ID, null, null);
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
 	}
 
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
-		AuthorizationProperties props = new AuthorizationProperties(null, null, ID, null, null);
-
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
 		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
+		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.isManaged(TOPIC));
 		assertFalse(configService.isManaged(TOPIC_INVALID));
@@ -53,30 +51,30 @@ public class ConfigurationDbServiceTest {
 
 	@Test
 	public void testPutGetEveryone() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.ALL, null, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
 
 		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, FceAction.ALL, null,
 				null, null, null);
 
-		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
+		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
 		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIG_GLOBAL), everyoneConfig);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == ALL_ID);
 
-		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, ID, null, null);
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ALL_ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == ALL_ID);
 
-		configService.put(TOPIC.getIdentifier(props, ManagedZone.CONFIG_GLOBAL), userConfig);
+		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
-		props = new AuthorizationProperties(TOPIC.getIdentifer(), null, ID, null, null);
+		props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
 
-		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, ID, null, null);
+		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props).getUserIdentifier() == ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
 	}
 }

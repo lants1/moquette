@@ -26,12 +26,12 @@ public final class QuotaConverter {
 
 	public static UserQuota convertSubscribeConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.SUBSCRIBE));
-		return new UserQuota(config.getUserName(), config.getUserIdentifier(), MqttAction.SUBSCRIBE, subscribeState);
+		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.SUBSCRIBE, subscribeState);
 	}
 	
 	public static UserQuota convertPublishConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.PUBLISH));
-		return new UserQuota(config.getUserName(), config.getUserIdentifier(), MqttAction.PUBLISH, subscribeState);
+		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.PUBLISH, subscribeState);
 	}
 	
 	public static List<Quota> convertRestrictions(List<Restriction> restrictions) {
