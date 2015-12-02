@@ -12,17 +12,18 @@ import java.nio.charset.CharsetEncoder;
 
 import static org.mockito.Matchers.any;
 
-import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
+import org.eclipse.moquette.fce.context.ConfigurationStore;
+import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.context.HashAssignmentStore;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.service.ConfigurationDbService;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.impl.mqtt.MqttService;
+import org.eclipse.moquette.fce.service.impl.parser.JsonParserService;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ManagedIntentHandlerTest {
@@ -42,100 +43,84 @@ public class ManagedIntentHandlerTest {
 		return null;
 	}
 
-	// TODO Lants1
-	@Ignore
-	@Test
-	public void testUnmanaged() {
-		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
-		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(false);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
-
-
-		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, null, null);
-		
-		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
-				str_to_bb(services.getJsonParser().serialize(userConfig)));
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
-		when(handler.getServices()).thenReturn(services);
-		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
-		assertTrue(handler.canDoOperation(authPropsPlugin, null));
+	private FceServiceFactory getServiceFactoryMock() {
+		FceServiceFactory sf = mock(FceServiceFactory.class);
+		FceContext context = mock(FceContext.class);
+		when(context.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
+		when(sf.getJsonParser()).thenReturn(new JsonParserService());
+		when(sf.getMqtt()).thenReturn(mock(MqttService.class));
+		return sf;
 	}
-	
+
 	@Test
 	public void testPrivate() {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
-		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
+		ConfigurationStore configDbService = mock(ConfigurationStore.class);
+
+		FceContext contextMock = mock(FceContext.class);
+		FceServiceFactory sf = getServiceFactoryMock();
+		when(contextMock.getConfigurationStore(any(ManagedScope.class))).thenReturn(configDbService);
+
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-		when(services.getHashAssignment().get(any(String.class))).thenReturn(USER_HASH);
-		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, null, ManagedScope.PRIVATE, null);
-		
+		when(contextMock.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
+		when(contextMock.getHashAssignment().get(any(String.class))).thenReturn(USER_HASH);
+		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, null, ManagedScope.PRIVATE,
+				null);
+
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, USER_HASH, false,
-				str_to_bb(services.getJsonParser().serialize(userConfig)));
+				str_to_bb(sf.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
-		when(handler.getServices()).thenReturn(services);
+		when(handler.getServices()).thenReturn(sf);
+		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
 		assertTrue(handler.canDoOperation(authPropsPlugin, null));
 	}
-
 
 	@Test
 	public void testUserConfigNull() {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
-		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
+		ConfigurationStore configDbService = mock(ConfigurationStore.class);
+		FceServiceFactory sf = getServiceFactoryMock();
+		FceContext contextMock = mock(FceContext.class);
+		when(contextMock.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
+		when(contextMock.getConfigurationStore(any(ManagedScope.class))).thenReturn(configDbService);
+
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
-		
+
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
-				str_to_bb(services.getJsonParser().serialize(userConfig)));
+				str_to_bb(sf.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
-		when(handler.getServices()).thenReturn(services);
+		when(handler.getServices()).thenReturn(sf);
+		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
 		assertFalse(handler.canDoOperation(authPropsPlugin, null));
 	}
-	
-	
+
 	@Test
-	public void testUserConfigNone() throws FceAuthorizationException{
+	public void testUserConfigNone() throws FceAuthorizationException {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
-		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
+		ConfigurationStore configDbService = mock(ConfigurationStore.class);
+		FceServiceFactory sf = getServiceFactoryMock();
+
+		FceContext contextMock = mock(FceContext.class);
+		when(contextMock.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
+		when(contextMock.getConfigurationStore(any(ManagedScope.class))).thenReturn(configDbService);
+
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.NONE, null, null, null));
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
-		
+
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
-				str_to_bb(services.getJsonParser().serialize(userConfig)));
+				str_to_bb(sf.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
-		when(handler.getServices()).thenReturn(services);
+		when(handler.getServices()).thenReturn(sf);
+		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
 		assertFalse(handler.canDoOperation(authPropsPlugin, null));
-	}
-	
-	@Test
-	public void testUserConfigValidForUser() throws FceAuthorizationException{
-		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
-		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
-		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.ALL, null, null, null));
-
-		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
-		
-		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
-				str_to_bb(services.getJsonParser().serialize(userConfig)));
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
-		when(handler.getServices()).thenReturn(services);
-		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
-		assertTrue(handler.canDoOperation(authPropsPlugin, null));
 	}
 }

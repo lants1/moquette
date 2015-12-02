@@ -17,8 +17,8 @@ public class TimeframeRestriction extends Restriction {
 	private Date from;
 	private Date to;
 
-	public TimeframeRestriction(FceAction mqttAction, Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, DataUnit sizeUnit, String wsdlUrl) {
-		super(mqttAction, messageCount, maxMessageSize, totalMessageSize, sizeUnit, wsdlUrl);
+	public TimeframeRestriction(FceAction mqttAction, Date from, Date to, int messageCount, int maxMessageSize, int totalMessageSize, DataUnit sizeUnit, DataSchema dataSchema) {
+		super(mqttAction, messageCount, maxMessageSize, totalMessageSize, sizeUnit, dataSchema);
 		this.from = from;
 		this.to = to;
 	}

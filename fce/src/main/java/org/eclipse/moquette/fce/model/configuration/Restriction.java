@@ -1,7 +1,5 @@
 package org.eclipse.moquette.fce.model.configuration;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.common.util.XmlSchemaValidationUtil;
 import org.eclipse.moquette.fce.model.common.DataUnit;
 import org.eclipse.moquette.fce.model.common.IValid;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
@@ -20,16 +18,16 @@ public abstract class Restriction implements IValid {
 	private final int maxMessageSize;
 	private final int totalMessageSize;
 	private final DataUnit sizeUnit;
-	private final String wsdlUrl;
+	private final DataSchema dataSchema;
 
 	public Restriction(FceAction mqttAction, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit,
-			String wsdlUrl) {
+			DataSchema dataSchema) {
 		super();
 		this.messageCount = messageCount;
 		this.maxMessageSize = maxMessageSizeKb;
 		this.totalMessageSize = totalMessageSizeKb;
 		this.sizeUnit = sizeUnit;
-		this.wsdlUrl = wsdlUrl;
+		this.dataSchema = dataSchema;
 		this.mqttAction = mqttAction;
 	}
 
@@ -42,8 +40,8 @@ public abstract class Restriction implements IValid {
 		return sizeUnit;
 	}
 
-	public String getWsdlUrl() {
-		return wsdlUrl;
+	public DataSchema getDataSchema() {
+		return dataSchema;
 	}
 
 	public int getMaxMessageSize() {
@@ -69,11 +67,8 @@ public abstract class Restriction implements IValid {
 			}
 		}
 		
-		if (StringUtils.isNotEmpty(getWsdlUrl())) {
-			if (!XmlSchemaValidationUtil
-					.isValidXmlFileAccordingToSchema(props.getMessage(), getWsdlUrl())) {
-				return false;
-			}
+		if (getDataSchema() != null) {
+			// TODO lan schema validation
 		}
 		
 		return true;

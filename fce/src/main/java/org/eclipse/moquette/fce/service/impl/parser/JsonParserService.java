@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.service.impl.parser;
 
 import java.nio.ByteBuffer;
 
@@ -9,9 +9,6 @@ import org.eclipse.moquette.fce.model.info.InfoMessage;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.IQuotaState;
-import org.eclipse.moquette.fce.service.parser.QuotaAdapter;
-import org.eclipse.moquette.fce.service.parser.QuotaStateAdapter;
-import org.eclipse.moquette.fce.service.parser.RestrictionAdapter;
 
 import com.google.gson.GsonBuilder;
 

@@ -2,7 +2,8 @@ package org.eclipse.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -16,8 +17,8 @@ public class UnmanagedTopicHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(UnmanagedTopicHandler.class.getName());
 	
-	public UnmanagedTopicHandler(IFceServiceFactory services, String pluginClientIdentifier) {
-		super(services, pluginClientIdentifier);
+	public UnmanagedTopicHandler(FceContext context, FceServiceFactory services) {
+		super(context, services);
 	}
 
 	@Override

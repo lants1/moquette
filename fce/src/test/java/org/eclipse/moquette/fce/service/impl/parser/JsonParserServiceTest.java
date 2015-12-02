@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.service.impl.parser;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +26,7 @@ import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
+import org.eclipse.moquette.fce.service.impl.parser.JsonParserService;
 import org.eclipse.moquette.plugin.MqttAction;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
@@ -52,8 +53,8 @@ public class JsonParserServiceTest {
 	
 	@Test
 	public void testSerializationAndDeserializationRestriction() throws IOException, URISyntaxException {
-		TimeframeRestriction specificRestriction = new TimeframeRestriction(FceAction.ALL, sampleDate, sampleDate, 11, 1024, 2048, DataUnit.kB, "");
-		PeriodicRestriction periodicRestriction = new PeriodicRestriction(FceAction.ALL, ManagedCycle.DAILY, 11, 1024, 2048, DataUnit.kB, "");
+		TimeframeRestriction specificRestriction = new TimeframeRestriction(FceAction.ALL, sampleDate, sampleDate, 11, 1024, 2048, DataUnit.kB, null);
+		PeriodicRestriction periodicRestriction = new PeriodicRestriction(FceAction.ALL, ManagedCycle.DAILY, 11, 1024, 2048, DataUnit.kB, null);
 
 		List<Restriction> restrictions = new ArrayList<Restriction>();
 

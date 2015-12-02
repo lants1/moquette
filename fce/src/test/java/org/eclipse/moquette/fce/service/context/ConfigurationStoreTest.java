@@ -1,8 +1,9 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.service.context;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.moquette.fce.context.ConfigurationStore;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -11,7 +12,7 @@ import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 
-public class ConfigurationDbServiceTest {
+public class ConfigurationStoreTest {
 
 	private static final String USERHASH = "testidentifier";
 	private static final String USER = "testuser";
@@ -29,7 +30,7 @@ public class ConfigurationDbServiceTest {
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
@@ -42,7 +43,7 @@ public class ConfigurationDbServiceTest {
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
 		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		assertTrue(configService.isManaged(TOPIC));
@@ -58,7 +59,7 @@ public class ConfigurationDbServiceTest {
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		ConfigurationDbService configService = new ConfigurationDbService(null, ManagedZone.CONFIG_GLOBAL);
+		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIG_GLOBAL), everyoneConfig);
 
 		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == ALL_ID);

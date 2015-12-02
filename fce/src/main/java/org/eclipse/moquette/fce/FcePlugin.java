@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.common.util.FceTimeUtil;
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
+import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.event.AuthenticationHandler;
 import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.event.ManagedIntentHandler;
@@ -21,8 +22,7 @@ import org.eclipse.moquette.fce.job.Heartbeat;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
-import org.eclipse.moquette.fce.service.FceServiceFactoryImpl;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
@@ -54,7 +54,9 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	private SecureRandom random = new SecureRandom();
 
 	private String pluginIdentifier;
-	private IFceServiceFactory services;
+	private FceServiceFactory services;
+	private FceContext context;
+	
 	ScheduledExecutorService scheduler;
 	
 	@Override
@@ -67,11 +69,12 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 		config.setProperty(PROPS_PLUGIN_CLIENT_USERNAME, pluginUsr);
 		config.setProperty(PROPS_PLUGIN_CLIENT_PASSWORD, pluginPw);
 
-		services = new FceServiceFactoryImpl(config, brokerOperator);
+		context = new FceContext(config, brokerOperator);
+		services = new FceServiceFactory(context);
 
 		scheduler = Executors.newScheduledThreadPool(2);
-		scheduler.scheduleAtFixedRate(new QuotaUpdater(services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
-		scheduler.scheduleAtFixedRate(new Heartbeat(services), 3, 60, TimeUnit.SECONDS);
+		scheduler.scheduleAtFixedRate(new QuotaUpdater(context, services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
+		scheduler.scheduleAtFixedRate(new Heartbeat(context, services), 3, 60, TimeUnit.SECONDS);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 
@@ -92,24 +95,24 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 
 	@Override
 	public boolean checkValid(AuthenticationProperties props) {
-		AuthenticationHandler handler = new AuthenticationHandler(services, pluginIdentifier);
+		AuthenticationHandler handler = new AuthenticationHandler(context, services);
 		return handler.checkValid(props);
 	}
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		if (ManagedZoneUtil.isInManagedReadableStore(props.getTopic())) {
-			return new ManagedStoreHandler(services, pluginIdentifier).canDoOperation(props, action);
+			return new ManagedStoreHandler(context, services).canDoOperation(props, action);
 		}
 
 		if (services.isInitialized()) {
 			FceEventHandler handler;
 			if (ManagedZone.INTENT.equals(ManagedZoneUtil.getZoneForTopic(props.getTopic()))) {
-				handler = new ManagedIntentHandler(services, pluginIdentifier);
-			} else if (services.getConfigDb(ManagedZone.CONFIG_GLOBAL).isManaged(new ManagedTopic(props.getTopic()))) {
-				handler = new ManagedTopicHandler(services, pluginIdentifier);
+				handler = new ManagedIntentHandler(context, services);
+			} else if (context.getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isManaged(new ManagedTopic(props.getTopic()))) {
+				handler = new ManagedTopicHandler(context, services);
 			} else {
-				handler = new UnmanagedTopicHandler(services, pluginIdentifier);
+				handler = new UnmanagedTopicHandler(context, services);
 			}
 
 			return handler.canDoOperation(props, action);

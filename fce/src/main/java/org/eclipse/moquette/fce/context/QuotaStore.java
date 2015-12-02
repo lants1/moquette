@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,11 +20,11 @@ import org.eclipse.moquette.plugin.MqttAction;
  * @author lants1
  *
  */
-public class QuotaDbService extends ManagedZoneInMemoryDbService {
+public class QuotaStore extends ManagedZoneInMemoryStore {
 
 	private HashMap<String, UserQuota> quotaStore = new HashMap<>();
 
-	public QuotaDbService(IBrokerOperator brokerOperator, ManagedZone zone) {
+	public QuotaStore(IBrokerOperator brokerOperator, ManagedZone zone) {
 		super(brokerOperator, zone);
 	}
 

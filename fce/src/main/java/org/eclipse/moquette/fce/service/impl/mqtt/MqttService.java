@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.service.impl.mqtt;
 
 import java.io.File;
 import java.io.FileInputStream;
