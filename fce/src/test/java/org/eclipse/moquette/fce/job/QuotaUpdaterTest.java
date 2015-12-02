@@ -53,7 +53,7 @@ public class QuotaUpdaterTest {
 		UserQuota quota = new UserQuota(TESTUSER, TESTIDENTIFIER, MqttAction.SUBSCRIBE, quotaStates);
 		quotaService.put(TEST_TOPIC1, quota, true);
 		quotaService.put(TEST_TOPIC2, quota, true);
-		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, null, quotaService, null,null);
+		FceServiceFactoryMockImpl serviceFactoryMock = new FceServiceFactoryMockImpl(null, quotaService, null,null);
 		QuotaUpdater updater = new QuotaUpdater(serviceFactoryMock);
 		updater.run();
 

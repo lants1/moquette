@@ -42,7 +42,7 @@ public class TimeframeQuota extends Quota {
 	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		Date now = new Date();
 		if (now.after(from) && now.before(to)) {
-			getState().isValid(props, operation);
+			return getState().isValid(props, operation);
 		}
 
 		return false;

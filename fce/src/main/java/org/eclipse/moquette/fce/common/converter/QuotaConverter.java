@@ -28,37 +28,40 @@ public final class QuotaConverter {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.SUBSCRIBE));
 		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.SUBSCRIBE, subscribeState);
 	}
-	
+
 	public static UserQuota convertPublishConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.PUBLISH));
 		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.PUBLISH, subscribeState);
 	}
-	
+
 	public static List<Quota> convertRestrictions(List<Restriction> restrictions) {
-		List<Quota> subscribeState = new ArrayList<>();
-		for (Restriction restriction : restrictions) {
-			List<IQuotaState> quotaStates = new ArrayList<>();
-			if (restriction.getMessageCount() > 0) {
-				quotaStates.add(new MessageCountState(restriction.getMessageCount(),0));
-			}
-
-			if (restriction.getTotalMessageSize() > 0) {
-				quotaStates.add(new TransmittedDataState(restriction.getTotalMessageSize() * restriction.getDataUnit().getMultiplier(),0));
-			}
-
-			if (restriction instanceof PeriodicRestriction) {
-				for (IQuotaState state : quotaStates) {
-					subscribeState.add(new PeriodicQuota(((PeriodicRestriction) restriction).getCyle(), state));
+		List<Quota> resultRestrictions = new ArrayList<>();
+		if (restrictions != null && !restrictions.isEmpty()) {
+			for (Restriction restriction : restrictions) {
+				List<IQuotaState> quotaStates = new ArrayList<>();
+				if (restriction.getMessageCount() != 0) {
+					quotaStates.add(new MessageCountState(restriction.getMessageCount(), 0));
 				}
-			}
 
-			if (restriction instanceof TimeframeRestriction) {
-				for (IQuotaState state : quotaStates) {
-					subscribeState.add(new TimeframeQuota(((TimeframeRestriction) restriction).getFrom(),
-							((TimeframeRestriction) restriction).getTo(), state));
+				if (restriction.getTotalMessageSize() != 0) {
+					quotaStates.add(new TransmittedDataState(
+							restriction.getTotalMessageSize() * restriction.getDataUnit().getMultiplier(), 0));
+				}
+
+				if (restriction instanceof PeriodicRestriction) {
+					for (IQuotaState state : quotaStates) {
+						resultRestrictions.add(new PeriodicQuota(((PeriodicRestriction) restriction).getCyle(), state));
+					}
+				}
+
+				if (restriction instanceof TimeframeRestriction) {
+					for (IQuotaState state : quotaStates) {
+						resultRestrictions.add(new TimeframeQuota(((TimeframeRestriction) restriction).getFrom(),
+								((TimeframeRestriction) restriction).getTo(), state));
+					}
 				}
 			}
 		}
-		return subscribeState;
+		return resultRestrictions;
 	}
 }

@@ -43,7 +43,7 @@ public class TimeframeRestriction extends Restriction {
 	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
 		Date now = new Date();
 		if (now.after(from) && now.before(to)) {
-			isValidCommon(props, operation);
+			return isValidCommon(props, operation);
 		}
 
 		return false;

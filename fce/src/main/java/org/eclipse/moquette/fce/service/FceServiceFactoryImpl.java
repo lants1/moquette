@@ -20,7 +20,6 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	private IBrokerOperator brokerOperator;
 
 	private MqttService dataStoreService;
-	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbServiceGlobal;
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServiceGlobal;
@@ -53,10 +52,7 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	 */
 	@Override
 	public JsonParserService getJsonParser() {
-		if (jsonParserService == null) {
-			jsonParserService = new JsonParserService();
-		}
-		return jsonParserService;
+		return new JsonParserService();
 	}
 
 	/*
