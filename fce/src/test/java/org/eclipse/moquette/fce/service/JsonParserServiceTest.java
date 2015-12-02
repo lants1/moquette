@@ -68,7 +68,7 @@ public class JsonParserServiceTest {
 		System.out.println(json);
 		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
-		assertTrue(sampleUserConfigDeserialized.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
+		assertTrue(sampleUserConfigDeserialized.getUserHash().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfigDeserialized.getActionPermission() == FceAction.ALL);
 		assertTrue(sampleUserConfigDeserialized.getRestrictions().size() == 2);
 		
@@ -92,7 +92,7 @@ public class JsonParserServiceTest {
 		
 		UserQuota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
-		deserializedQuota.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER);
+		deserializedQuota.getUserHash().equalsIgnoreCase(TESTIDENTIFIER);
 		
 		assertTrue(((TimeframeQuota) deserializedQuota.getQuotas().get(0)).getTo().equals(sampleDate));
 		assertTrue(((PeriodicQuota) deserializedQuota.getQuotas().get(1)).getCycle() == ManagedCycle.DAILY);
@@ -104,7 +104,7 @@ public class JsonParserServiceTest {
 		JsonParserService mJsonParser = new JsonParserService();
 		String inputJson = readFile("/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
-		assertTrue(sampleUserConfig.getUserIdentifier().equalsIgnoreCase(TESTIDENTIFIER));
+		assertTrue(sampleUserConfig.getUserHash().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfig.getActionPermission() == FceAction.ALL);
 		assertTrue(sampleUserConfig.getRestrictions().size() == 2);
 		

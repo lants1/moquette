@@ -32,6 +32,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
+		String usernameHashFromRequest = getServices().getHashAssignment().get(props.getClientId());
 		log.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
@@ -47,7 +48,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 			if (getServices().getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					if (props.getClientId().equals(newConfig.getUserIdentifier())) {
+					if (getServices().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash())) {
 						log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
 								+ " and action:" + action);
 						storeUserConfiguration(topic, newConfig);
@@ -56,7 +57,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 					return false;
 				}
 
-				UserConfiguration userConfig = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props);
+				UserConfiguration userConfig = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
 				if (userConfig == null) {
 					return false;
 				}
@@ -111,9 +112,9 @@ public class ManagedIntentHandler extends FceEventHandler {
 		List<UserQuota> quotasToRemove = getServices().getQuotaDb(ManagedScope.GLOBAL).getAllForTopic(topic);
 		List<UserConfiguration> configs = getServices().getConfigDb(ManagedScope.GLOBAL).getAllForTopic(topic);
 		for (UserQuota quota : quotasToRemove) {
-			String quotaIdentifier = quota.getUserIdentifier();
+			String quotaIdentifier = quota.getUserHash();
 			for (UserConfiguration config : configs) {
-				if (config.getUserIdentifier().equals(quotaIdentifier)) {
+				if (config.getUserHash().equals(quotaIdentifier)) {
 					quotasToRemove.remove(quota);
 				}
 			}
@@ -123,7 +124,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 	}
 
 	private void deleteQuota(ManagedTopic topic, UserQuota quotaToRemove) throws FceAuthorizationException {
-		String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserIdentifier(), ManagedZone.QUOTA_GLOBAL,
+		String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserHash(), ManagedZone.QUOTA_GLOBAL,
 				quotaToRemove.getAction());
 
 		getServices().getQuotaDb(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);

@@ -23,7 +23,7 @@ public interface IFceServiceFactory {
 	
 	QuotaDbService getQuotaDb(ManagedScope scope);
 	
-	HashClientIdAssignmentService getHashAssignmentService();
+	HashAssignmentService getHashAssignment();
 	
 	boolean isInitialized();
 

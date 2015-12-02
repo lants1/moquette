@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 
 import org.eclipse.moquette.fce.common.FceServiceFactoryMockImpl;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
@@ -27,7 +27,7 @@ import org.junit.Test;
 
 public class ManagedIntentHandlerTest {
 
-	private static final String USER_IDENTIFIER = "hashtest";
+	private static final String USER_HASH = "hashtest";
 
 	public static Charset charset = Charset.forName("UTF-8");
 	public static CharsetEncoder encoder = charset.newEncoder();
@@ -55,7 +55,7 @@ public class ManagedIntentHandlerTest {
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, null, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, null, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);
@@ -69,11 +69,11 @@ public class ManagedIntentHandlerTest {
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
 		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-
-		UserConfiguration userConfig = new UserConfiguration(null, USER_IDENTIFIER, null, null, null, ManagedScope.PRIVATE, null);
+		when(services.getHashAssignment().get(any(String.class))).thenReturn(USER_HASH);
+		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, null, ManagedScope.PRIVATE, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, USER_IDENTIFIER, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, USER_HASH, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);
@@ -92,7 +92,7 @@ public class ManagedIntentHandlerTest {
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, null, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);
@@ -107,12 +107,12 @@ public class ManagedIntentHandlerTest {
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
 		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-		when(configDbService.getConfiguration(any(AuthorizationProperties.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.NONE, null, null, null));
+		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.NONE, null, null, null));
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, null, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);
@@ -126,12 +126,12 @@ public class ManagedIntentHandlerTest {
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
 		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
-		when(configDbService.getConfiguration(any(AuthorizationProperties.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.ALL, null, null, null));
+		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.ALL, null, null, null));
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
 		
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
-				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_IDENTIFIER, null, null, false,
+				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(services.getJsonParser().serialize(userConfig)));
 		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
 		when(handler.getServices()).thenReturn(services);

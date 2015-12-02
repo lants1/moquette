@@ -17,7 +17,7 @@ import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
 /**
- * Abstract handler for each Managed Event with common methods... 
+ * Abstract handler for each Managed Event with common methods...
  * 
  * @author lants1
  *
@@ -54,7 +54,7 @@ public abstract class FceEventHandler {
 			return Boolean.TRUE;
 		}
 		if (!TopicPermission.getBasicPermission(properties.getTopic()).isAllowed(action)) {
-			log.info("no permission to "+action + " topic"+properties.getTopic());
+			log.info("no permission to " + action + " topic" + properties.getTopic());
 			return Boolean.FALSE;
 		}
 		return null;
@@ -62,20 +62,21 @@ public abstract class FceEventHandler {
 
 	private boolean isPluginClient(AuthorizationProperties properties) {
 		if (!pluginClientIdentifer.isEmpty()) {
-			return StringUtils.equals(properties.getClientId(), getPluginClientIdentifer());
+			return StringUtils.equals(getServices().getHashAssignment().get(properties.getClientId()),
+					getPluginClientIdentifer());
 		}
 		return false;
 	}
 
 	protected void logAndSendInfoMsg(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
 		log.info(msgType + " for topic:" + props.getTopic() + " user: " + props.getUser() + " action:" + action);
-		InfoMessage infoMsg = new InfoMessage(props.getUser(), props.getClientId(), msgType, "mqttaction: " + action);
-		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(props, ManagedZone.INFO),
+		InfoMessage infoMsg = new InfoMessage(props.getClientId(), getServices().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
+		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(getServices().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
 	}
-	
-	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig, ManagedZone quotaZone)
-			throws FceAuthorizationException {
+
+	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig,
+			ManagedZone quotaZone) throws FceAuthorizationException {
 		UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
 		UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
 

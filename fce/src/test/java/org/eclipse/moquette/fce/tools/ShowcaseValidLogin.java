@@ -18,7 +18,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 public class ShowcaseValidLogin extends Showcase{
 
 	private static String USERNAME = "user";
-	private static String PASSWORD = "password";
 	
 	public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, KeyStoreException, MqttException, IOException {
 		loginAndPublishToTopic();
@@ -28,13 +27,13 @@ public class ShowcaseValidLogin extends Showcase{
 	public static void loginAndPublishToTopic() throws MqttException, KeyManagementException, UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
 			
 		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", FceHashUtil.getFceHash(USERNAME, PASSWORD));
+		client = new MqttClient("ssl://localhost:8883", "client");
 
 			SSLSocketFactory ssf = configureSSLSocketFactory();
 
 			MqttConnectOptions options = new MqttConnectOptions();
 			options.setUserName(USERNAME);
-			options.setPassword(PASSWORD.toCharArray());
+			options.setPassword(FceHashUtil.getFceHash(USERNAME).toCharArray());
 			options.setSocketFactory(ssf);
 
 			client.connect(options);

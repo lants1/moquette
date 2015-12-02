@@ -17,7 +17,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 public class ShowcaseManageIntent extends Showcase{
 
 	private static String USERNAME = "user";
-	private static String PASSWORD = "password";
 
 	public static void main(String[] args) throws Exception {
 		initializeInternalMqttClient();
@@ -27,13 +26,13 @@ public class ShowcaseManageIntent extends Showcase{
 
 	public static void initializeInternalMqttClient() throws Exception {
 		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", FceHashUtil.getFceHash(USERNAME, PASSWORD));
+		client = new MqttClient("ssl://localhost:8883", "client");
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setUserName(USERNAME);
-		options.setPassword(PASSWORD.toCharArray());
+		options.setPassword(FceHashUtil.getFceHash(USERNAME).toCharArray());
 		options.setSocketFactory(ssf);
 
 		client.connect(options);
@@ -50,13 +49,13 @@ public class ShowcaseManageIntent extends Showcase{
 	public static void bookQuota() throws Exception {
 
 		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", FceHashUtil.getFceHash(USERNAME, PASSWORD));
+		client = new MqttClient("ssl://localhost:8883", "client");
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setUserName(USERNAME);
-		options.setPassword(PASSWORD.toCharArray());
+		options.setPassword(FceHashUtil.getFceHash(USERNAME).toCharArray());
 		options.setSocketFactory(ssf);
 
 		client.connect(options);

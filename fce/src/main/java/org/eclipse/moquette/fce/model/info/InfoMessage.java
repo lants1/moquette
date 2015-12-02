@@ -13,8 +13,8 @@ public class InfoMessage extends ManagedInformation{
 	private InfoMessageType messageType;
 	private String messageText;
 	
-	public InfoMessage(String userName, String userIdentifier, InfoMessageType messageType, String messageText) {
-		super(userName, userIdentifier);
+	public InfoMessage(String alias, String usernameHash, InfoMessageType messageType, String messageText) {
+		super(alias, usernameHash);
 		this.messageType = messageType;
 		this.messageText = messageText;
 	}

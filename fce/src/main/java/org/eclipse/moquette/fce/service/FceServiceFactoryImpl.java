@@ -25,7 +25,7 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServiceGlobal;
 	private ConfigurationDbService configDbServicePrivate;
-	private HashClientIdAssignmentService hashAssignment;
+	private HashAssignmentService hashAssignment;
 
 	public FceServiceFactoryImpl(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		this.pluginConfig = config;
@@ -124,9 +124,9 @@ public class FceServiceFactoryImpl implements IFceServiceFactory {
 	}
 
 	@Override
-	public HashClientIdAssignmentService getHashAssignmentService() {
+	public HashAssignmentService getHashAssignment() {
 		if (hashAssignment == null) {
-			hashAssignment = new HashClientIdAssignmentService();
+			hashAssignment = new HashAssignmentService();
 		}
 		return hashAssignment;
 	}

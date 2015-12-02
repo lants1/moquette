@@ -26,10 +26,10 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 	private final FceAction actionPermission;
 	private final List<Restriction> restrictions;
 
-	public UserConfiguration(String userName, String userIdentifier, FceAction actionPermission,
+	public UserConfiguration(String alias, String usernameHash, FceAction actionPermission,
 			AdminPermission adminPermission, ManagedState managedState, ManagedScope scope,
 			List<Restriction> restrictions) {
-		super(userName, userIdentifier);
+		super(alias, usernameHash);
 		this.actionPermission = actionPermission;
 		this.restrictions = restrictions;
 		this.managedState = managedState;
@@ -96,6 +96,6 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 	}
 
 	public boolean isValidForEveryone() {
-		return StringUtils.isEmpty(getUserIdentifier());
+		return StringUtils.isEmpty(getUserHash());
 	}
 }
