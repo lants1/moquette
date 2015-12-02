@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
+import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -12,7 +13,7 @@ import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessage;
 import org.eclipse.moquette.fce.model.info.InfoMessageType;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -26,20 +27,20 @@ public abstract class FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(FceEventHandler.class.getName());
 
-	private final IFceServiceFactory services;
-	private final String pluginClientIdentifer;
+	private final FceContext context;
+	private final FceServiceFactory services;
 
-	public FceEventHandler(IFceServiceFactory services, String pluginClientIdentifier) {
+	public FceEventHandler(FceContext context, FceServiceFactory services) {
 		this.services = services;
-		this.pluginClientIdentifer = pluginClientIdentifier;
+		this.context = context;
+	}
+	
+	public FceContext getContext() {
+		return context;
 	}
 
-	public IFceServiceFactory getServices() {
+	public FceServiceFactory getServices() {
 		return services;
-	}
-
-	public String getPluginClientIdentifer() {
-		return pluginClientIdentifer;
 	}
 
 	public Boolean preCheckManagedZone(AuthorizationProperties properties, MqttAction action) {
@@ -61,17 +62,17 @@ public abstract class FceEventHandler {
 	}
 
 	private boolean isPluginClient(AuthorizationProperties properties) {
-		if (!pluginClientIdentifer.isEmpty()) {
-			return StringUtils.equals(getServices().getHashAssignment().get(properties.getClientId()),
-					getPluginClientIdentifer());
+		if (!context.getPluginIdentifier().isEmpty()) {
+			return StringUtils.equals(getContext().getHashAssignment().get(properties.getClientId()),
+					context.getPluginIdentifier());
 		}
 		return false;
 	}
 
 	protected void logAndSendInfoMsg(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
 		log.info(msgType + " for topic:" + props.getTopic() + " user: " + props.getUser() + " action:" + action);
-		InfoMessage infoMsg = new InfoMessage(props.getClientId(), getServices().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
-		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(getServices().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
+		InfoMessage infoMsg = new InfoMessage(props.getClientId(), getContext().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
+		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
 	}
 
@@ -83,8 +84,8 @@ public abstract class FceEventHandler {
 		String subQuotaTopic = topic.getIdentifier(subQuota, quotaZone, MqttAction.SUBSCRIBE);
 		String pubQuotaTopic = topic.getIdentifier(pubQuota, quotaZone, MqttAction.PUBLISH);
 
-		getServices().getQuotaDb(usrConfig.getManagedScope()).put(subQuotaTopic, subQuota, true);
-		getServices().getQuotaDb(usrConfig.getManagedScope()).put(pubQuotaTopic, pubQuota, true);
+		getContext().getQuotaStore(usrConfig.getManagedScope()).put(subQuotaTopic, subQuota, true);
+		getContext().getQuotaStore(usrConfig.getManagedScope()).put(pubQuotaTopic, pubQuota, true);
 		getServices().getMqtt().publish(subQuotaTopic, getServices().getJsonParser().serialize(subQuota));
 		getServices().getMqtt().publish(pubQuotaTopic, getServices().getJsonParser().serialize(pubQuota));
 	}

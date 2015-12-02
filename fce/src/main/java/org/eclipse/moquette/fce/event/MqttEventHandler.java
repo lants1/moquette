@@ -3,12 +3,13 @@ package org.eclipse.moquette.fce.event;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
+import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -20,8 +21,8 @@ public class MqttEventHandler extends FceEventHandler implements MqttCallback {
 
 	private final static Logger log = Logger.getLogger(MqttEventHandler.class.getName());
 
-	public MqttEventHandler(IFceServiceFactory services, String pluginClientIdentifier) {
-		super(services, pluginClientIdentifier);
+	public MqttEventHandler(FceContext context, FceServiceFactory services) {
+		super(context, services);
 	}
 
 	@Override
@@ -51,13 +52,13 @@ public class MqttEventHandler extends FceEventHandler implements MqttCallback {
 		case CONFIG_PRIVATE:
 		case CONFIG_GLOBAL:
 			UserConfiguration msgConfig = getServices().getJsonParser().deserializeUserConfiguration(msgPayload);
-			getServices().getConfigDb(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
+			getContext().getConfigurationStore(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
 			log.info("received configuration message for topic: " + topicIdentifier);
 			break;
 		case QUOTA_PRIVATE:
 		case QUOTA_GLOBAL:
 			UserQuota msgQuota = getServices().getJsonParser().deserializeQuota(msgPayload);
-			getServices().getQuotaDb(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
+			getContext().getQuotaStore(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
 			log.info("received quota message for topic: " + topicIdentifier);
 			break;
 		default:

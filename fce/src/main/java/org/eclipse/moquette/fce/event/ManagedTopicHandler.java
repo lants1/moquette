@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.event;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
+import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
@@ -10,7 +11,7 @@ import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessageType;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -24,12 +25,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(ManagedTopicHandler.class.getName());
 
-	public ManagedTopicHandler(IFceServiceFactory services, String pluginClientIdentifier) {
-		super(services, pluginClientIdentifier);
+	public ManagedTopicHandler(FceContext context, FceServiceFactory services) {
+		super(context, services);
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		String usernameHashFromRequest = getServices().getHashAssignment().get(props.getClientId());
+		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
 		
 		
 		log.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
@@ -42,8 +43,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 		}
 
 		try {
-			UserConfiguration configGlobal = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
-			UserQuota quotasGlobal = getServices().getQuotaDb(ManagedScope.GLOBAL).getQuota(props.getTopic(), usernameHashFromRequest, action);
+			UserConfiguration configGlobal = getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasGlobal = getContext().getQuotaStore(ManagedScope.GLOBAL).getQuota(props.getTopic(), usernameHashFromRequest, action);
 
 			if (configGlobal.isValidForEveryone()) {
 				if (quotasGlobal == null) {
@@ -62,8 +63,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 				return false;
 			}
 
-			UserConfiguration configPrivate = getServices().getConfigDb(ManagedScope.PRIVATE).getConfiguration(props.getTopic(), usernameHashFromRequest);
-			UserQuota quotasPrivate = getServices().getQuotaDb(ManagedScope.PRIVATE).getQuota(props.getTopic(), usernameHashFromRequest, action);
+			UserConfiguration configPrivate = getContext().getConfigurationStore(ManagedScope.PRIVATE).getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasPrivate = getContext().getQuotaStore(ManagedScope.PRIVATE).getQuota(props.getTopic(), usernameHashFromRequest, action);
 
 			if (configPrivate != null) {
 				if (!configPrivate.isValid(props, action)) {
@@ -90,14 +91,14 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
 			UserQuota userQuotas) throws FceAuthorizationException {
-		String usernameHashFromRequest = getServices().getHashAssignment().get(properties.getClientId());
+		String usernameHashFromRequest = getContext().getHashAssignment().get(properties.getClientId());
 		
 		userQuotas.substractRequestFromQuota(properties, operation);
 		String quotaJson = getServices().getJsonParser().serialize(userQuotas);
 
 		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(usernameHashFromRequest, zone, operation);
 
-		getServices().getQuotaDb(zone.getScope()).put(userTopicIdentifier, userQuotas);
+		getContext().getQuotaStore(zone.getScope()).put(userTopicIdentifier, userQuotas);
 		getServices().getMqtt().publish(userTopicIdentifier, quotaJson);
 	}
 

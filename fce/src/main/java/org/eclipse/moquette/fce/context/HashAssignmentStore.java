@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.context;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
  * @author lants1
  *
  */
-public class HashAssignmentService {
+public class HashAssignmentStore {
 
 	Map<String, String> assignments = new HashMap<>();
 	

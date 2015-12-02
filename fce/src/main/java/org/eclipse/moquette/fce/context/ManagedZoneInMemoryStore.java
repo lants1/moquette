@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service;
+package org.eclipse.moquette.fce.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,15 +21,15 @@ import org.eclipse.moquette.plugin.MqttAction;
  * @author lants1
  *
  */
-public abstract class ManagedZoneInMemoryDbService {
+public abstract class ManagedZoneInMemoryStore {
 	
-	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryDbService.class.getName());
+	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryStore.class.getName());
 	
 	private boolean initialized;
 	private final IBrokerOperator brokerOperator;
 	private final ManagedZone correspondingZone;
 	
-	public ManagedZoneInMemoryDbService(IBrokerOperator brokerOperator, ManagedZone correspondingZone) {
+	public ManagedZoneInMemoryStore(IBrokerOperator brokerOperator, ManagedZone correspondingZone) {
 		super();
 		this.initialized = false;
 		this.brokerOperator = brokerOperator;

@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
+import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
@@ -13,7 +14,7 @@ import org.eclipse.moquette.fce.model.configuration.AdminPermission;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.model.info.InfoMessageType;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -27,12 +28,12 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(ManagedIntentHandler.class.getName());
 
-	public ManagedIntentHandler(IFceServiceFactory services, String pluginClientIdentifier) {
-		super(services, pluginClientIdentifier);
+	public ManagedIntentHandler(FceContext context, FceServiceFactory services) {
+		super(context, services);
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		String usernameHashFromRequest = getServices().getHashAssignment().get(props.getClientId());
+		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
 		log.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
@@ -46,9 +47,9 @@ public class ManagedIntentHandler extends FceEventHandler {
 			UserConfiguration newConfig = getServices().getJsonParser()
 					.deserializeUserConfiguration(props.getMessage());
 
-			if (getServices().getConfigDb(ManagedScope.GLOBAL).isManaged(topic)) {
+			if (getContext().getConfigurationStore(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					if (getServices().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash())) {
+					if (getContext().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash())) {
 						log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
 								+ " and action:" + action);
 						storeUserConfiguration(topic, newConfig);
@@ -57,7 +58,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 					return false;
 				}
 
-				UserConfiguration userConfig = getServices().getConfigDb(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
+				UserConfiguration userConfig = getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
 				if (userConfig == null) {
 					return false;
 				}
@@ -100,7 +101,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 			throw new FceAuthorizationException("invalid managed scope");
 		}
 
-		getServices().getConfigDb(newConfig.getManagedScope()).put(topic.getIdentifier(newConfig, configurationZone),
+		getContext().getConfigurationStore(newConfig.getManagedScope()).put(topic.getIdentifier(newConfig, configurationZone),
 				newConfig);
 		getServices().getMqtt().publish(topic.getIdentifier(newConfig, configurationZone),
 				getServices().getJsonParser().serialize(newConfig));
@@ -109,8 +110,8 @@ public class ManagedIntentHandler extends FceEventHandler {
 	}
 
 	private List<UserQuota> getUnneededGlobalQuotas(ManagedTopic topic) {
-		List<UserQuota> quotasToRemove = getServices().getQuotaDb(ManagedScope.GLOBAL).getAllForTopic(topic);
-		List<UserConfiguration> configs = getServices().getConfigDb(ManagedScope.GLOBAL).getAllForTopic(topic);
+		List<UserQuota> quotasToRemove = getContext().getQuotaStore(ManagedScope.GLOBAL).getAllForTopic(topic);
+		List<UserConfiguration> configs = getContext().getConfigurationStore(ManagedScope.GLOBAL).getAllForTopic(topic);
 		for (UserQuota quota : quotasToRemove) {
 			String quotaIdentifier = quota.getUserHash();
 			for (UserConfiguration config : configs) {
@@ -127,7 +128,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 		String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserHash(), ManagedZone.QUOTA_GLOBAL,
 				quotaToRemove.getAction());
 
-		getServices().getQuotaDb(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);
+		getContext().getQuotaStore(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);
 		getServices().getMqtt().delete(userTopicIdentifier);
 	}
 

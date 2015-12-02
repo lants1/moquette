@@ -50,8 +50,8 @@ public class QuotaConverterTest {
 	@Test
 	public void testWithEmptyRestriction() {
 		List<Restriction> restrictions = new ArrayList<>();
-		TimeframeRestriction tfRest = new TimeframeRestriction(FceAction.PUBLISH, null, null, 0, 0, 0, DataUnit.B, "asdf");
-		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, 0, 0, 0, DataUnit.B, "asdfasf");
+		TimeframeRestriction tfRest = new TimeframeRestriction(FceAction.PUBLISH, null, null, 0, 0, 0, DataUnit.B, null);
+		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, 0, 0, 0, DataUnit.B, null);
 		restrictions.add(tfRest);
 		restrictions.add(perRest);
 		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,restrictions);
@@ -66,8 +66,8 @@ public class QuotaConverterTest {
 	@Test
 	public void testWithMinusRestriction() {
 		List<Restriction> restrictions = new ArrayList<>();
-		TimeframeRestriction tfRest = new TimeframeRestriction(FceAction.PUBLISH, null, null, -1, -1, -1, DataUnit.B, "asdf");
-		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, -1, -1, -1, DataUnit.B, "asdfasf");
+		TimeframeRestriction tfRest = new TimeframeRestriction(FceAction.PUBLISH, null, null, -1, -1, -1, DataUnit.B, null);
+		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, -1, -1, -1, DataUnit.B, null);
 		restrictions.add(tfRest);
 		restrictions.add(perRest);
 		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,restrictions);

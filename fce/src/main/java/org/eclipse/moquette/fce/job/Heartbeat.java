@@ -2,7 +2,8 @@ package org.eclipse.moquette.fce.job;
 
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.service.IFceServiceFactory;
+import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 
 /**
  * Heartbeat for the plugin...
@@ -14,11 +15,13 @@ public class Heartbeat implements Runnable {
 
 	private final static Logger log = Logger.getLogger(Heartbeat.class.getName());
 
-	private IFceServiceFactory services;
-
-	public Heartbeat(IFceServiceFactory services) {
+	private FceServiceFactory services;
+	private FceContext context;
+	
+	public Heartbeat(FceContext context, FceServiceFactory services) {
 		super();
 		this.services = services;
+		this.context = context;
 	}
 
 	@Override

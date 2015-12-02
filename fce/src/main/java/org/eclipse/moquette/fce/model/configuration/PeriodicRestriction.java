@@ -15,8 +15,8 @@ public class PeriodicRestriction extends Restriction{
 
 	private ManagedCycle cyle;
 
-	public PeriodicRestriction(FceAction mqttAction, ManagedCycle cycle, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit, String wsdlUrl) {
-		super(mqttAction, messageCount, maxMessageSizeKb, totalMessageSizeKb, sizeUnit, wsdlUrl);
+	public PeriodicRestriction(FceAction mqttAction, ManagedCycle cycle, int messageCount, int maxMessageSizeKb, int totalMessageSizeKb, DataUnit sizeUnit, DataSchema dataSchema) {
+		super(mqttAction, messageCount, maxMessageSizeKb, totalMessageSizeKb, sizeUnit, dataSchema);
 		this.cyle = cycle;
 	}
 

@@ -1,8 +1,8 @@
-package org.eclipse.moquette.fce.service.parser;
+package org.eclipse.moquette.fce.service.impl.parser;
 
 import java.lang.reflect.Type;
 
-import org.eclipse.moquette.fce.model.quota.Quota;
+import org.eclipse.moquette.fce.model.quota.IQuotaState;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -14,15 +14,15 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 /**
- * GSON QuotaAdapter for serialization/deserialization.
+ * GSON QuotaState for serialization/deserialization.
  * 
  * @author lants1
  *
  */
-public class QuotaAdapter implements JsonSerializer<Quota>, JsonDeserializer<Quota> {
+public class QuotaStateAdapter implements JsonSerializer<IQuotaState>, JsonDeserializer<IQuotaState> {
 	
 	@Override
-	public JsonElement serialize(Quota src, Type typeOfSrc, JsonSerializationContext context) {
+	public JsonElement serialize(IQuotaState src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject result = new JsonObject();
 		result.add("type", new JsonPrimitive(src.getClass().getSimpleName()));
 		result.add("properties", context.serialize(src, src.getClass()));
@@ -30,7 +30,7 @@ public class QuotaAdapter implements JsonSerializer<Quota>, JsonDeserializer<Quo
 	}
 
 	@Override
-	public Quota deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+	public IQuotaState deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 			throws JsonParseException {
 		JsonObject jsonObject = json.getAsJsonObject();
 		String type = jsonObject.get("type").getAsString();
