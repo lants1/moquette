@@ -1,5 +1,7 @@
 package org.eclipse.moquette.fce.common;
 
+import static org.mockito.Mockito.mock;
+
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -14,21 +16,19 @@ import org.mockito.Mockito;
 
 public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 
-	private IBrokerOperator brokerOperator;
+	private IBrokerOperator brokerOperator = mock(IBrokerOperator.class);
 
 	private MqttService dataStoreService;
-	private JsonParserService jsonParserService;
 	private QuotaDbService quotaDbServiceGlobal;
 	private ConfigurationDbService configDbServiceGlobal;
 	private QuotaDbService quotaDbServicePrivate;
 	private ConfigurationDbService configDbServicePrivate;
 	private HashAssignmentService hashAssignment;
 
-	public FceServiceFactoryMockImpl(IBrokerOperator brokerOperator, ConfigurationDbService configDbServiceGlobal,
+	public FceServiceFactoryMockImpl(ConfigurationDbService configDbServiceGlobal,
 			QuotaDbService quotaDbServiceGlobal, ConfigurationDbService configDbServicePrivate,
 			QuotaDbService quotaDbServicePrivate) {
 		super();
-		this.brokerOperator = brokerOperator;
 		this.configDbServiceGlobal = configDbServiceGlobal;
 		this.quotaDbServiceGlobal = quotaDbServiceGlobal;
 		this.configDbServicePrivate = configDbServicePrivate;
@@ -43,10 +43,7 @@ public class FceServiceFactoryMockImpl implements IFceServiceFactory {
 	}
 
 	public JsonParserService getJsonParser() {
-		if (jsonParserService == null) {
-			jsonParserService = new JsonParserService();
-		}
-		return jsonParserService;
+		return new JsonParserService();
 	}
 
 	@Override

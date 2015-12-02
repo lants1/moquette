@@ -49,7 +49,7 @@ public class ManagedIntentHandlerTest {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(false);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
+		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
 
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, null, null);
@@ -67,7 +67,7 @@ public class ManagedIntentHandlerTest {
 	public void testPrivate() {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
+		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 		when(services.getHashAssignment().get(any(String.class))).thenReturn(USER_HASH);
 		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, null, ManagedScope.PRIVATE, null);
@@ -86,7 +86,7 @@ public class ManagedIntentHandlerTest {
 	public void testUserConfigNull() {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
+		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 
 		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
@@ -105,7 +105,7 @@ public class ManagedIntentHandlerTest {
 	public void testUserConfigNone() throws FceAuthorizationException{
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
+		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.NONE, null, null, null));
 
@@ -124,7 +124,7 @@ public class ManagedIntentHandlerTest {
 	public void testUserConfigValidForUser() throws FceAuthorizationException{
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
 		ConfigurationDbService configDbService = mock(ConfigurationDbService.class);
-		IFceServiceFactory services = new FceServiceFactoryMockImpl(null, configDbService, null, null, null);
+		IFceServiceFactory services = new FceServiceFactoryMockImpl(configDbService, null, null, null);
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 		when(configDbService.getConfiguration(any(String.class), any(String.class))).thenReturn(new UserConfiguration(null, null, null, AdminPermission.ALL, null, null, null));
 

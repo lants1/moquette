@@ -1,5 +1,6 @@
 package org.eclipse.moquette.fce.model.configuration;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.common.util.XmlSchemaValidationUtil;
 import org.eclipse.moquette.fce.model.common.DataUnit;
 import org.eclipse.moquette.fce.model.common.IValid;
@@ -68,7 +69,7 @@ public abstract class Restriction implements IValid {
 			}
 		}
 		
-		if (!getWsdlUrl().isEmpty()) {
+		if (StringUtils.isNotEmpty(getWsdlUrl())) {
 			if (!XmlSchemaValidationUtil
 					.isValidXmlFileAccordingToSchema(props.getMessage(), getWsdlUrl())) {
 				return false;
