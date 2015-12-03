@@ -13,7 +13,7 @@ public class UserConfigurationTest {
 	@Test
 	public void testValidationForAction() {
 		UserConfiguration userConfig = new UserConfiguration(USER, ID, FceAction.PUBLISH, null, null, null, null);
-		assertFalse(userConfig.isValid(null, MqttAction.SUBSCRIBE));
+		assertFalse(userConfig.isValid(null, null, MqttAction.SUBSCRIBE));
 	}
 
 }

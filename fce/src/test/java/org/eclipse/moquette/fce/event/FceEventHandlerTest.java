@@ -7,6 +7,8 @@ import static org.mockito.Mockito.any;
 
 import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.context.HashAssignmentStore;
+import org.eclipse.moquette.fce.event.broker.ManagedStoreHandler;
+import org.eclipse.moquette.fce.event.broker.ManagedTopicHandler;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;

@@ -24,9 +24,9 @@ public class TimeframeRestrictionTest {
 		
 		// valid case
 		IQuotaState state = mock(IQuotaState.class);
-		when(state.isValid(null, null)).thenReturn(true);
+		when(state.isValid(null, null, null)).thenReturn(true);
 		TimeframeRestriction quotaValid = new TimeframeRestriction(null, hourMinusOne, hourPlusOne, 0, 0, 0, null,null);
-		assertTrue(quotaValid.isValid(null, null));
+		assertTrue(quotaValid.isValid(null, null, null));
 		
 		// invalid case past
 		cal.setTime(new Date());
@@ -34,7 +34,7 @@ public class TimeframeRestrictionTest {
 		Date hourMinusTwo = cal.getTime();
 		
 		TimeframeRestriction quotaInvalidPast = new TimeframeRestriction(null, hourMinusTwo, hourMinusOne, 0, 0, 0, null, null);
-		assertFalse(quotaInvalidPast.isValid(null, null));
+		assertFalse(quotaInvalidPast.isValid(null, null, null));
 		
 		// invalid case future
 		cal.setTime(new Date());
@@ -42,7 +42,7 @@ public class TimeframeRestrictionTest {
 		Date hourPlusTwo = cal.getTime();
 		
 		TimeframeRestriction quotaInvalidFuture = new TimeframeRestriction(null, hourPlusOne, hourPlusTwo, 0, 0, 0, null, null);
-		assertFalse(quotaInvalidFuture.isValid(null, null));
+		assertFalse(quotaInvalidFuture.isValid(null, null, null));
 	}
 
 

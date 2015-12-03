@@ -19,7 +19,7 @@ import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
 import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.mqtt.MqttService;
+import org.eclipse.moquette.fce.service.mqtt.FceMqttClientWrapper;
 import org.eclipse.moquette.fce.service.parser.JsonParserService;
 import org.eclipse.moquette.fce.model.quota.Quota;
 import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
@@ -65,7 +65,7 @@ public class QuotaUpdaterTest {
 		FceContext contextMock = mock(FceContext.class);
 		
 		when(contextMock.getQuotaStore(any(ManagedZone.class))).thenReturn(quotaService);
-		when(serviceFactoryMock.getMqtt()).thenReturn(mock(MqttService.class));
+		when(serviceFactoryMock.getMqtt()).thenReturn(mock(FceMqttClientWrapper.class));
 		when(serviceFactoryMock.getJsonParser()).thenReturn(new JsonParserService());
 		QuotaUpdater updater = new QuotaUpdater(contextMock, serviceFactoryMock);
 		updater.run();

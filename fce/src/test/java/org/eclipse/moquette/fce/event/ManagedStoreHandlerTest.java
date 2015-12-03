@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.context.HashAssignmentStore;
+import org.eclipse.moquette.fce.event.broker.ManagedStoreHandler;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.FceServiceFactory;

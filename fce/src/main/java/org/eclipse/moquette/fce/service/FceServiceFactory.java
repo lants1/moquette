@@ -1,8 +1,9 @@
 package org.eclipse.moquette.fce.service;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.moquette.fce.context.FceContext;
-import org.eclipse.moquette.fce.event.MqttManageEventHandler;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
+import org.eclipse.moquette.fce.model.configuration.DataSchema;
 import org.eclipse.moquette.fce.model.configuration.SchemaType;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.fce.service.hash.HashService;
@@ -21,13 +22,14 @@ import org.eclipse.moquette.fce.service.validation.XmlSchemaValidationService;
 public class FceServiceFactory {
 
 	private FceContext context;
-	private MqttService dataStoreService;
+	private MqttService mqttService;
 
-	public FceServiceFactory(FceContext serviceContext) {
+	public FceServiceFactory(FceContext serviceContext, MqttService mqttService) {
 		this.context = serviceContext;
+		this.mqttService = mqttService;
 	}
 
-	protected FceContext getContext() {
+	private FceContext getContext() {
 		return context;
 	}
 	
@@ -40,26 +42,16 @@ public class FceServiceFactory {
 	}
 
 	public MqttService getMqtt() {
-		if (dataStoreService == null) {
-			dataStoreService = new MqttService(getContext(), this));
-			dataStoreService.initializeInternalMqttClient();
-		}
-		return dataStoreService;
+		return mqttService;
 	}
 
-	public ISchemaValidationService getSchemaValidationService(SchemaType type) {
-		if(SchemaType.JSON_SCHEMA.equals(type)){
-			return new JsonSchemaValidationService();
+	public ISchemaValidationService getSchemaValidationService(DataSchema dataSchema) {
+		ByteBuffer schema = getContext().getSchemaAssignment().get(dataSchema.getSchemaTopic());
+		if(SchemaType.JSON_SCHEMA.equals(dataSchema.getSchemaType())){
+			return new JsonSchemaValidationService(schema);
 		}
 		else{
-			return new XmlSchemaValidationService();
+			return new XmlSchemaValidationService(schema);
 		}
-	}
-	
-	public boolean isInitialized() {
-		return (getMqtt() != null && getContext().getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
-				&& getContext().getQuotaStore(ManagedZone.QUOTA_GLOBAL).isInitialized()
-				&& getContext().getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
-				&& getContext().getQuotaStore(ManagedZone.QUOTA_PRIVATE).isInitialized() && getMqtt().isInitialized());
 	}
 }

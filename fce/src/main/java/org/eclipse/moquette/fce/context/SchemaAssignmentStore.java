@@ -1,5 +1,6 @@
 package org.eclipse.moquette.fce.context;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,13 +12,13 @@ import java.util.Map;
  */
 public class SchemaAssignmentStore {
 
-	Map<String, byte[]> assignments = new HashMap<>();
+	Map<String, ByteBuffer> assignments = new HashMap<>();
 	
-	public void put(String topic, byte[] bs){
+	public void put(String topic, ByteBuffer bs){
 		assignments.put(topic, bs);
 	}
 	
-	public byte[] get(String topic){
+	public ByteBuffer get(String topic){
 		return assignments.get(topic);
 	}
 	

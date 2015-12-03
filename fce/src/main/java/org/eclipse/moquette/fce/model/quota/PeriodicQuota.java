@@ -3,6 +3,7 @@ package org.eclipse.moquette.fce.model.quota;
 import java.util.Date;
 
 import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -40,8 +41,8 @@ public class PeriodicQuota extends Quota {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
-		return getState().isValid(props, operation);
+	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
+		return getState().isValid(services, props, operation);
 	}
 	
 }

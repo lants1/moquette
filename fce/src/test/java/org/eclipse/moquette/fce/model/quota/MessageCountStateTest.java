@@ -17,10 +17,10 @@ public class MessageCountStateTest {
 	@Test
 	public void testValid() {
 		MessageCountState state = new MessageCountState(3,3);
-		assertFalse(state.isValid(null, null));
+		assertFalse(state.isValid(null, null, null));
 		
 		state = new MessageCountState(3,2);
-		assertTrue(state.isValid(null, null));
+		assertTrue(state.isValid(null, null, null));
 	}
 
 	@Test

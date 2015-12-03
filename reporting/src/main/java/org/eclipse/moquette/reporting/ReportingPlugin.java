@@ -52,6 +52,12 @@ public class ReportingPlugin implements IBrokerInterceptionPlugin {
 	}
 
 	@Override
+	public void onServerStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public String getPluginIdentifier() {
 		return PLUGIN_IDENTIFIER;
 	}

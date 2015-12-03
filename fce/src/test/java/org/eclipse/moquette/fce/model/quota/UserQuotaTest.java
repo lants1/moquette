@@ -13,7 +13,7 @@ public class UserQuotaTest {
 	@Test
 	public void testOnEmptyUserQuotaValidation() {
 		UserQuota userQuota = new UserQuota(ID, USER, null, null);
-		assertTrue(userQuota.isValid(null, MqttAction.SUBSCRIBE));
+		assertTrue(userQuota.isValid(null, null, MqttAction.SUBSCRIBE));
 	}
 
 }

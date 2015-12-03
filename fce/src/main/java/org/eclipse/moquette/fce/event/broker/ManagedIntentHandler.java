@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.broker;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;

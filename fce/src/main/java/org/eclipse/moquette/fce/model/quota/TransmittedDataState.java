@@ -1,6 +1,7 @@
 package org.eclipse.moquette.fce.model.quota;
 
 import org.eclipse.moquette.fce.model.common.DataUnit;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -49,7 +50,7 @@ public class TransmittedDataState implements IQuotaState {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
+	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
 		if (getCurrentQuota() + props.getMessage().position() < getMaxQuota()) {
 			return true;
 		}
