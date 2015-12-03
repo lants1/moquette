@@ -30,7 +30,7 @@ public class ShowcaseValidLogin extends Showcase{
 		client = new MqttClient("ssl://localhost:8883", "client");
 
 			SSLSocketFactory ssf = configureSSLSocketFactory();
-			FceServiceFactory services = new FceServiceFactory(null);
+			FceServiceFactory services = new FceServiceFactory(null, null);
 			
 			MqttConnectOptions options = new MqttConnectOptions();
 			options.setUserName(USERNAME);

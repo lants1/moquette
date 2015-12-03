@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.common.IValid;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -75,7 +76,7 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
+	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
 		List<Restriction> restrictions = getRestrictions(operation);
 
 		if (!getActionPermission().canDoOperation(operation)) {
@@ -87,7 +88,7 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 		}
 
 		for (Restriction restriction : restrictions) {
-			if (!restriction.isValid(props, operation)) {
+			if (!restriction.isValid(services, props, operation)) {
 				return false;
 			}
 		}

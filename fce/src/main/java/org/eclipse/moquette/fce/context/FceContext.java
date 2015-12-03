@@ -137,4 +137,11 @@ public class FceContext {
 	public String getPluginJksPath(){
 		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_JKS_PATH);
 	}
+	
+	public boolean isInitialized() {
+		return (getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
+				&& getQuotaStore(ManagedZone.QUOTA_GLOBAL).isInitialized()
+				&& getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
+				&& getQuotaStore(ManagedZone.QUOTA_PRIVATE).isInitialized());
+	}
 }

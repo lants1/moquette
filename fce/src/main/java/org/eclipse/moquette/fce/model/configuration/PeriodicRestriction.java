@@ -2,6 +2,7 @@ package org.eclipse.moquette.fce.model.configuration;
 
 import org.eclipse.moquette.fce.model.common.DataUnit;
 import org.eclipse.moquette.fce.model.common.ManagedCycle;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -29,7 +30,7 @@ public class PeriodicRestriction extends Restriction{
 	}
 	
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttAction operation) {
-		return isValidCommon(props, operation);
+	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
+		return isValidCommon(services, props, operation);
 	}
 }

@@ -18,6 +18,11 @@ public interface IBrokerPlugin {
 	 * @param brokerOperator
 	 */
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator);
+	
+	/**
+	 * Callback when server has loaded all plugins and is ready to serve requests.
+	 */
+	public void onServerStarted();
 
 	/**
 	 * Called before the broker shutdown. Use this method to safely shutdown the plugin.

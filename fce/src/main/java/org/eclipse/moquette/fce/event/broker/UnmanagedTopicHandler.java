@@ -1,8 +1,9 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.broker;
 
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;

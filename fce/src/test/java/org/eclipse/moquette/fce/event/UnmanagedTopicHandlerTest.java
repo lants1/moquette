@@ -2,6 +2,7 @@ package org.eclipse.moquette.fce.event;
 
 import static org.junit.Assert.*;
 
+import org.eclipse.moquette.fce.event.broker.UnmanagedTopicHandler;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 

@@ -27,8 +27,8 @@ public abstract class FceEventHandler {
 
 	private final static Logger log = Logger.getLogger(FceEventHandler.class.getName());
 
-	private final FceContext context;
-	private final FceServiceFactory services;
+	private FceContext context;
+	private FceServiceFactory services;
 
 	public FceEventHandler(FceContext context, FceServiceFactory services) {
 		this.services = services;
@@ -90,5 +90,11 @@ public abstract class FceEventHandler {
 		getServices().getMqtt().publish(pubQuotaTopic, getServices().getJsonParser().serialize(pubQuota));
 	}
 
+	public void injectFceEnvironment(FceContext context, FceServiceFactory services) {
+		this.context = context;
+		this.services = services;
+	}
+
+	
 	public abstract boolean canDoOperation(AuthorizationProperties properties, MqttAction operation);
 }

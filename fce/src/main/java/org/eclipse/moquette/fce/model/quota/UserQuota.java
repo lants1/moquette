@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.moquette.fce.model.ManagedInformation;
 import org.eclipse.moquette.fce.model.common.IValid;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -42,9 +43,9 @@ public class UserQuota extends ManagedInformation implements IValid{
 	}
 
 	@Override
-	public boolean isValid(AuthorizationProperties props, MqttAction operation){
+	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation){
 		for(Quota quota : getQuotas()){
-			if(!quota.isValid(props, operation)){
+			if(!quota.isValid(services, props, operation)){
 				return false;
 			}
 		}

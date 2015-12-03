@@ -24,13 +24,18 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 public final class JsonSchemaValidationService implements ISchemaValidationService {
 	
 	private final static Logger log = Logger.getLogger(JsonSchemaValidationService.class.getName());
+	private ByteBuffer schema;
+	
+	public JsonSchemaValidationService(ByteBuffer schema){
+		this.schema = schema;
+	}
 	
 	@Override
-	public boolean isSchemaValid(ByteBuffer schemaDefinition, ByteBuffer msgToValidate) {
+	public boolean isSchemaValid(ByteBuffer msgToValidate) {
 		try {
 			final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
 			final JsonNode schemaJson = JsonLoader
-					.fromReader(new StreamSource(new ByteBufferInputStream(schemaDefinition)).getReader());
+					.fromReader(new StreamSource(new ByteBufferInputStream(schema)).getReader());
 			final JsonNode jsonToVavlidate = JsonLoader
 					.fromReader(new StreamSource(new ByteBufferInputStream(msgToValidate)).getReader());
 			factory.getJsonSchema(schemaJson);

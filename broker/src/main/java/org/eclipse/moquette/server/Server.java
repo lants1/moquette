@@ -115,8 +115,16 @@ public class Server {
 		m_acceptor.initialize(processor, config);
 		
 		loadPlugins(config, processor);
-
+		
+		notifyPluginsStartupCompleted();
+		
 		LOG.info("Server started.");
+	}
+
+	private void notifyPluginsStartupCompleted() {
+		for(IBrokerPlugin plugin : loadedPlugins){
+			plugin.onServerStarted();
+		}
 	}
 
 	public void stopServer() {

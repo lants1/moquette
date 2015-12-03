@@ -15,13 +15,14 @@ import static org.mockito.Matchers.any;
 import org.eclipse.moquette.fce.context.ConfigurationStore;
 import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.context.HashAssignmentStore;
+import org.eclipse.moquette.fce.event.broker.ManagedIntentHandler;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.mqtt.MqttService;
+import org.eclipse.moquette.fce.service.mqtt.FceMqttClientWrapper;
 import org.eclipse.moquette.fce.service.parser.JsonParserService;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class ManagedIntentHandlerTest {
 		FceContext context = mock(FceContext.class);
 		when(context.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
 		when(sf.getJsonParser()).thenReturn(new JsonParserService());
-		when(sf.getMqtt()).thenReturn(mock(MqttService.class));
+		when(sf.getMqtt()).thenReturn(mock(FceMqttClientWrapper.class));
 		return sf;
 	}
 

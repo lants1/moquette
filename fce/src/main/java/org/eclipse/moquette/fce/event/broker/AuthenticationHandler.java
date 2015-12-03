@@ -1,11 +1,11 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.broker;
 
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.hash.HashService;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 
 /**
@@ -20,7 +20,6 @@ public class AuthenticationHandler {
 
 	final FceContext context;
 	final FceServiceFactory services;
-
 
 	public AuthenticationHandler(FceContext context, FceServiceFactory services) {
 		this.services = services;

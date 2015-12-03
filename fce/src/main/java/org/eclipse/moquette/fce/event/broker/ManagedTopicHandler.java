@@ -1,9 +1,10 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.broker;
 
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.converter.QuotaConverter;
 import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.exception.FceAuthorizationException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
@@ -53,12 +54,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 				}
 			}
 
-			if (!configGlobal.isValid(props, action)) {
+			if (!configGlobal.isValid(getServices(), props, action)) {
 				logAndSendInfoMsg(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
 				return false;
 			}
 
-			if (!quotasGlobal.isValid(props, action)) {
+			if (!quotasGlobal.isValid(getServices(), props, action)) {
 				logAndSendInfoMsg(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
 				return false;
 			}
@@ -67,12 +68,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 			UserQuota quotasPrivate = getContext().getQuotaStore(ManagedScope.PRIVATE).getQuota(props.getTopic(), usernameHashFromRequest, action);
 
 			if (configPrivate != null) {
-				if (!configPrivate.isValid(props, action)) {
+				if (!configPrivate.isValid(getServices(), props, action)) {
 					logAndSendInfoMsg(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
 					return false;
 				}
 
-				if (!quotasPrivate.isValid(props, action)) {
+				if (!quotasPrivate.isValid(getServices(), props, action)) {
 					logAndSendInfoMsg(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
 					return false;
 				}

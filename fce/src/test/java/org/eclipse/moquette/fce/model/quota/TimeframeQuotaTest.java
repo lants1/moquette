@@ -23,9 +23,9 @@ public class TimeframeQuotaTest {
 		
 		// valid case
 		IQuotaState state = mock(IQuotaState.class);
-		when(state.isValid(null, null)).thenReturn(true);
+		when(state.isValid(null, null, null)).thenReturn(true);
 		TimeframeQuota quotaValid = new TimeframeQuota(hourMinusOne,hourPlusOne,state);
-		assertTrue(quotaValid.isValid(null, null));
+		assertTrue(quotaValid.isValid(null, null, null));
 		
 		// invalid case past
 		cal.setTime(new Date());
@@ -33,7 +33,7 @@ public class TimeframeQuotaTest {
 		Date hourMinusTwo = cal.getTime();
 		
 		TimeframeQuota quotaInvalidPast = new TimeframeQuota(hourMinusTwo,hourMinusOne,state);
-		assertFalse(quotaInvalidPast.isValid(null, null));
+		assertFalse(quotaInvalidPast.isValid(null, null, null));
 		
 		// invalid case future
 		cal.setTime(new Date());
@@ -41,7 +41,7 @@ public class TimeframeQuotaTest {
 		Date hourPlusTwo = cal.getTime();
 		
 		TimeframeQuota quotaInvalidFuture = new TimeframeQuota(hourPlusOne,hourPlusTwo,state);
-		assertFalse(quotaInvalidFuture.isValid(null, null));
+		assertFalse(quotaInvalidFuture.isValid(null, null, null));
 	}
 
 }

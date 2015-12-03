@@ -14,7 +14,7 @@ public class HashServiceTest {
 	
 	@Test
 	public void testHashing() throws Exception {
-		FceServiceFactory services = new FceServiceFactory(null);
+		FceServiceFactory services = new FceServiceFactory(null, null);
 		String usr1hash = services.getHashing().generateHash(USER1);
 		String usr2hash = services.getHashing().generateHash(USER2);
 

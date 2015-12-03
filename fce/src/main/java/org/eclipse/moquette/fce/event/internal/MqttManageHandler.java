@@ -1,9 +1,10 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.internal;
 
 import java.util.logging.Logger;
 
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.context.FceContext;
+import org.eclipse.moquette.fce.event.FceEventHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -12,33 +13,18 @@ import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-public class MqttManageEventHandler extends FceEventHandler implements MqttCallback {
+public class MqttManageHandler extends FceEventHandler implements IFceMqttCallback {
 
-	private final static Logger log = Logger.getLogger(MqttManageEventHandler.class.getName());
+	private final static Logger log = Logger.getLogger(MqttManageHandler.class.getName());
 
-	public MqttManageEventHandler(FceContext context, FceServiceFactory services) {
+	public MqttManageHandler(){
+		super(null, null);
+	}
+	
+	public MqttManageHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
-	}
-
-	@Override
-	public void connectionLost(Throwable arg0) {
-		try {
-			log.warning("internal plugin mqttclient conection to broker connection lost");
-			getServices().getMqtt().connect();
-		} catch (MqttException e) {
-			log.severe("internal plugin mqttclient could not reconnect to broker");
-			throw new FceSystemException(e);
-		}
-	}
-
-	@Override
-	public void deliveryComplete(IMqttDeliveryToken arg0) {
-		// doNothing
 	}
 
 	@Override
@@ -52,7 +38,9 @@ public class MqttManageEventHandler extends FceEventHandler implements MqttCallb
 		case CONFIG_GLOBAL:
 			UserConfiguration msgConfig = getServices().getJsonParser().deserializeUserConfiguration(msgPayload);
 			getContext().getConfigurationStore(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
-			getServices().getMqtt().addNewSubscriptions(msgConfig.getSchemaTopics());
+			for(String schemaTopic : msgConfig.getSchemaTopics()){
+				getServices().getMqtt().addNewSubscription(schemaTopic, new MqttSchemaHandler());
+			}
 			log.info("received configuration message for topic: " + topicIdentifier);
 			break;
 		case QUOTA_PRIVATE:
@@ -70,5 +58,4 @@ public class MqttManageEventHandler extends FceEventHandler implements MqttCallb
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
 		throw new FceSystemException("not implemented");
 	}
-
 }

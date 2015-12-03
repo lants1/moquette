@@ -1,7 +1,7 @@
 package org.eclipse.moquette.fce.model.configuration;
-
 import org.eclipse.moquette.fce.model.common.DataUnit;
 import org.eclipse.moquette.fce.model.common.IValid;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.MqttAction;
 
@@ -60,7 +60,7 @@ public abstract class Restriction implements IValid {
 		return sizeUnit;
 	}
 
-	public boolean isValidCommon(AuthorizationProperties props, MqttAction operation){
+	public boolean isValidCommon(FceServiceFactory services, AuthorizationProperties props, MqttAction operation){
 		if(getMaxMessageSize() > 0){
 			if(!(props.getMessage().position() < (getMaxMessageSize() * getSizeUnit().getMultiplier()))){
 				return false;
@@ -68,7 +68,7 @@ public abstract class Restriction implements IValid {
 		}
 		
 		if (getDataSchema() != null) {
-			// TODO lan schema validation
+			services.getSchemaValidationService(getDataSchema()).isSchemaValid(props.getMessage());
 		}
 		
 		return true;

@@ -2,6 +2,8 @@ package org.eclipse.moquette.fce;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -11,17 +13,19 @@ import java.util.logging.Logger;
 import org.eclipse.moquette.fce.common.util.FceTimeUtil;
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.context.FceContext;
-import org.eclipse.moquette.fce.event.AuthenticationHandler;
 import org.eclipse.moquette.fce.event.FceEventHandler;
-import org.eclipse.moquette.fce.event.ManagedIntentHandler;
-import org.eclipse.moquette.fce.event.ManagedStoreHandler;
-import org.eclipse.moquette.fce.event.ManagedTopicHandler;
-import org.eclipse.moquette.fce.event.UnmanagedTopicHandler;
-import org.eclipse.moquette.fce.job.Heartbeat;
+import org.eclipse.moquette.fce.event.broker.AuthenticationHandler;
+import org.eclipse.moquette.fce.event.broker.ManagedIntentHandler;
+import org.eclipse.moquette.fce.event.broker.ManagedStoreHandler;
+import org.eclipse.moquette.fce.event.broker.ManagedTopicHandler;
+import org.eclipse.moquette.fce.event.broker.UnmanagedTopicHandler;
+import org.eclipse.moquette.fce.event.internal.IFceMqttCallback;
+import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.job.QuotaUpdater;
 import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.mqtt.FceMqttClientWrapper;
 import org.eclipse.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
 import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
@@ -34,8 +38,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
- * Main of the plugin, loaded and called by the broker over it's interface methods. Registered
- * by the META-INF/org.eclipse.moquette.plugin.IBrokerPlugin File.
+ * Main of the plugin, loaded and called by the broker over it's interface
+ * methods. Registered by the META-INF/org.eclipse.moquette.plugin.IBrokerPlugin
+ * File.
  * 
  * @author lants1
  *
@@ -43,26 +48,28 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCallback {
 
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
-	
+
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
 
+	private FceMqttClientWrapper mqttClient;
 	private FceServiceFactory services;
 	private FceContext context;
 	private ScheduledExecutorService scheduler;
-	
+
 	@Override
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		String pluginUsr = randomString();
 		context = new FceContext(config, brokerOperator);
-		services = new FceServiceFactory(context);
+		mqttClient = new FceMqttClientWrapper(context, this);
+		services = new FceServiceFactory(context, mqttClient);
 
 		context.setPluginIdentifier(randomString());
 		context.setPluginUser(pluginUsr);
 		context.setPluginPw(services.getHashing().generateHash(pluginUsr));
-		
-		scheduler = Executors.newScheduledThreadPool(2);
-		scheduler.scheduleAtFixedRate(new QuotaUpdater(context, services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
-		scheduler.scheduleAtFixedRate(new Heartbeat(context, services), 3, 60, TimeUnit.SECONDS);
+
+		scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleAtFixedRate(new QuotaUpdater(context, services), FceTimeUtil.delayTo(0, 0), 1,
+				TimeUnit.HOURS);
 		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 
@@ -73,7 +80,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 	@Override
 	public void unload() {
 		try {
-			services.getMqtt().unregisterManageSubscriptions();
+			mqttClient.unregisterSubscriptions();
 		} catch (MqttException e) {
 			log.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
 		}
@@ -93,11 +100,12 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 			return new ManagedStoreHandler(context, services).canDoOperation(props, action);
 		}
 
-		if (services.isInitialized()) {
+		if (mqttClient.isInitialized() && context.isInitialized()) {
 			FceEventHandler handler;
 			if (ManagedZone.INTENT.equals(ManagedZoneUtil.getZoneForTopic(props.getTopic()))) {
 				handler = new ManagedIntentHandler(context, services);
-			} else if (context.getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isManaged(new ManagedTopic(props.getTopic()))) {
+			} else if (context.getConfigurationStore(ManagedZone.CONFIG_GLOBAL)
+					.isManaged(new ManagedTopic(props.getTopic()))) {
 				handler = new ManagedTopicHandler(context, services);
 			} else {
 				handler = new UnmanagedTopicHandler(context, services);
@@ -109,29 +117,45 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 		return false;
 	}
 
-	
-	
 	@Override
 	public String getPluginIdentifier() {
 		return PLUGIN_IDENTIFIER;
 	}
 
 	@Override
-	public void connectionLost(Throwable arg0) {
-		// TODO Auto-generated method stub
-		
+	public void connectionLost(Throwable exception) {
+		try {
+			log.warning("internal plugin mqttclient conection to broker connection lost");
+			mqttClient.connect();
+		} catch (MqttException e) {
+			log.severe("internal plugin mqttclient could not reconnect to broker");
+			throw new FceSystemException(e);
+		}
+
 	}
 
 	@Override
-	public void deliveryComplete(IMqttDeliveryToken arg0) {
-		// TODO Auto-generated method stub
-		
+	public void deliveryComplete(IMqttDeliveryToken token) {
+		// Marion Mitchell Morrison (born Marion Robert Morrison; May 26, 1907 –
+		// June 11, 1979), known by his stage name John Wayne, was an American
+		// film actor, director, and producer.
+		// Wayne:)
 	}
 
 	@Override
-	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void messageArrived(String topic, MqttMessage message) throws Exception {
+		IFceMqttCallback fceMqttCallback = mqttClient.getCallback(topic);
+		fceMqttCallback.injectFceEnvironment(context, services);
+		fceMqttCallback.messageArrived(topic, message);
 	}
 
+	@Override
+	public void onServerStarted() {
+		List<String> subscriptions = new ArrayList<>();
+		subscriptions.add(ManagedZone.CONFIG_GLOBAL.getTopicFilter());
+		subscriptions.add(ManagedZone.CONFIG_PRIVATE.getTopicFilter());
+		subscriptions.add(ManagedZone.QUOTA_GLOBAL.getTopicFilter());
+		subscriptions.add(ManagedZone.QUOTA_PRIVATE.getTopicFilter());
+		mqttClient.initializeInternalMqttClient(subscriptions);
+	}
 }
