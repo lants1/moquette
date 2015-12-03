@@ -21,8 +21,8 @@ import org.eclipse.moquette.fce.model.common.ManagedTopic;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.impl.mqtt.MqttService;
-import org.eclipse.moquette.fce.service.impl.parser.JsonParserService;
+import org.eclipse.moquette.fce.service.mqtt.MqttService;
+import org.eclipse.moquette.fce.service.parser.JsonParserService;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
 

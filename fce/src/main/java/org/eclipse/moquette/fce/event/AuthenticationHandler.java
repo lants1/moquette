@@ -3,9 +3,9 @@ package org.eclipse.moquette.fce.event;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.hash.HashService;
 import org.eclipse.moquette.plugin.AuthenticationProperties;
 
 /**
@@ -36,10 +36,10 @@ public class AuthenticationHandler {
 			return true;
 		}
 
-		boolean usernameHashValidation = FceHashUtil.validateUsernameHash(props);
+		boolean usernameHashValidation = services.getHashing().validateUsernameHash(props);
 		if (usernameHashValidation) {
 			// if a user with a valid hash login and a user with the same clientid already exists the other session is dropped by the broker...
-			context.getHashAssignment().put(props.getClientId(), FceHashUtil.getFceHash(props.getUsername()));
+			context.getHashAssignment().put(props.getClientId(), services.getHashing().generateHash(props.getUsername()));
 		}
 		
 		// if the plugin is active only users with usr:username, pw:hash(username) could login to the broker

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.common.util.FceTimeUtil;
 import org.eclipse.moquette.fce.common.util.ManagedZoneUtil;
 import org.eclipse.moquette.fce.context.FceContext;
@@ -29,7 +28,10 @@ import org.eclipse.moquette.plugin.AuthenticationProperties;
 import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  * Main of the plugin, loaded and called by the broker over it's interface methods. Registered
@@ -38,40 +40,26 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  * @author lants1
  *
  */
-public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
+public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCallback {
 
 	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
+	
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
 
-	public static final String PROPS_PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
-	public static final String PROPS_PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
-	public static final String PROPS_PLUGIN_JKS_PATH = "plugin_jks_path";
-
-	public static final String PROPS_PLUGIN_CLIENT_USERNAME = "plugin_client_username";
-	public static final String PROPS_PLUGIN_CLIENT_PASSWORD = "plugin_client_password";
-	public static final String PROPS_PLUGIN_CLIENT_IDENTIFIER = "plugin_client_identifier";
-
-	private SecureRandom random = new SecureRandom();
-
-	private String pluginIdentifier;
 	private FceServiceFactory services;
 	private FceContext context;
-	
-	ScheduledExecutorService scheduler;
+	private ScheduledExecutorService scheduler;
 	
 	@Override
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator) {
 		String pluginUsr = randomString();
-		String pluginPw = FceHashUtil.getFceHash(pluginUsr);
-		pluginIdentifier = randomString();
-
-		config.setProperty(PROPS_PLUGIN_CLIENT_IDENTIFIER, pluginIdentifier);
-		config.setProperty(PROPS_PLUGIN_CLIENT_USERNAME, pluginUsr);
-		config.setProperty(PROPS_PLUGIN_CLIENT_PASSWORD, pluginPw);
-
 		context = new FceContext(config, brokerOperator);
 		services = new FceServiceFactory(context);
 
+		context.setPluginIdentifier(randomString());
+		context.setPluginUser(pluginUsr);
+		context.setPluginPw(services.getHashing().generateHash(pluginUsr));
+		
 		scheduler = Executors.newScheduledThreadPool(2);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(context, services), FceTimeUtil.delayTo(0, 0), 1, TimeUnit.HOURS);
 		scheduler.scheduleAtFixedRate(new Heartbeat(context, services), 3, 60, TimeUnit.SECONDS);
@@ -79,13 +67,13 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 	}
 
 	private String randomString() {
-		return new BigInteger(130, random).toString(16);
+		return new BigInteger(130, new SecureRandom()).toString(16);
 	}
 
 	@Override
 	public void unload() {
 		try {
-			services.getMqtt().unregisterSubscriptions();
+			services.getMqtt().unregisterManageSubscriptions();
 		} catch (MqttException e) {
 			log.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
 		}
@@ -121,9 +109,29 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin {
 		return false;
 	}
 
+	
+	
 	@Override
 	public String getPluginIdentifier() {
 		return PLUGIN_IDENTIFIER;
+	}
+
+	@Override
+	public void connectionLost(Throwable arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deliveryComplete(IMqttDeliveryToken arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

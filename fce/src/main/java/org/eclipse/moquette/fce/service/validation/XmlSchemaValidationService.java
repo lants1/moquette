@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service.impl.validation;
+package org.eclipse.moquette.fce.service.validation;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

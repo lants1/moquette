@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.common.util;
+package org.eclipse.moquette.fce.service.hash;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,15 +13,15 @@ import java.util.logging.Logger;
  * @author lants1
  *
  */
-public final class FceHashUtil {
+public class HashService {
 
-	private final static Logger log = Logger.getLogger(FceHashUtil.class.getName());
+	private final static Logger log = Logger.getLogger(HashService.class.getName());
 
-	public static String getFceHash(String username) {
+	public String generateHash(String username) {
 		return DigestUtils.sha256Hex(username);
 	}
 
-	public static boolean validateUsernameHash(AuthenticationProperties props) {
+	public boolean validateUsernameHash(AuthenticationProperties props) {
 		try {
 			if (props.getUsername() == null || props.getPassword() == null) {
 				return false;

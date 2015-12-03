@@ -17,11 +17,11 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-public class MqttEventHandler extends FceEventHandler implements MqttCallback {
+public class MqttManageEventHandler extends FceEventHandler implements MqttCallback {
 
-	private final static Logger log = Logger.getLogger(MqttEventHandler.class.getName());
+	private final static Logger log = Logger.getLogger(MqttManageEventHandler.class.getName());
 
-	public MqttEventHandler(FceContext context, FceServiceFactory services) {
+	public MqttManageEventHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
 	}
 
@@ -47,12 +47,12 @@ public class MqttEventHandler extends FceEventHandler implements MqttCallback {
 		ManagedZone zone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
 		String msgPayload = message.toString();
 		ManagedTopic topic = new ManagedTopic(topicIdentifier);
-
 		switch (zone) {
 		case CONFIG_PRIVATE:
 		case CONFIG_GLOBAL:
 			UserConfiguration msgConfig = getServices().getJsonParser().deserializeUserConfiguration(msgPayload);
 			getContext().getConfigurationStore(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
+			getServices().getMqtt().addNewSubscriptions(msgConfig.getSchemaTopics());
 			log.info("received configuration message for topic: " + topicIdentifier);
 			break;
 		case QUOTA_PRIVATE:

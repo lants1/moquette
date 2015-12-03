@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service.impl.parser;
+package org.eclipse.moquette.fce.service.parser;
 
 import java.nio.ByteBuffer;
 

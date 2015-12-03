@@ -95,6 +95,19 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 		return true;
 	}
 
+	public List<String> getSchemaTopics() {
+		List<Restriction> restrictions = getRestrictions();
+		List<String> resultSchemaTopics = new ArrayList<>();
+		
+		for (Restriction restriction : restrictions) {
+			if (restriction.getDataSchema() != null && StringUtils.isNotEmpty(restriction.getDataSchema().getSchemaTopic())) {
+				resultSchemaTopics.add(restriction.getDataSchema().getSchemaTopic());
+			}
+		}
+
+		return resultSchemaTopics;
+	}
+	
 	public boolean isValidForEveryone() {
 		return StringUtils.isEmpty(getUserHash());
 	}
