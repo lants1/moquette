@@ -2,8 +2,9 @@ package org.eclipse.moquette.fce.tools;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.eclipse.moquette.fce.common.util.FceHashUtil;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
+import org.eclipse.moquette.fce.service.FceServiceFactory;
+import org.eclipse.moquette.fce.service.hash.HashService;
 import org.eclipse.moquette.fce.tools.callback.SampleFceClientCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -21,10 +22,11 @@ public class ShowcaseManageStore extends Showcase{
 		client = new MqttClient("ssl://localhost:8883", "client");
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
-
+		FceServiceFactory services = new FceServiceFactory(null);
+		
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setUserName(USERNAME);
-		options.setPassword(FceHashUtil.getFceHash(USERNAME).toCharArray());
+		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
 		options.setSocketFactory(ssf);
 
 		client.connect(options);

@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.service.context;
+package org.eclipse.moquette.fce.context;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

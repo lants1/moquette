@@ -1,6 +1,5 @@
 package org.eclipse.moquette.fce.context;
 
-import org.eclipse.moquette.fce.FcePlugin;
 import org.eclipse.moquette.fce.exception.FceSystemException;
 import org.eclipse.moquette.fce.model.common.ManagedScope;
 import org.eclipse.moquette.fce.model.common.ManagedZone;
@@ -9,6 +8,10 @@ import org.eclipse.moquette.plugin.IBrokerOperator;
 
 public class FceContext {
 
+	private static final String PROPS_PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
+	private static final String PROPS_PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
+	private static final String PROPS_PLUGIN_JKS_PATH = "plugin_jks_path";
+	
 	private final IBrokerConfig pluginConfig;
 	private final IBrokerOperator brokerOperator;
 	
@@ -17,6 +20,11 @@ public class FceContext {
 	private ConfigurationStore configDbServiceGlobal;
 	private ConfigurationStore configDbServicePrivate;
 	private HashAssignmentStore hashAssignment;
+	private SchemaAssignmentStore schemaAssignment;
+	
+	private String pluginUser;
+	private String pluginPw;
+	private String pluginIdentifier;
 
 	public FceContext(IBrokerConfig pluginConfig, IBrokerOperator brokerOperator) {
 		super();
@@ -87,7 +95,46 @@ public class FceContext {
 		return hashAssignment;
 	}
 	
-	public String getPluginIdentifier(){
-		return getPluginConfig().getProperty(FcePlugin.PROPS_PLUGIN_CLIENT_IDENTIFIER);
+	public SchemaAssignmentStore getSchemaAssignment() {
+		if (schemaAssignment == null) {
+			schemaAssignment = new SchemaAssignmentStore();
+		}
+		return schemaAssignment;
+	}
+
+	public String getPluginUser() {
+		return pluginUser;
+	}
+
+	public void setPluginUser(String pluginUser) {
+		this.pluginUser = pluginUser;
+	}
+
+	public String getPluginPw() {
+		return pluginPw;
+	}
+
+	public void setPluginPw(String pluginPw) {
+		this.pluginPw = pluginPw;
+	}
+
+	public String getPluginIdentifier() {
+		return pluginIdentifier;
+	}
+
+	public void setPluginIdentifier(String pluginIdentifier) {
+		this.pluginIdentifier = pluginIdentifier;
+	}
+	
+	public String getPluginKeyManagerPassword(){
+		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_KEY_MANAGER_PASSWORD);
+	}
+	
+	public String getPluginKeyStorePassword(){
+		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_KEY_STORE_PASSWORD);
+	}
+	
+	public String getPluginJksPath(){
+		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_JKS_PATH);
 	}
 }
