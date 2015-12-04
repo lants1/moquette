@@ -15,11 +15,6 @@
  */
 package io.moquette.server;
 
-import static io.moquette.commons.Constants.JKS_PATH_PROPERTY_NAME;
-import static io.moquette.commons.Constants.KEY_MANAGER_PASSWORD_PROPERTY_NAME;
-import static io.moquette.commons.Constants.KEY_STORE_PASSWORD_PROPERTY_NAME;
-import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
-import static io.moquette.commons.Constants.SSL_PORT_PROPERTY_NAME;
 import static org.junit.Assert.assertFalse;
 
 import java.io.File;
@@ -39,6 +34,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import io.moquette.commons.Constants;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
@@ -52,8 +48,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.moquette.server.Server;
 
 /**
  * Check that Moquette could also handle SSL.
@@ -81,11 +75,11 @@ public class ServerIntegrationSSLTest {
         m_server = new Server();
 
         Properties sslProps = new Properties();
-        sslProps.put(SSL_PORT_PROPERTY_NAME, "8883");
-        sslProps.put(JKS_PATH_PROPERTY_NAME, "serverkeystore.jks");
-        sslProps.put(KEY_STORE_PASSWORD_PROPERTY_NAME, "passw0rdsrv");
-        sslProps.put(KEY_MANAGER_PASSWORD_PROPERTY_NAME, "passw0rdsrv");
-        sslProps.put(PERSISTENT_STORE_PROPERTY_NAME, IntegrationUtils.localMapDBPath());
+        sslProps.put(io.moquette.commons.Constants.SSL_PORT_PROPERTY_NAME, "8883");
+        sslProps.put(Constants.JKS_PATH_PROPERTY_NAME, "serverkeystore.jks");
+        sslProps.put(Constants.KEY_STORE_PASSWORD_PROPERTY_NAME, "passw0rdsrv");
+        sslProps.put(Constants.KEY_MANAGER_PASSWORD_PROPERTY_NAME, "passw0rdsrv");
+        sslProps.put(Constants.PERSISTENT_STORE_PROPERTY_NAME, IntegrationUtils.localMapDBPath());
         m_server.startServer(sslProps);
     }
 

@@ -1,13 +1,9 @@
 package io.moquette.spi.impl.subscriptions;
 
-
 import static io.moquette.proto.messages.AbstractMessage.QOSType.*;
 import static junit.framework.Assert.assertEquals;
 
 import org.junit.Test;
-
-import io.moquette.spi.impl.subscriptions.Subscription;
-import io.moquette.spi.impl.subscriptions.TreeNode;
 
 import java.util.Set;
 
@@ -17,7 +13,7 @@ public class TreeNodeTest {
 
     @Test
     public void testAddSubscriptionOverwriteAnExistingWithDifferentCleanSessionFlag() throws Exception {
-        TreeNode root = new TreeNode(null);
+        TreeNode root = new TreeNode();
         Subscription existingSub = new Subscription(CLIENT_ID, "/topic", LEAST_ONE, false);
         root.addSubscription(existingSub);
         Set<Subscription> subs = root.findAllByClientID(CLIENT_ID);

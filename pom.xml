@@ -11,7 +11,7 @@
         <bintray.parent.package>org.dna.mqtt.moquette-parent</bintray.parent.package>
     </properties>
     
-    <groupId>org.eclipse.moquette</groupId>
+    <groupId>io.moquette</groupId>
     <artifactId>moquette-parent</artifactId>
 
     <packaging>pom</packaging>

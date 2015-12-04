@@ -15,7 +15,6 @@
  */
 package io.moquette.plugin;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -27,7 +26,6 @@ import io.moquette.interception.InterceptHandler;
 import io.moquette.plugin.IBrokerOperator;
 import io.moquette.plugin.MoquetteOperator;
 import io.moquette.proto.messages.*;
-import io.moquette.proto.messages.AbstractMessage.QOSType;
 import io.moquette.spi.IMessagesStore;
 import io.moquette.spi.ISessionsStore;
 import io.moquette.spi.impl.DummyChannel;
@@ -53,7 +51,7 @@ public class MoquetteOperatorTest {
     ConnectMessage connMsg;
     ProtocolProcessor m_processor;
     
-    IMessagesStore m_storageService;
+    IMessagesStore m_messagesStore;
     ISessionsStore m_sessionStore;
     SubscriptionsStore subscriptions;
     MockAuthenticator m_mockAuthenticator;
@@ -70,18 +68,19 @@ public class MoquetteOperatorTest {
         //sleep to let the messaging batch processor to process the initEvent
         Thread.sleep(300);
         MemoryStorageService memStorage = new MemoryStorageService();
-        m_storageService = memStorage;
-        m_sessionStore = memStorage;
-        m_storageService.initStore();
+        memStorage.initStore();
+        m_messagesStore = memStorage.messagesStore();
+        m_sessionStore = memStorage.sessionsStore();
+        //m_messagesStore.initStore();
         
         Map<String, byte[]> users = new HashMap<>();
         users.put(TEST_USER, TEST_PWD);
         m_mockAuthenticator = new MockAuthenticator(users);
 
         subscriptions = new SubscriptionsStore();
-        subscriptions.init(new MemoryStorageService());
+        subscriptions.init(memStorage.sessionsStore());
         m_processor = new ProtocolProcessor();
-        m_processor.init(subscriptions, m_storageService, m_sessionStore, m_mockAuthenticator, true,
+        m_processor.init(subscriptions, m_messagesStore, m_sessionStore, m_mockAuthenticator, true,
                 new PermitAllAuthorizator(), null);
         
         this.brokerOperator = new MoquetteOperator(m_processor);
@@ -94,11 +93,9 @@ public class MoquetteOperatorTest {
      */
     @Test
     public void testCountRetainedMessages() {
-        ByteBuffer payload1 = ByteBuffer.allocate(32).put("Hello".getBytes());
-        ByteBuffer payload2 = ByteBuffer.allocate(32).put("Hello".getBytes());
-        m_processor.getMessagesStore().storeRetained(FAKE_TOPIC, payload1, QOSType.LEAST_ONE);
-        m_processor.getMessagesStore().storeRetained(FAKE_SUBTOPIC, payload2, QOSType.LEAST_ONE);
-    
+        m_processor.getMessagesStore().storeRetained(FAKE_TOPIC,"2");
+        m_processor.getMessagesStore().storeRetained(FAKE_SUBTOPIC,"3");
+        
         assertTrue(brokerOperator.countRetainedMessages(FAKE_TOPICANDSUBTOPICFILTER)==2);
         assertTrue(brokerOperator.countRetainedMessages(FAKE_TOPIC)==1);
         assertTrue(brokerOperator.countRetainedMessages(FAKE_SUBTOPIC)==1);

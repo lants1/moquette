@@ -40,7 +40,7 @@ import io.moquette.plugin.MqttAction;
 
 /**
  * Main of the plugin, loaded and called by the broker over it's interface
- * methods. Registered by the META-INF/org.eclipse.moquette.plugin.IBrokerPlugin
+ * methods. Registered by the META-INF/io.moquette.plugin.IBrokerPlugin
  * File.
  * 
  * @author lants1

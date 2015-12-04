@@ -28,13 +28,11 @@ class TreeNode {
         
     }
 
-    TreeNode m_parent;
     Token m_token;
     List<TreeNode> m_children = new ArrayList<>();
     List<Subscription> m_subscriptions = new ArrayList<>();
 
-    TreeNode(TreeNode parent) {
-        this.m_parent = parent;
+    TreeNode() {
     }
 
     Token getToken() {
@@ -70,13 +68,9 @@ class TreeNode {
      * Copy the token and the children.
      * */
     TreeNode copy() {
-        final TreeNode copy = new TreeNode(this);
-        copy.m_parent = m_parent;
+        final TreeNode copy = new TreeNode();
         copy.m_children = new ArrayList<>(m_children);
-        copy.m_subscriptions = new ArrayList<>(m_subscriptions.size());
-        for (Subscription sub : m_subscriptions) {
-            copy.m_subscriptions.add(new Subscription(sub));
-        }
+        copy.m_subscriptions = new ArrayList<>(m_subscriptions);
         copy.m_token = m_token;
         return copy;
     }
@@ -168,46 +162,6 @@ class TreeNode {
         List<TreeNode> newChildren = new ArrayList<>(newSubRoot.m_children.size());
         for (TreeNode child : newSubRoot.m_children) {
             newChildren.add(child.removeClientSubscriptions(clientID));
-        }
-        newSubRoot.m_children = newChildren;
-        return newSubRoot;
-    }
-
-    /**
-     * Deactivate all topic subscriptions for the given clientID.
-     * */
-    TreeNode deactivate(String clientID) {
-        TreeNode newSubRoot = this.copy();
-        for (Subscription s : newSubRoot.m_subscriptions) {
-            if (s.clientId.equals(clientID)) {
-                s.setActive(false);
-            }
-        }
-
-        //go deep
-        List<TreeNode> newChildren = new ArrayList<>(newSubRoot.m_children.size());
-        for (TreeNode child : newSubRoot.m_children) {
-            newChildren.add(child.deactivate(clientID));
-        }
-        newSubRoot.m_children = newChildren;
-        return newSubRoot;
-    }
-
-    /**
-     * Activate all topic subscriptions for the given clientID.
-     * */
-    TreeNode activate(String clientID) {
-        TreeNode newSubRoot = this.copy();
-        for (Subscription s : newSubRoot.m_subscriptions) {
-            if (s.clientId.equals(clientID)) {
-                s.setActive(true);
-            }
-        }
-
-        //go deep
-        List<TreeNode> newChildren = new ArrayList<>(newSubRoot.m_children.size());
-        for (TreeNode child : newSubRoot.m_children) {
-            newChildren.add(child.activate(clientID));
         }
         newSubRoot.m_children = newChildren;
         return newSubRoot;

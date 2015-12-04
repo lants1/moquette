@@ -20,16 +20,13 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import io.moquette.spi.ISessionsStore;
+import io.moquette.spi.impl.MemoryStorageService;
+import io.moquette.proto.messages.AbstractMessage;
+
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.spi.impl.MemoryStorageService;
-import io.moquette.spi.impl.subscriptions.Subscription;
-import io.moquette.spi.impl.subscriptions.SubscriptionsStore;
-import io.moquette.spi.impl.subscriptions.Token;
-import io.moquette.spi.impl.subscriptions.TreeNode;
 
 /**
  *
@@ -45,7 +42,9 @@ public class SubscriptionsStoreTest {
     @Before
     public void setUp() throws IOException {
         store = new SubscriptionsStore();
-        store.init(new MemoryStorageService());
+        MemoryStorageService storageService = new MemoryStorageService();
+        storageService.initStore();
+        store.init(storageService.sessionsStore());
     }
     
     @Test
@@ -59,11 +58,6 @@ public class SubscriptionsStoreTest {
         tokens = store.parseTopic("/");
         assertEqualsSeq(asArray(Token.EMPTY, Token.EMPTY), tokens);
     }
-
-//    @Test(expected = ParseException.class)
-//    public void testSplitTopicTwinsSlashAvoided() throws ParseException {
-//        store.parseTopic("/finance//stock/ibm");
-//    }
 
     @Test
     public void testParseTopicMultiValid() throws ParseException {
@@ -240,7 +234,9 @@ public class SubscriptionsStoreTest {
     
     private void assertMatch(String subscription, String topic) {
         store = new SubscriptionsStore();
-        store.init(new MemoryStorageService());
+        MemoryStorageService memStore = new MemoryStorageService();
+        memStore.initStore();
+        store.init(memStore.sessionsStore());
         Subscription sub = new Subscription("FAKE_CLI_ID_1", subscription, AbstractMessage.QOSType.MOST_ONE, false);
         store.add(sub);
         assertFalse(store.matches(topic).isEmpty());
@@ -248,7 +244,9 @@ public class SubscriptionsStoreTest {
     
     private void assertNotMatch(String subscription, String topic) {
         store = new SubscriptionsStore();
-        store.init(new MemoryStorageService());
+        MemoryStorageService memStore = new MemoryStorageService();
+        memStore.initStore();
+        store.init(memStore.sessionsStore());
         Subscription sub = new Subscription("FAKE_CLI_ID_1", subscription, AbstractMessage.QOSType.MOST_ONE, false);
         store.add(sub);
         assertTrue(store.matches(topic).isEmpty());
@@ -347,12 +345,15 @@ public class SubscriptionsStoreTest {
     @Test
     public void removeSubscription_withDifferentClients_subscribedSameTopic() {
         SubscriptionsStore aStore = new SubscriptionsStore();
-        aStore.init(new MemoryStorageService());
+        MemoryStorageService memStore = new MemoryStorageService();
+        memStore.initStore();
+        ISessionsStore sessionsStore = memStore.sessionsStore();
+        aStore.init(sessionsStore);
         //subscribe a not active clientID1 to /topic
         Subscription slashSub = new Subscription("FAKE_CLI_ID_1", "/topic", AbstractMessage.QOSType.MOST_ONE, false);
         aStore.add(slashSub);
-        aStore.deactivate(slashSub.getClientId());
-        
+        sessionsStore.createNewSession("FAKE_CLI_ID_1", true).deactivate();
+
         //subscribe an active clientID2 to /topic
         Subscription slashSub2 = new Subscription("FAKE_CLI_ID_2", "/topic", AbstractMessage.QOSType.MOST_ONE, false);
         aStore.add(slashSub2);
@@ -403,7 +404,7 @@ public class SubscriptionsStoreTest {
 
     @Test
     public void testRecreatePath_emptyRoot() {
-        TreeNode oldRoot = new TreeNode(null);
+        TreeNode oldRoot = new TreeNode();
         final SubscriptionsStore.NodeCouple resp = store.recreatePath("/finance", oldRoot);
 
         //Verify
@@ -415,7 +416,7 @@ public class SubscriptionsStoreTest {
 
     @Test
     public void testRecreatePath_1layer_tree() {
-        TreeNode oldRoot = new TreeNode(null);
+        TreeNode oldRoot = new TreeNode();
         final SubscriptionsStore.NodeCouple respFinance = store.recreatePath("/finance", oldRoot);
         final SubscriptionsStore.NodeCouple respPlus = store.recreatePath("/+", respFinance.root);
 

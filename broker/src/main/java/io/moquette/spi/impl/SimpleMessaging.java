@@ -15,19 +15,17 @@
  */
 package io.moquette.spi.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.moquette.spi.IMessagesStore;
 import io.moquette.commons.Constants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.server.config.IConfig;
-import io.moquette.spi.IMessagesStore;
 import io.moquette.spi.ISessionsStore;
 import io.moquette.spi.impl.security.*;
 import io.moquette.spi.impl.subscriptions.SubscriptionsStore;
 import io.moquette.spi.persistence.MapDBPersistentStore;
-
 import static io.moquette.commons.Constants.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -40,9 +38,7 @@ import java.util.List;
  *
  * Singleton class that orchestrate the execution of the protocol.
  *
- * Uses the LMAX Disruptor to serialize the incoming, requests, because it work in a evented fashion;
- * the requests income from front Netty connectors and are dispatched to the
- * ProtocolProcessor.
+ * It's main responsibility is instantiate the ProtocolProcessor.
  *
  * @author andrea
  */
@@ -52,9 +48,7 @@ public class SimpleMessaging {
 
     private SubscriptionsStore subscriptions;
 
-
-    private IMessagesStore m_storageService;
-    private ISessionsStore m_sessionsStore;
+    private MapDBPersistentStore m_mapStorage;
 
     private BrokerInterceptor m_interceptor;
 
@@ -72,18 +66,13 @@ public class SimpleMessaging {
         return INSTANCE;
     }
 
-    public ProtocolProcessor init(IConfig configProps) {
+    public ProtocolProcessor init(IConfig props) {
         subscriptions = new SubscriptionsStore();
-        return processInit(configProps);
-    }
 
-    private ProtocolProcessor processInit(IConfig props) {
-        //TODO use a property to select the storage path
-        MapDBPersistentStore mapStorage = new MapDBPersistentStore(props.getProperty(PERSISTENT_STORE_PROPERTY_NAME, ""));
-        m_storageService = mapStorage;
-        m_sessionsStore = mapStorage;
-
-        m_storageService.initStore();
+        m_mapStorage = new MapDBPersistentStore(props);
+        m_mapStorage.initStore();
+        IMessagesStore messagesStore = m_mapStorage.messagesStore();
+        ISessionsStore sessionsStore = m_mapStorage.sessionsStore(messagesStore);
 
         List<InterceptHandler> observers = new ArrayList<>();
         String interceptorClassName = props.getProperty("intercept.handler");
@@ -97,7 +86,7 @@ public class SimpleMessaging {
         }
         m_interceptor = new BrokerInterceptor(observers);
 
-        subscriptions.init(m_sessionsStore);
+        subscriptions.init(sessionsStore);
 
         String configPath = System.getProperty("moquette.path", null);
         String authenticatorClassName = props.getProperty(Constants.AUTHENTICATOR_CLASS_NAME, "");
@@ -143,7 +132,7 @@ public class SimpleMessaging {
         }
 
         boolean allowAnonymous = Boolean.parseBoolean(props.getProperty(ALLOW_ANONYMOUS_PROPERTY_NAME, "true"));
-        m_processor.init(subscriptions, m_storageService, m_sessionsStore, authenticator, allowAnonymous, authorizator, m_interceptor);
+        m_processor.init(subscriptions, messagesStore, sessionsStore, authenticator, allowAnonymous, authorizator, m_interceptor);
         return m_processor;
     }
     
@@ -183,6 +172,6 @@ public class SimpleMessaging {
     }
 
     public void shutdown() {
-        this.m_storageService.close();
+        this.m_mapStorage.close();
     }
 }

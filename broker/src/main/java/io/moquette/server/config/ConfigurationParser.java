@@ -15,10 +15,9 @@
  */
 package io.moquette.server.config;
 
+import io.moquette.commons.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.moquette.commons.Constants.*;
 
 import java.io.*;
 import java.text.ParseException;
@@ -43,14 +42,14 @@ class ConfigurationParser {
     }
 
     private void createDefaults() {
-        m_properties.put(PORT_PROPERTY_NAME, Integer.toString(PORT));
-        m_properties.put(HOST_PROPERTY_NAME, HOST);
-        m_properties.put(WEB_SOCKET_PORT_PROPERTY_NAME, Integer.toString(WEBSOCKET_PORT));
-        m_properties.put(PASSWORD_FILE_PROPERTY_NAME, "");
-        m_properties.put(PERSISTENT_STORE_PROPERTY_NAME, DEFAULT_PERSISTENT_PATH);
-        m_properties.put(ALLOW_ANONYMOUS_PROPERTY_NAME, true);
-        m_properties.put(AUTHENTICATOR_CLASS_NAME, "");
-        m_properties.put(AUTHORIZATOR_CLASS_NAME, "");
+        m_properties.put(Constants.PORT_PROPERTY_NAME, Integer.toString(Constants.PORT));
+        m_properties.put(Constants.HOST_PROPERTY_NAME, Constants.HOST);
+        m_properties.put(Constants.WEB_SOCKET_PORT_PROPERTY_NAME, Integer.toString(Constants.WEBSOCKET_PORT));
+        m_properties.put(Constants.PASSWORD_FILE_PROPERTY_NAME, "");
+        m_properties.put(Constants.PERSISTENT_STORE_PROPERTY_NAME, Constants.DEFAULT_PERSISTENT_PATH);
+        m_properties.put(Constants.ALLOW_ANONYMOUS_PROPERTY_NAME, true);
+        m_properties.put(Constants.AUTHENTICATOR_CLASS_NAME, "");
+        m_properties.put(Constants.AUTHORIZATOR_CLASS_NAME, "");
     }
     
     /**

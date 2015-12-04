@@ -15,10 +15,10 @@
  */
 package io.moquette.spi.impl;
 
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.ConnAckMessage;
 import io.moquette.server.ServerChannel;
 import io.netty.util.AttributeKey;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.ConnAckMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +29,9 @@ import java.util.Map;
  */
 public class DummyChannel implements ServerChannel {
 
-    protected AbstractMessage m_receivedMessage;
+    AbstractMessage m_receivedMessage;
 
-    protected byte m_returnCode;
+    byte m_returnCode;
 
     private boolean m_channelClosed = false;
 
@@ -52,7 +52,7 @@ public class DummyChannel implements ServerChannel {
         m_channelClosed = true;
     }
 
-    public boolean isClosed() {
+    boolean isClosed() {
         return this.m_channelClosed;
     }
 

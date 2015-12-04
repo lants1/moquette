@@ -15,6 +15,7 @@
  */
 package io.moquette.spi;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,8 @@ import io.moquette.spi.impl.subscriptions.Subscription;
  * @author andrea
  */
 public interface ISessionsStore {
+
+    void initStore();
 
     /**
      * Add a new subscription to the session
@@ -54,5 +57,42 @@ public interface ISessionsStore {
      */
     boolean contains(String clientID);
 
-    void createNewSession(String clientID);
+    ClientSession createNewSession(String clientID, boolean cleanSession);
+
+    /**
+     * @return the session for the given clientID, null if not found.
+     * */
+    ClientSession sessionForClient(String clientID);
+
+    void activate(String clientID);
+
+    void deactivate(String clientID);
+
+    void inFlightAck(String clientID, int messageID);
+
+    /**
+     * Save the binding messageID, clientID <-> guid
+     * */
+    void inFlight(String clientID, int messageID, String guid);
+
+    /**
+     * Store the guid to be later published.
+     * */
+    void bindToDeliver(String guid, String clientID);
+
+    /**
+     * List the guids for retained messages for the session
+     * */
+    Collection<String> enqueued(String clientID);
+
+    /**
+     * Remove form the queue of stored messages for session.
+     * */
+    void removeEnqueued(String clientID, String guid);
+
+    void secondPhaseAcknowledged(String clientID, int messageID);
+
+    void secondPhaseAckWaiting(String clientID, int messageID);
+
+    String mapToGuid(String clientID, int messageID);
 }

@@ -36,7 +36,7 @@ public class RestrictionAdapter implements JsonSerializer<Restriction>, JsonDese
 		JsonElement element = jsonObject.get("properties");
 
 		try {
-			String thepackage = "org.eclipse.moquette.fce.model.configuration.";
+			String thepackage = "io.moquette.fce.model.configuration.";
 			return context.deserialize(element, Class.forName(thepackage + type));
 		} catch (ClassNotFoundException cnfe) {
 			throw new JsonParseException("Unknown element type: " + type, cnfe);

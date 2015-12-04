@@ -37,7 +37,7 @@ public class QuotaAdapter implements JsonSerializer<Quota>, JsonDeserializer<Quo
 		JsonElement element = jsonObject.get("properties");
 
 		try {
-			String thepackage = "org.eclipse.moquette.fce.model.quota.";
+			String thepackage = "io.moquette.fce.model.quota.";
 			return context.deserialize(element, Class.forName(thepackage + type));
 		} catch (ClassNotFoundException cnfe) {
 			throw new JsonParseException("Unknown element type: " + type, cnfe);
