@@ -12,7 +12,7 @@
 		<moquette.version>0.8-SNAPSHOT</moquette.version>
 	</properties>
 
-	<groupId>org.eclipse.moquette</groupId>
+	<groupId>io.moquette</groupId>
 	<artifactId>moquette-parent</artifactId>
 
 	<packaging>pom</packaging>
