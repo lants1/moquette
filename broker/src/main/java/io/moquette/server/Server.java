@@ -15,93 +15,163 @@
  */
 package io.moquette.server;
 
-import io.moquette.server.config.MemoryConfig;
-import io.moquette.spi.impl.SimpleMessaging;
-import io.moquette.server.config.FilesystemConfig;
-import io.moquette.server.config.IConfig;
-import io.moquette.server.netty.NettyAcceptor;
-import io.moquette.spi.impl.ProtocolProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.plugin.IAuthenticationAndAuthorizationPlugin;
+import io.moquette.plugin.IBrokerInterceptionPlugin;
+import io.moquette.plugin.IBrokerPlugin;
+import io.moquette.plugin.MoquetteOperator;
+import io.moquette.plugin.PluginAuthenticationAndAuthorizationAdapter;
+import io.moquette.plugin.PluginInterceptionHandlerAdapter;
+import io.moquette.server.config.FilesystemConfig;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+import io.moquette.server.netty.NettyAcceptor;
+import io.moquette.spi.impl.ProtocolProcessor;
+import io.moquette.spi.impl.SimpleMessaging;
+
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
- * Launch a  configured version of the server.
+ * Launch a configured version of the server.
+ * 
  * @author andrea
  */
 public class Server {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-    
-    private ServerAcceptor m_acceptor;
 
-    public static void main(String[] args) throws IOException {
-        final Server server = new Server();
-        server.startServer();
-        System.out.println("Server started, version 0.8-SNAPSHOT");
-        //Bind  a shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                server.stopServer();
-            }
-        });
-    }
-    
-    /**
-     * Starts Moquette bringing the configuration from the file 
-     * located at m_config/moquette.conf
-     */
-    public void startServer() throws IOException {
-        final IConfig config = new FilesystemConfig();
-        startServer(config);
-    }
+	private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    /**
-     * Starts Moquette bringing the configuration from the given file
-     */
-    public void startServer(File configFile) throws IOException {
-        LOG.info("Using m_config file: " + configFile.getAbsolutePath());
-        final IConfig config = new FilesystemConfig(configFile);
-        startServer(config);
-    }
-    
-    /**
-     * Starts the server with the given properties.
-     * 
-     * Its suggested to at least have the following properties:
-     * <ul>
-     *  <li>port</li>
-     *  <li>password_file</li>
-     * </ul>
-     */
-    public void startServer(Properties configProps) throws IOException {
-        final IConfig config = new MemoryConfig(configProps);
-        startServer(config);
-    }
+	private ServerAcceptor m_acceptor;
 
-    /**
-     * Starts Moquette bringing the configuration files from the given Config implementation.
-     */
-    public void startServer(IConfig config) throws IOException {
-        final String handlerProp = System.getProperty("intercept.handler");
-        if (handlerProp != null) {
-            config.setProperty("intercept.handler", handlerProp);
-        }
-        LOG.info("Persistent store file: " + config.getProperty(io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME));
-        final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config);
+	private List<IBrokerPlugin> loadedPlugins = new ArrayList<>();
 
-        m_acceptor = new NettyAcceptor();
-        m_acceptor.initialize(processor, config);
-    }
-    
-    public void stopServer() {
-    	LOG.info("Server stopping...");
-        m_acceptor.close();
-        SimpleMessaging.getInstance().shutdown();
-        LOG.info("Server stopped");
-    }
+	public static void main(String[] args) throws IOException {
+		final Server server = new Server();
+		server.startServer();
+
+		// Bind a shutdown hook
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				server.stopServer();
+			}
+		});
+	}
+
+	/**
+	 * Starts Moquette bringing the configuration from the file located at
+	 * m_config/moquette.conf
+	 */
+	public void startServer() throws IOException {
+		final IConfig config = new FilesystemConfig();
+		startServer(config);
+	}
+
+	/**
+	 * Starts Moquette bringing the configuration from the given file
+	 */
+	public void startServer(File configFile) throws IOException {
+		LOG.info("Using m_config file: " + configFile.getAbsolutePath());
+		final IConfig config = new FilesystemConfig(configFile);
+		startServer(config);
+	}
+
+	/**
+	 * Starts the server with the given properties.
+	 * 
+	 * Its suggested to at least have the following properties:
+	 * <ul>
+	 * <li>port</li>
+	 * <li>password_file</li>
+	 * </ul>
+	 */
+	public void startServer(Properties configProps) throws IOException {
+		final IConfig config = new MemoryConfig(configProps);
+
+		startServer(config);
+	}
+
+	/**
+	 * Starts Moquette bringing the configuration files from the given Config
+	 * implementation.
+	 */
+	public void startServer(IConfig config) throws IOException {
+		LOG.info("Server starting...");
+		final String handlerProp = System.getProperty("intercept.handler");
+		if (handlerProp != null) {
+			config.setProperty("intercept.handler", handlerProp);
+		}
+		LOG.info("Persistent store file: " + config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+		final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config);
+
+		m_acceptor = new NettyAcceptor();
+		m_acceptor.initialize(processor, config);
+		
+		loadPlugins(config, processor);
+		
+		notifyPluginsStartupCompleted();
+		
+		LOG.info("Server started.");
+	}
+
+	private void notifyPluginsStartupCompleted() {
+		for(IBrokerPlugin plugin : loadedPlugins){
+			plugin.onServerStarted();
+		}
+	}
+
+	public void stopServer() {
+		LOG.info("Server stopping...");
+		unloadPlugins();
+		m_acceptor.close();
+		SimpleMessaging.getInstance().shutdown();
+		LOG.info("Server stopped");
+	}
+
+	private void loadPlugins(IConfig config, final ProtocolProcessor processor) {
+		LOG.info("Try to load plugins...");
+		ServiceLoader<IBrokerPlugin> loader = ServiceLoader.load(IBrokerPlugin.class);
+
+		boolean alreadyLoadedAuthenticationAndAuthorizationPlugin = false;
+
+		for (IBrokerPlugin p : loader) {
+			if (p instanceof IAuthenticationAndAuthorizationPlugin) {
+				// Only one Authentication and Authorization Plugin allowed.
+				if (!alreadyLoadedAuthenticationAndAuthorizationPlugin) {
+					IAuthenticationAndAuthorizationPlugin currentPlugin = (IAuthenticationAndAuthorizationPlugin) p;
+					currentPlugin.load(config, new MoquetteOperator(processor));
+					PluginAuthenticationAndAuthorizationAdapter pluginAdapter = new PluginAuthenticationAndAuthorizationAdapter(
+							currentPlugin);
+					// plugin replaces already defined Authenticator and Authorizator
+					processor.setAuthenticator(pluginAdapter);
+					processor.setAuthorizator(pluginAdapter);
+					loadedPlugins.add(currentPlugin);
+					LOG.info("Loaded AuthenticationAndAuthorizationPlugin: " + currentPlugin.getPluginIdentifier());
+				}
+				alreadyLoadedAuthenticationAndAuthorizationPlugin = true;
+			}
+			if (p instanceof IBrokerInterceptionPlugin) {
+				IBrokerInterceptionPlugin currentPlugin = (IBrokerInterceptionPlugin) p;
+				currentPlugin.load(config, new MoquetteOperator(processor));
+				processor.addInterceptionHandler(new PluginInterceptionHandlerAdapter(currentPlugin));
+				loadedPlugins.add(currentPlugin);
+				LOG.info("Loaded BrokerInterceptionPlugin: " + currentPlugin.getPluginIdentifier());
+			}
+		}
+	}
+
+	private void unloadPlugins() {
+		for (IBrokerPlugin plugin : loadedPlugins) {
+			plugin.unload();
+			LOG.info("Unloaded Broker Plugin: " + plugin.getPluginIdentifier());
+		}
+	}
 }

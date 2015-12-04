@@ -15,13 +15,13 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.AbstractMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import io.moquette.proto.messages.AbstractMessage;
 
 /**
  *

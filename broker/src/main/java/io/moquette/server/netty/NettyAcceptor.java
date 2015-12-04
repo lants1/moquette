@@ -17,11 +17,22 @@ package io.moquette.server.netty;
 
 import io.moquette.commons.Constants;
 import io.moquette.parser.netty.MQTTDecoder;
+import io.moquette.parser.netty.MQTTEncoder;
+import io.moquette.server.ServerAcceptor;
 import io.moquette.server.config.IConfig;
 import io.moquette.server.netty.metrics.*;
+import io.moquette.spi.IMessaging;
+import io.moquette.spi.impl.ProtocolProcessor;
+import io.moquette.spi.impl.SimpleMessaging;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -34,21 +45,21 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.concurrent.Future;
-import io.moquette.parser.netty.MQTTEncoder;
-import io.moquette.server.ServerAcceptor;
-import io.moquette.spi.impl.ProtocolProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import java.io.*;
 import java.net.URL;
 import java.security.*;
+
 import java.security.cert.CertificateException;
 import java.util.List;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+
+import io.netty.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -224,13 +235,13 @@ public class NettyAcceptor implements ServerAcceptor {
     }
 
     private void initializeWSSTransport(final NettyMQTTHandler handler, IConfig props, final SslHandlerFactory sslHandlerFactory) throws IOException {
-        String sslPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
-        if (sslPortProp == null) {
-            //Do nothing no SSL configured
-            LOG.info("SSL is disabled");
+        String wssPortProp = props.getProperty(Constants.WSS_PORT_PROPERTY_NAME);
+        if (wssPortProp == null) {
+            //Do nothing no WSSL configured
+            LOG.info("WSS is disabled");
             return;
         }
-        int sslPort = Integer.parseInt(sslPortProp);
+        int sslPort = Integer.parseInt(wssPortProp);
         final MoquetteIdleTimoutHandler timeoutHandler = new MoquetteIdleTimoutHandler();
         String host = props.getProperty(Constants.HOST_PROPERTY_NAME);
         initFactory(host, sslPort, new PipelineInitializer() {

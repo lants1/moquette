@@ -15,31 +15,36 @@
  */
 package io.moquette.server;
 
-import io.moquette.server.config.MemoryConfig;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import io.moquette.server.config.IConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.commons.Constants;
+import io.moquette.server.Server;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
 import static org.junit.Assert.assertTrue;
 
 
 /**
  * Integration test to check the function of Moquette with a WebSocket channel.
  * 
- * @author andrea
+ * @author andreaorg.eclipse.moquette.commons.Constants.
  */
 public class ServerIntegrationWebSocketTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ServerIntegrationWebSocketTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerIntegrationPahoTest.class);
 
     Server m_server;
     WebSocketClient client;
@@ -63,20 +68,23 @@ public class ServerIntegrationWebSocketTest {
         client.stop();
         
         m_server.stopServer();
-        IntegrationUtils.cleanPersistenceFile(m_config);
+        File dbFile = new File(m_config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
     }
     
     @Test
     public void checkPlainConnect() throws Exception {
         LOG.info("*** checkPlainConnect ***");
-        String destUri = "ws://localhost:" + io.moquette.commons.Constants.WEBSOCKET_PORT;
+        String destUri = "ws://localhost:" + Constants.WEBSOCKET_PORT;
         
         MQTTWebSocket socket = new MQTTWebSocket();
         client.start();
         URI echoUri = new URI(destUri);
         ClientUpgradeRequest request = new ClientUpgradeRequest();
         client.connect(socket, echoUri, request);
-        LOG.info("Connecting to : %s", echoUri);
+        LOG.info("Connecting to : %s%n", echoUri);
         boolean connected = socket.awaitConnected(4, TimeUnit.SECONDS);
         
         assertTrue(connected);

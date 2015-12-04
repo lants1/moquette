@@ -2,9 +2,10 @@ package org.eclipse.moquette.fce.event.broker;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.moquette.fce.event.broker.UnmanagedTopicHandler;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
+
+import io.moquette.fce.event.broker.UnmanagedTopicHandler;
+import io.moquette.plugin.AuthorizationProperties;
 
 public class UnmanagedTopicHandlerTest {
 

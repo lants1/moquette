@@ -15,6 +15,8 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.PubRelDecoder;
+import io.moquette.proto.messages.AbstractMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CorruptedFrameException;
@@ -22,7 +24,7 @@ import io.netty.util.AttributeMap;
 import io.netty.util.DefaultAttributeMap;
 import java.util.ArrayList;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;

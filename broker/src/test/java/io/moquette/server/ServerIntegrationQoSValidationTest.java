@@ -16,8 +16,6 @@
 package io.moquette.server;
 
 
-import io.moquette.server.config.IConfig;
-import io.moquette.server.config.MemoryConfig;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
@@ -30,10 +28,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.server.Server;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -77,6 +80,8 @@ public class ServerIntegrationQoSValidationTest {
         m_subscriber.connect();
         
         m_publisher = new MqttClient("tcp://localhost:1883", "Publisher", s_pubDataStore);
+//        m_callback = new TestCallback();
+//        m_subscriber.setCallback(m_callback);
         m_publisher.connect();
     }
 
@@ -91,7 +96,10 @@ public class ServerIntegrationQoSValidationTest {
         }
 
         m_server.stopServer();
-        IntegrationUtils.cleanPersistenceFile(m_config);
+        File dbFile = new File(m_config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
     }
     
     @Test

@@ -12,20 +12,21 @@ import java.nio.charset.CharsetEncoder;
 
 import static org.mockito.Matchers.any;
 
-import org.eclipse.moquette.fce.context.ConfigurationStore;
-import org.eclipse.moquette.fce.context.FceContext;
-import org.eclipse.moquette.fce.context.HashAssignmentStore;
-import org.eclipse.moquette.fce.event.broker.ManagedIntentHandler;
-import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.common.ManagedScope;
-import org.eclipse.moquette.fce.model.common.ManagedTopic;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.mqtt.FceMqttClientWrapper;
-import org.eclipse.moquette.fce.service.parser.JsonParserService;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
+
+import io.moquette.fce.context.ConfigurationStore;
+import io.moquette.fce.context.FceContext;
+import io.moquette.fce.context.HashAssignmentStore;
+import io.moquette.fce.event.broker.ManagedIntentHandler;
+import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.ManagedScope;
+import io.moquette.fce.model.common.ManagedTopic;
+import io.moquette.fce.model.common.ManagedZone;
+import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.fce.service.FceServiceFactory;
+import io.moquette.fce.service.mqtt.FceMqttClientWrapper;
+import io.moquette.fce.service.parser.JsonParserService;
+import io.moquette.plugin.AuthorizationProperties;
 
 public class ManagedIntentHandlerTest {
 

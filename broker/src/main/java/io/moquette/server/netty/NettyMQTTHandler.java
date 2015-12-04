@@ -15,15 +15,18 @@
  */
 package io.moquette.server.netty;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.moquette.proto.Utils;
 import io.moquette.proto.messages.*;
+import io.moquette.spi.IMessaging;
 import io.moquette.spi.impl.ProtocolProcessor;
-import static io.moquette.proto.messages.AbstractMessage.*;
-import io.netty.channel.ChannelHandler.Sharable;
+import io.moquette.spi.impl.events.LostConnectionEvent;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import io.netty.handler.codec.CorruptedFrameException;
+
+import static io.moquette.proto.messages.AbstractMessage.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +39,17 @@ import org.slf4j.LoggerFactory;
 public class NettyMQTTHandler extends ChannelInboundHandlerAdapter {
     
     private static final Logger LOG = LoggerFactory.getLogger(NettyMQTTHandler.class);
+    private IMessaging m_messaging;
     private final ProtocolProcessor m_processor;
+
+    private NettyMQTTHandler() {
+        m_processor = null;
+    }
 
     public NettyMQTTHandler(ProtocolProcessor processor) {
         m_processor = processor;
     }
+
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object message) {
@@ -70,7 +79,7 @@ public class NettyMQTTHandler extends ChannelInboundHandlerAdapter {
                     m_processor.processPubRel(new NettyChannel(ctx), (PubRelMessage) msg);
                     break;
                 case DISCONNECT:
-                    m_processor.processDisconnect(new NettyChannel(ctx));
+                    m_processor.processDisconnect(new NettyChannel(ctx), (DisconnectMessage) msg);
                     break;
                 case PUBACK:
                     m_processor.processPubAck(new NettyChannel(ctx), (PubAckMessage) msg);
@@ -96,7 +105,7 @@ public class NettyMQTTHandler extends ChannelInboundHandlerAdapter {
             if (stolenAttr != null && stolenAttr == Boolean.TRUE) {
                 stolen = stolenAttr;
             }
-            m_processor.processConnectionLost(clientID, stolen);
+            m_processor.processConnectionLost(new LostConnectionEvent(clientID, stolen));
         }
         ctx.close(/*false*/);
     }

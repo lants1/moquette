@@ -27,7 +27,7 @@ public class SubAckMessage extends MessageIDMessage {
     List<QOSType> m_types = new ArrayList<QOSType>();
     
     public SubAckMessage() {
-        m_messageType = SUBACK;
+        m_messageType = AbstractMessage.SUBACK;
     }
 
     public List<QOSType> types() {

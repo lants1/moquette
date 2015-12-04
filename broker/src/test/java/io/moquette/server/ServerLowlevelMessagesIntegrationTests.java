@@ -15,13 +15,6 @@
  */
 package io.moquette.server;
 
-import io.moquette.proto.messages.ConnectMessage;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.AbstractMessage.QOSType;
-import io.moquette.proto.messages.ConnAckMessage;
-import io.moquette.server.config.IConfig;
-import io.moquette.server.config.MemoryConfig;
-import io.moquette.testclient.Client;
 import org.fusesource.mqtt.client.*;
 import org.junit.After;
 import org.junit.Before;
@@ -29,11 +22,22 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.ConnAckMessage;
+import io.moquette.proto.messages.ConnectMessage;
+import io.moquette.proto.messages.AbstractMessage.QOSType;
+import io.moquette.server.Server;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+import io.moquette.testclient.Client;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
 import static org.junit.Assert.*;
 
 /**
@@ -71,7 +75,10 @@ public class ServerLowlevelMessagesIntegrationTests {
         Thread.sleep(300); //to let the close event pass before server stop event
         m_server.stopServer();
         LOG.debug("After asked server to stop");
-        IntegrationUtils.cleanPersistenceFile(m_config);
+        File dbFile = new File(m_config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
     }
     
     @Test

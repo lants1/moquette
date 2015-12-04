@@ -22,6 +22,6 @@ package io.moquette.proto.messages;
 public class PubRelMessage extends MessageIDMessage {
     
     public PubRelMessage() {
-        m_messageType = PUBREL;
+        m_messageType = AbstractMessage.PUBREL;
     }
 }

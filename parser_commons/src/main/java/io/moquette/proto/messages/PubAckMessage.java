@@ -23,6 +23,6 @@ package io.moquette.proto.messages;
 public class PubAckMessage extends MessageIDMessage {
     
     public PubAckMessage() {
-        m_messageType = PUBACK;
+        m_messageType = AbstractMessage.PUBACK;
     }
 }

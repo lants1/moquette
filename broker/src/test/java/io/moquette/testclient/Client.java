@@ -18,6 +18,7 @@ package io.moquette.testclient;
 import io.moquette.commons.Constants;
 import io.moquette.parser.netty.MQTTDecoder;
 import io.moquette.parser.netty.MQTTEncoder;
+import io.moquette.proto.messages.AbstractMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -27,7 +28,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.moquette.proto.messages.AbstractMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

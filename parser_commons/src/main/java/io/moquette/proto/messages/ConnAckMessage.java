@@ -32,7 +32,7 @@ public class ConnAckMessage extends AbstractMessage {
     private boolean sessionPresent;
     
     public ConnAckMessage() {
-        m_messageType = CONNACK;
+        m_messageType = AbstractMessage.CONNACK;
     }
 
     public byte getReturnCode() {

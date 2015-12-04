@@ -16,26 +16,38 @@
 package io.moquette.server;
 
 /**
- * Value object to maintain the information of single connection, like ClientID, IoSession,
- * and other clean session fla.
+ * Maintains the information of single connection, like ClientID, IoSession,
+ * and other connection related flags.
  * 
  * 
  * @author andrea
  */
 public class ConnectionDescriptor {
     
-    public final String clientID;
-    public final ServerChannel session;
-    public final boolean cleanSession;
+    private String m_clientID;
+    private ServerChannel m_session;
+    private boolean m_cleanSession;
     
     public ConnectionDescriptor(String clientID, ServerChannel session, boolean cleanSession) {
-        this.clientID = clientID;
-        this.session = session;
-        this.cleanSession = cleanSession;
+        this.m_clientID = clientID;
+        this.m_session = session;
+        this.m_cleanSession = cleanSession;
+    }
+    
+    public boolean isCleanSession() {
+        return m_cleanSession;
+    }
+
+    public String getClientID() {
+        return m_clientID;
+    }
+
+    public ServerChannel getSession() {
+        return m_session;
     }
 
     @Override
     public String toString() {
-        return "ConnectionDescriptor{" + "clientID=" + clientID + ", cleanSession=" + cleanSession + '}';
+        return "ConnectionDescriptor{" + "m_clientID=" + m_clientID + ", m_cleanSession=" + m_cleanSession + '}';
     }
 }

@@ -15,6 +15,8 @@
  */
 package io.moquette.spi.impl.security;
 
+import java.nio.ByteBuffer;
+
 /**
  * ACL checker.
  *
@@ -29,7 +31,7 @@ public interface IAuthorizator {
     /**
      * Ask the implementation of the authorizator if the topic can be used in a publish.
      * */
-    boolean canWrite(String topic, String user, String client);
+    boolean canWrite(String topic, String user, String clientId, Boolean anonymous, ByteBuffer message);
 
-    boolean canRead(String topic, String user, String client);
+    boolean canRead(String topic, String user, String clientId, Boolean anonymous, ByteBuffer message);
 }

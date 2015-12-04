@@ -22,7 +22,7 @@ package io.moquette.proto.messages;
 public class UnsubAckMessage extends MessageIDMessage {
     
     public UnsubAckMessage() {
-        m_messageType = UNSUBACK;
+        m_messageType = AbstractMessage.UNSUBACK;
     }
 }
 

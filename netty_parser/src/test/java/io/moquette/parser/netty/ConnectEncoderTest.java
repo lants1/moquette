@@ -15,12 +15,16 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.ConnectEncoder;
 import io.moquette.proto.messages.ConnectMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+
 import org.junit.Test;
 import org.junit.Before;
+
+import static io.moquette.parser.netty.TestUtils.*;
 import static org.junit.Assert.*;
 
 
@@ -35,7 +39,7 @@ public class ConnectEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
     }
     
     @Test
@@ -54,7 +58,7 @@ public class ConnectEncoderTest {
         //Verify
         assertEquals(0x10, out.readByte()); //1 byte
         assertEquals(12, out.readByte()); //remaining length
-        TestUtils.verifyString("MQIsdp", out);
+        verifyString("MQIsdp", out);
         assertEquals(0x03, out.readByte()); //protocol version
         assertEquals(0x32, out.readByte()); //flags
         assertEquals(2, out.readByte()); //keepAliveTimer msb
@@ -84,16 +88,16 @@ public class ConnectEncoderTest {
         //Verify
         assertEquals(0x10, out.readByte()); //1 byte
         assertEquals(36, out.readByte()); //remaining length
-        TestUtils.verifyString("MQIsdp", out);
+        verifyString("MQIsdp", out);
         assertEquals(0x03, out.readByte()); //protocol version
         assertEquals(0x36, out.readByte()); //flags
         assertEquals(2, out.readByte()); //keepAliveTimer msb
         assertEquals(0, out.readByte()); //keepAliveTimer lsb
         
         //Variable part
-        TestUtils.verifyString("ABCDEF", out);
-        TestUtils.verifyString("Topic", out);
-        TestUtils.verifyString("Message", out);
+        verifyString("ABCDEF", out);
+        verifyString("Topic", out);
+        verifyString("Message", out);
     }
     
     @Test
@@ -122,17 +126,17 @@ public class ConnectEncoderTest {
         //Verify
         assertEquals(0x10, out.readByte()); //1 byte
         assertEquals(48, out.readByte()); //remaining length
-        TestUtils.verifyString("MQIsdp", out);
+        verifyString("MQIsdp", out);
         assertEquals(0x03, out.readByte()); //protocol version
         assertEquals((byte)0xF6, (byte)out.readByte()); //flags
         assertEquals(2, out.readByte()); //keepAliveTimer msb
         assertEquals(0, out.readByte()); //keepAliveTimer lsb
         
         //Variable part
-        TestUtils.verifyString("ABCDEF", out);
-        TestUtils.verifyString("Topic", out);
-        TestUtils.verifyString("Message", out);
-        TestUtils.verifyString("Pablo", out);//username
-        TestUtils.verifyString("PBL", out);//password
+        verifyString("ABCDEF", out);
+        verifyString("Topic", out);
+        verifyString("Message", out);
+        verifyString("Pablo", out);//username
+        verifyString("PBL", out);//password
     }
 }

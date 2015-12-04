@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import io.moquette.fce.model.common.ManagedZone;
+import io.moquette.fce.model.common.TopicPermission;
+
 public class TopicPermissionTest {
 
 	@Test

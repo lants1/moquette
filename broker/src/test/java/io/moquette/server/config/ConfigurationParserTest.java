@@ -15,16 +15,18 @@
  */
 package io.moquette.server.config;
 
-import io.moquette.commons.Constants;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.moquette.server.config.ConfigurationParser;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Properties;
 
+import static io.moquette.commons.Constants.HOST;
+import static io.moquette.commons.Constants.PORT;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -101,7 +103,7 @@ public class ConfigurationParserTest {
      * Helper method to verify default options.
      */
     private void verifyDefaults(Properties props) {
-        Assert.assertEquals(Constants.PORT, Integer.parseInt(props.getProperty("port")));
-        Assert.assertEquals(Constants.HOST, props.getProperty("host"));
+        assertEquals(PORT, Integer.parseInt(props.getProperty("port")));
+        assertEquals(HOST, props.getProperty("host"));
     }
 }

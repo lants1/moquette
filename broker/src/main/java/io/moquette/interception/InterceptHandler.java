@@ -15,13 +15,13 @@
  */
 package io.moquette.interception;
 
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.spi.impl.subscriptions.Subscription;
 import io.moquette.interception.messages.InterceptConnectMessage;
 import io.moquette.interception.messages.InterceptDisconnectMessage;
 import io.moquette.interception.messages.InterceptPublishMessage;
 import io.moquette.interception.messages.InterceptSubscribeMessage;
 import io.moquette.interception.messages.InterceptUnsubscribeMessage;
+import io.moquette.proto.messages.*;
+import io.moquette.spi.impl.subscriptions.Subscription;
 
 /**
  * This interface is used to inject code for intercepting broker events.

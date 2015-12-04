@@ -15,12 +15,14 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.ConnAckDecoder;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.ConnAckMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.ConnAckMessage;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

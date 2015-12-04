@@ -15,8 +15,6 @@
  */
 package io.moquette.server;
 
-import io.moquette.server.config.IConfig;
-import io.moquette.server.config.MemoryConfig;
 import org.fusesource.mqtt.client.*;
 import org.junit.After;
 import org.junit.Before;
@@ -24,10 +22,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.server.Server;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
 import static org.junit.Assert.*;
 
 /**
@@ -60,6 +64,9 @@ public class ServerIntegrationFuseTest {
 
     @After
     public void tearDown() throws Exception {
+//        if (m_mqtt.isConnected()) {
+//            m_mqtt.disconnect();
+//        }
         if (m_subscriber != null) {
             m_subscriber.disconnect();
         }
@@ -69,7 +76,10 @@ public class ServerIntegrationFuseTest {
         }
 
         m_server.stopServer();
-        IntegrationUtils.cleanPersistenceFile(m_config);
+        File dbFile = new File(m_config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
     }
     
     @Test
@@ -88,8 +98,8 @@ public class ServerIntegrationFuseTest {
     }
     
     @Test
-    public void checkWillTestamentIsPublishedOnConnectionKill_noRetain() throws Exception {
-        LOG.info("checkWillTestamentIsPublishedOnConnectionKill");
+    public void checkWillTestmaentIsPublishedOnConnectionKill_noRetain() throws Exception {
+        LOG.info("checkWillTestmaentIsPublishedOnConnectionKill");
         
         String willTestamentTopic = "/will/test";
         String willTestamentMsg = "Bye bye";
@@ -154,8 +164,8 @@ public class ServerIntegrationFuseTest {
         //reconnect and expect to receive the hello 2 message
         m_subscriber = m_mqtt.blockingConnection();
         m_subscriber.connect();
-        //topics = new Topic[]{new Topic("/topic", QoS.AT_LEAST_ONCE)};
-        //m_subscriber.subscribe(topics);
+        topics = new Topic[]{new Topic("/topic", QoS.AT_LEAST_ONCE)};
+        m_subscriber.subscribe(topics);
         msg = m_subscriber.receive();
         msg.ack();
         assertEquals("Hello world MQTT!!-2", new String(msg.getPayload()));
@@ -206,8 +216,8 @@ public class ServerIntegrationFuseTest {
      * subscriber connects again and receive "hello1" "hello2"
      */
     @Test
-    public void checkQoS2SubscriberDisconnectReceivePersistedPublishes() throws Exception {
-        LOG.info("*** checkQoS2SubscriberDisconnectReceivePersistedPublishes ***");
+    public void checkQoS2SuscriberDisconnectReceivePersistedPublishes() throws Exception {
+        LOG.info("*** checkQoS2SuscriberDisconnectReceivePersistedPublishes ***");
         m_mqtt.setHost("localhost", 1883); 
         m_mqtt.setCleanSession(false);
         m_mqtt.setClientId("Subscriber");

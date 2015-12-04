@@ -15,10 +15,16 @@
  */
 package io.moquette.spi.impl.security;
 
-import io.moquette.spi.impl.subscriptions.SubscriptionsStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.spi.impl.subscriptions.SubscriptionsStore;
+
+import static io.moquette.spi.impl.security.Authorization.Permission.READ;
+import static io.moquette.spi.impl.security.Authorization.Permission.READWRITE;
+import static io.moquette.spi.impl.security.Authorization.Permission.WRITE;
+
+import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.util.*;
 
@@ -108,13 +114,13 @@ class AuthorizationsCollector implements IAuthorizator {
     }
 
     @Override
-    public boolean canWrite(String topic, String user, String client) {
-        return canDoOperation(topic, Authorization.Permission.WRITE, user, client);
+    public boolean canWrite(String topic, String user, String client, Boolean anonymous, ByteBuffer message) {
+        return canDoOperation(topic, WRITE, user, client);
     }
 
     @Override
-    public boolean canRead(String topic, String user, String client) {
-        return canDoOperation(topic, Authorization.Permission.READ, user, client);
+    public boolean canRead(String topic, String user, String client, Boolean anonymous,  ByteBuffer message) {
+        return canDoOperation(topic, READ, user, client);
     }
 
     private boolean canDoOperation(String topic, Authorization.Permission permission, String username, String client) {

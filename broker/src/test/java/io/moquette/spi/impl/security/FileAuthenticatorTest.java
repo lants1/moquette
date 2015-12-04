@@ -17,6 +17,9 @@ package io.moquette.spi.impl.security;
 
 import org.junit.Test;
 
+import io.moquette.spi.impl.security.FileAuthenticator;
+import io.moquette.spi.impl.security.IAuthenticator;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +34,7 @@ public class FileAuthenticatorTest {
         String file = getClass().getResource("/password_file.conf").getPath();        
         IAuthenticator auth = new FileAuthenticator(null, file);
         
-        assertTrue(auth.checkValid("testuser", "passwd".getBytes()));
+        assertTrue(auth.checkValid("testuser", "passwd".getBytes(), ""));
     }
     
     @Test
@@ -39,14 +42,14 @@ public class FileAuthenticatorTest {
         String file = getClass().getResource("/password_file.conf").getPath();        
         IAuthenticator auth = new FileAuthenticator(null, file);
         
-        assertFalse(auth.checkValid("testuser2", "passwd".getBytes()));
+        assertFalse(auth.checkValid("testuser2", "passwd".getBytes(), ""));
     }
     
     @Test
     public void loadPasswordFile_verifyDirectoryRef() {
         IAuthenticator auth = new FileAuthenticator("", "");
         
-        assertFalse(auth.checkValid("testuser2", "passwd".getBytes()));
+        assertFalse(auth.checkValid("testuser2", "passwd".getBytes(),""));
     }
 
 }

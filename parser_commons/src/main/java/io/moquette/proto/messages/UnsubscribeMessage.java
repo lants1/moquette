@@ -26,7 +26,7 @@ public class UnsubscribeMessage extends MessageIDMessage {
     List<String> m_types = new ArrayList<String>();
     
     public UnsubscribeMessage() {
-        m_messageType = UNSUBSCRIBE;
+        m_messageType = AbstractMessage.UNSUBSCRIBE;
     }
 
     public List<String> topicFilters() {

@@ -18,8 +18,13 @@ package io.moquette.spi.impl.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.moquette.spi.impl.security.Authorization.Permission;
+
 import java.io.*;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Parses the acl configuration file.

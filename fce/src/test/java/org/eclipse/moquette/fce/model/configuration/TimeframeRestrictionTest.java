@@ -8,8 +8,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.eclipse.moquette.fce.model.quota.IQuotaState;
 import org.junit.Test;
+
+import io.moquette.fce.model.configuration.TimeframeRestriction;
+import io.moquette.fce.model.quota.IQuotaState;
 
 public class TimeframeRestrictionTest {
 

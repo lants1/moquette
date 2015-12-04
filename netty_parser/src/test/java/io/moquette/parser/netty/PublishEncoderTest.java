@@ -15,16 +15,18 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.PublishEncoder;
+import io.moquette.proto.messages.PublishMessage;
+import io.moquette.proto.messages.AbstractMessage.QOSType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import java.nio.ByteBuffer;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
-import io.moquette.proto.messages.AbstractMessage.QOSType;
-import io.moquette.proto.messages.PublishMessage;
+import static io.moquette.parser.netty.TestUtils.*;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -38,7 +40,7 @@ public class PublishEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
         m_out = Unpooled.buffer();
     }
     
@@ -64,9 +66,9 @@ public class PublishEncoderTest {
         assertEquals(12, m_out.readByte()); //remaining length
 
         //Variable part
-        TestUtils.verifyString(topic, m_out);
+        verifyString(topic, m_out);
         payload.rewind();
-        TestUtils.verifyBuff(bpayload.length, payload, m_out);
+        verifyBuff(bpayload.length, payload, m_out);
     }
     
     
@@ -92,11 +94,11 @@ public class PublishEncoderTest {
         assertEquals(14, m_out.readByte()); //remaining length
 
         //Variable part
-        TestUtils.verifyString(topic, m_out);
+        verifyString(topic, m_out);
         assertEquals(0, m_out.readByte()); //MessageID MSB
         assertEquals(1, m_out.readByte()); //MessageID LSB
         payload.rewind();
-        TestUtils.verifyBuff(bpayload.length, payload, m_out);
+        verifyBuff(bpayload.length, payload, m_out);
     }
     
     @Test(expected = IllegalArgumentException.class)

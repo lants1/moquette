@@ -15,8 +15,6 @@
  */
 package io.moquette.server;
 
-import io.moquette.server.config.IConfig;
-import io.moquette.server.config.MemoryConfig;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.junit.After;
@@ -26,10 +24,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.moquette.server.Server;
+import io.moquette.server.config.IConfig;
+import io.moquette.server.config.MemoryConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import static io.moquette.commons.Constants.*;
 import static org.junit.Assert.*;
 
 public class ServerIntegrationPahoTest {
@@ -61,9 +64,8 @@ public class ServerIntegrationPahoTest {
     @Before
     public void setUp() throws Exception {
         String dbPath = IntegrationUtils.localMapDBPath();
-        IntegrationUtils.cleanPersistenceFile(dbPath);
-//        File dbFile = new File(dbPath);
-//        assertFalse(String.format("The DB storagefile %s already exists", dbPath), dbFile.exists());
+        File dbFile = new File(dbPath);
+        assertFalse(String.format("The DB storagefile %s already exists", dbPath), dbFile.exists());
     	
         startServer();
 
@@ -83,7 +85,11 @@ public class ServerIntegrationPahoTest {
 
     private void stopServer() {
         m_server.stopServer();
-        IntegrationUtils.cleanPersistenceFile(m_config);
+        File dbFile = new File(m_config.getProperty(PERSISTENT_STORE_PROPERTY_NAME));
+        if (dbFile.exists()) {
+            dbFile.delete();
+        }
+        assertFalse(dbFile.exists());
     }
 
     @Test
@@ -155,7 +161,7 @@ public class ServerIntegrationPahoTest {
         m_client.connect();
         m_client.publish("/topic", "Test my payload".getBytes(), 0, false);
 
-        assertEquals("Test my payload", new String(m_callback.getMessage(false).getPayload()));
+        assertNull(m_callback.getMessage(false));
     }
 
     @Test
@@ -261,7 +267,7 @@ public class ServerIntegrationPahoTest {
 
         assertEquals("Hello MQTT", m_callback.getMessage(true).toString());
     }
-
+    
     @Test
     public void checkReceivePublishedMessage_after_a_reconnect_with_notCleanSession() throws Exception {
         LOG.info("*** checkReceivePublishedMessage_after_a_reconnect_with_notCleanSession ***");
@@ -270,19 +276,19 @@ public class ServerIntegrationPahoTest {
         m_client.connect(options);
         m_client.subscribe("/topic", 1);
         m_client.disconnect();
-
+        
         m_client.connect(options);
         m_client.subscribe("/topic", 1);
-
+        
         //publish a QoS 1 message another client publish a message on the topic
-        publishFromAnotherClient("/topic", "Hello MQTT".getBytes(), 1);
-
+        publishFromAnotherClient("/topic", "Hello MQTT".getBytes(), 1); 
+        
         //Verify that after a reconnection the client receive the message
         MqttMessage message = m_callback.getMessage(true);
         assertNotNull(message);
         assertEquals("Hello MQTT", message.toString());
     }
-
+ 
     private void publishFromAnotherClient(String topic, byte[] payload, int qos) throws Exception {
         IMqttClient anotherClient = new MqttClient("tcp://localhost:1883", "TestClientPUB", s_pubDataStore);
         anotherClient.connect();
@@ -303,7 +309,7 @@ public class ServerIntegrationPahoTest {
         publishFromAnotherClient("/topic", "Hello MQTT".getBytes(), 2);
         m_callback.reinit();
         m_client.connect(options);
-
+        
         MqttMessage message = m_callback.getMessage(true);
         assertEquals("Hello MQTT", message.toString());
         assertEquals(2, message.getQos());
@@ -322,13 +328,13 @@ public class ServerIntegrationPahoTest {
         publishFromAnotherClient("/topic", "Hello MQTT".getBytes(), 2);
         m_callback.reinit();
         m_client.connect(options);
-
+        
         assertNotNull(m_callback);
         MqttMessage message = m_callback.getMessage(true);
         assertNotNull(message);
         assertEquals("Hello MQTT", message.toString());
     }
-
+    
     @Test
     public void avoidMultipleNotificationsAfterMultipleReconnection_cleanSessionFalseQoS1() throws Exception {
         LOG.info("*** avoidMultipleNotificationsAfterMultipleReconnection_cleanSessionFalseQoS1, issue #16 ***");
@@ -337,20 +343,20 @@ public class ServerIntegrationPahoTest {
         m_client.connect(options);
         m_client.subscribe("/topic", 1);
         m_client.disconnect();
-
+        
         publishFromAnotherClient("/topic", "Hello MQTT 1".getBytes(), 1);
         m_callback.reinit();
         m_client.connect(options);
-
+        
         assertNotNull(m_callback);
         MqttMessage message = m_callback.getMessage(true);
         assertNotNull(message);
         assertEquals("Hello MQTT 1", message.toString());
         m_client.disconnect();
-
+        
         //publish other message
         publishFromAnotherClient("/topic", "Hello MQTT 2".getBytes(), 1);
-
+        
         //reconnect the second time
         m_callback.reinit();
         m_client.connect(options);

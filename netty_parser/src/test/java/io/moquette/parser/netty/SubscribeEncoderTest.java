@@ -15,11 +15,14 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.SubscribeEncoder;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.SubscribeMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.SubscribeMessage;
+
+import static io.moquette.parser.netty.TestUtils.*;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +39,7 @@ public class SubscribeEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
         m_out = Unpooled.buffer();
     }
     
@@ -64,9 +67,9 @@ public class SubscribeEncoderTest {
         assertEquals((byte)0xBB, m_out.readByte());
         
         //Variable part
-        TestUtils.verifyString(c1.getTopicFilter(), m_out);
+        verifyString(c1.getTopicFilter(), m_out);
         assertEquals(c1.getQos(), m_out.readByte());
-        TestUtils.verifyString(c2.getTopicFilter(), m_out);
+        verifyString(c2.getTopicFilter(), m_out);
         assertEquals(c2.getQos(), m_out.readByte());
     }
     

@@ -18,7 +18,9 @@ package io.moquette.server;
 import java.io.IOException;
 
 import io.moquette.server.config.IConfig;
+import io.moquette.spi.IMessaging;
 import io.moquette.spi.impl.ProtocolProcessor;
+import io.moquette.spi.impl.SimpleMessaging;
 
 /**
  *

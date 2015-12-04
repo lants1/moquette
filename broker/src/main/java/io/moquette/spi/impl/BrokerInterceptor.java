@@ -19,8 +19,8 @@ import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.Interceptor;
 import io.moquette.interception.messages.*;
 import io.moquette.proto.messages.ConnectMessage;
-import io.moquette.spi.impl.subscriptions.Subscription;
 import io.moquette.proto.messages.PublishMessage;
+import io.moquette.spi.impl.subscriptions.Subscription;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
  * @author Wagner Macedo
  */
 final class BrokerInterceptor implements Interceptor {
-    private final List<InterceptHandler> handlers;
+    private List<InterceptHandler> handlers;
     private final ExecutorService executor;
 
     BrokerInterceptor(List<InterceptHandler> handlers) {
@@ -105,5 +105,13 @@ final class BrokerInterceptor implements Interceptor {
                 }
             });
         }
+    }
+    
+    public void addInterceptionHandler(InterceptHandler handler){
+    	handlers.add(handler);
+    }
+    
+    public void removeInterceptionHandler(InterceptHandler handler){
+    	handlers.remove(handler);
     }
 }

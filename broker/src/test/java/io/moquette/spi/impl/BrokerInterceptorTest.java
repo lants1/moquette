@@ -15,15 +15,17 @@
  */
 package io.moquette.spi.impl;
 
-import io.moquette.interception.messages.*;
-import io.moquette.proto.messages.ConnectMessage;
-import io.moquette.interception.InterceptHandler;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.PublishMessage;
-import io.moquette.spi.impl.subscriptions.Subscription;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.moquette.interception.InterceptHandler;
+import io.moquette.interception.messages.*;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.ConnectMessage;
+import io.moquette.proto.messages.PublishMessage;
+import io.moquette.spi.impl.BrokerInterceptor;
+import io.moquette.spi.impl.subscriptions.Subscription;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;

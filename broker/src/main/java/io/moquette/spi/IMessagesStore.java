@@ -17,7 +17,9 @@ package io.moquette.spi;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+
 import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.spi.impl.events.PublishEvent;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,15 +29,10 @@ import java.util.List;
  */
 public interface IMessagesStore {
 
-    class StoredMessage implements Serializable {
+    public static class StoredMessage implements Serializable {
         final AbstractMessage.QOSType m_qos;
         final byte[] m_payload;
         final String m_topic;
-        private boolean m_retained;
-        private String m_clientID;
-        //Optional attribute, available only fo QoS 1 and 2
-        private Integer m_msgID;
-        private String m_guid;
 
         public StoredMessage(byte[] message, AbstractMessage.QOSType qos, String topic) {
             m_qos = qos;
@@ -54,53 +51,6 @@ public interface IMessagesStore {
         public String getTopic() {
             return m_topic;
         }
-
-        public void setGuid(String guid) {
-            this.m_guid = guid;
-        }
-
-        public String getGuid() {
-            return m_guid;
-        }
-
-        public String getClientID() {
-            return m_clientID;
-        }
-
-        public void setClientID(String m_clientID) {
-            this.m_clientID = m_clientID;
-        }
-
-        public void setMessageID(Integer messageID) {
-            this.m_msgID = messageID;
-        }
-
-        public Integer getMessageID() {
-            return m_msgID;
-        }
-
-        public ByteBuffer getMessage() {
-            return ByteBuffer.wrap(m_payload);
-        }
-
-        public void setRetained(boolean retained) {
-            this.m_retained = retained;
-        }
-
-        public boolean isRetained() {
-            return m_retained;
-        }
-
-        @Override
-        public String toString() {
-            return "PublishEvent{" +
-                    "m_msgID=" + m_msgID +
-                    ", clientID='" + m_clientID + '\'' +
-                    ", m_retain=" + m_retained +
-                    ", m_qos=" + m_qos +
-                    ", m_topic='" + m_topic + '\'' +
-                    '}';
-        }
     }
 
     /**
@@ -112,36 +62,42 @@ public interface IMessagesStore {
      * Persist the message. 
      * If the message is empty then the topic is cleaned, else it's stored.
      */
-    void storeRetained(String topic, String guid);
+    void storeRetained(String topic, ByteBuffer message, AbstractMessage.QOSType qos);
 
     /**
      * Return a list of retained messages that satisfy the condition.
      */
     Collection<StoredMessage> searchMatching(IMatchingCondition condition);
 
-    /**
-     * Persist the message.
-     * @return the unique id in the storage (guid).
-     * */
-    String storePublishForFuture(StoredMessage evt);
+    void storePublishForFuture(PublishEvent evt);
 
     /**
      * Return the list of persisted publishes for the given clientID.
      * For QoS1 and QoS2 with clean session flag, this method return the list of 
      * missed publish events while the client was disconnected.
      */
-    List<StoredMessage> listMessagesInSession(Collection<String> guids);
+    List<PublishEvent> listMessagesInSession(String clientID);
     
+    void removeMessageInSession(String clientID, Integer packetID);
+
     void dropMessagesInSession(String clientID);
 
-    StoredMessage getMessageByGuid(String guid);
+    void cleanTemporaryPublish(String clientID, int packetID);
+
+    void storeTemporaryPublish(PublishEvent evt, String clientID, int packetID);
 
     /**
-     * Return the next valid packetIdentifier for the given client session.
+     * Return the next valid packetIdentifer for the given client session.
      * */
     int nextPacketID(String clientID);
 
-//    void close();
+    void close();
+
+    void persistQoS2Message(String publishKey, PublishEvent evt);
+
+    void removeQoS2Message(String publishKey);
+
+    PublishEvent retrieveQoS2Message(String publishKey);
 
     void cleanRetained(String topic);
 }

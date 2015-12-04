@@ -2,8 +2,10 @@ package org.eclipse.moquette.fce.model.quota;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.moquette.plugin.MqttAction;
 import org.junit.Test;
+
+import io.moquette.fce.model.quota.UserQuota;
+import io.moquette.plugin.MqttAction;
 
 public class UserQuotaTest {
 

@@ -15,6 +15,10 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.PublishDecoder;
+import io.moquette.parser.netty.Utils;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.PublishMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CorruptedFrameException;
@@ -24,8 +28,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.PublishMessage;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

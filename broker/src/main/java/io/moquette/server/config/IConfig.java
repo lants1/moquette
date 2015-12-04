@@ -15,12 +15,14 @@
  */
 package io.moquette.server.config;
 
+import io.moquette.plugin.IBrokerConfig;
+
 /**
  * Base interface for all configuration implementations (filesystem, memory or classpath)
  *
  * @author andrea
  */
-public interface IConfig {
+public interface IConfig extends IBrokerConfig {
     void setProperty(String name, String value);
 
     String getProperty(String name);

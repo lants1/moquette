@@ -15,11 +15,14 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.SubAckEncoder;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.SubAckMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.SubAckMessage;
+
+import static io.moquette.parser.netty.TestUtils.mockChannelHandler;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +39,7 @@ public class SubAckEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
         m_out = Unpooled.buffer();
     }
     

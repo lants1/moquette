@@ -15,12 +15,13 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.PubAckDecoder;
+import io.moquette.proto.messages.AbstractMessage;
 import io.moquette.proto.messages.PubAckMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,7 +53,7 @@ public class PubAckDecoderTest {
         m_msgdec.decode(null, m_buff, results);
         
         assertFalse(results.isEmpty());
-        PubAckMessage message = (PubAckMessage)results.get(0);
+        PubAckMessage message = (PubAckMessage)results.get(0); 
         assertNotNull(message);
         assertEquals(messageId, message.getMessageID().intValue());
         assertEquals(AbstractMessage.PUBACK, message.getMessageType());

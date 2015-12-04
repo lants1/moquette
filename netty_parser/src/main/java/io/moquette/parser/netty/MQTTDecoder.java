@@ -15,6 +15,7 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.AbstractMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -23,7 +24,6 @@ import io.netty.util.AttributeKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import io.moquette.proto.messages.AbstractMessage;
 
 /**
  *

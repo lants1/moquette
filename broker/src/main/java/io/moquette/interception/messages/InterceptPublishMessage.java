@@ -1,8 +1,8 @@
 package io.moquette.interception.messages;
 
-import io.moquette.proto.messages.PublishMessage;
-
 import java.nio.ByteBuffer;
+
+import io.moquette.proto.messages.PublishMessage;
 
 /**
  * @author Wagner Macedo

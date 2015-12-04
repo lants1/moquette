@@ -106,7 +106,7 @@ public class FileAuthenticator implements IAuthenticator {
         }
     }
     
-    public boolean checkValid(String username, byte[] password) {
+    public boolean checkValid(String username, byte[] password, String clientId) {
         if (username == null || password == null) {
             LOG.info("username or password was null");
             return false;

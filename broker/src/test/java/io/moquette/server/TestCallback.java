@@ -38,7 +38,7 @@ class TestCallback implements MqttCallback {
                     throw new IllegalStateException("Elapsed the timeout to get the result");
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             return m_message;
         }
@@ -47,7 +47,7 @@ class TestCallback implements MqttCallback {
             try {
                 m_latch.await(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             return m_topic;
         }
@@ -59,6 +59,7 @@ class TestCallback implements MqttCallback {
         }
 
         public void connectionLost(Throwable cause) {
+            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -68,5 +69,6 @@ class TestCallback implements MqttCallback {
         }
 
         public void deliveryComplete(IMqttDeliveryToken token) {
+            //To change body of implemented methods use File | Settings | File Templates.
         }
     }

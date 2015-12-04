@@ -15,11 +15,14 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.UnsubscribeEncoder;
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.UnsubscribeMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.UnsubscribeMessage;
+
+import static io.moquette.parser.netty.TestUtils.*;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +40,7 @@ public class UnsubscribeEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
         m_out = Unpooled.buffer();
         m_msg = new UnsubscribeMessage();
         m_msg.setMessageID(0xAABB);
@@ -64,7 +67,7 @@ public class UnsubscribeEncoderTest {
         assertEquals((byte)0xBB, m_out.readByte());
         
         //Variable part
-        TestUtils.verifyString(topic1, m_out);
+        verifyString(topic1, m_out);
     }
     
 
@@ -90,8 +93,8 @@ public class UnsubscribeEncoderTest {
         assertEquals((byte)0xBB, m_out.readByte());
         
         //Variable part
-        TestUtils.verifyString(topic1, m_out);
-        TestUtils.verifyString(topic2, m_out);
+        verifyString(topic1, m_out);
+        verifyString(topic2, m_out);
     }
     
     @Test(expected = IllegalArgumentException.class)

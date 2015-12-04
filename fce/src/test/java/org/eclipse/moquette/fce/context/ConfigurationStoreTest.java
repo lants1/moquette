@@ -3,14 +3,15 @@ package org.eclipse.moquette.fce.context;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.moquette.fce.context.ConfigurationStore;
-import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.common.ManagedTopic;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.model.configuration.FceAction;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
+
+import io.moquette.fce.context.ConfigurationStore;
+import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.ManagedTopic;
+import io.moquette.fce.model.common.ManagedZone;
+import io.moquette.fce.model.configuration.FceAction;
+import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.plugin.AuthorizationProperties;
 
 public class ConfigurationStoreTest {
 

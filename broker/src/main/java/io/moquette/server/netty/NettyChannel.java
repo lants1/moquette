@@ -16,11 +16,11 @@
 package io.moquette.server.netty;
 
 import io.moquette.server.Constants;
+import io.moquette.server.ServerChannel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import io.moquette.server.ServerChannel;
 
 /**
  *
@@ -32,13 +32,15 @@ public class NettyChannel implements ServerChannel {
 
     public static final String ATTR_USERNAME = "username";
     public static final String ATTR_SESSION_STOLEN = "sessionStolen";
+    public static final String ATTR_ANONYMOUS = "anonymous";
 
     public static final AttributeKey<Object> ATTR_KEY_KEEPALIVE = AttributeKey.valueOf(Constants.KEEP_ALIVE);
     public static final AttributeKey<Object> ATTR_KEY_CLEANSESSION = AttributeKey.valueOf(Constants.CLEAN_SESSION);
     public static final AttributeKey<Object> ATTR_KEY_CLIENTID = AttributeKey.valueOf(Constants.ATTR_CLIENTID);
     public static final AttributeKey<Object> ATTR_KEY_USERNAME = AttributeKey.valueOf(ATTR_USERNAME);
     public static final AttributeKey<Object> ATTR_KEY_SESSION_STOLEN = AttributeKey.valueOf(ATTR_SESSION_STOLEN);
-
+    public static final AttributeKey<Object> ATTR_KEY_ANONYMOUS_ACCESS = AttributeKey.valueOf(ATTR_ANONYMOUS);
+    
     NettyChannel(ChannelHandlerContext ctx) {
         m_channel = ctx;
     }
@@ -71,6 +73,6 @@ public class NettyChannel implements ServerChannel {
     @Override
     public String toString() {
         String clientID = (String) getAttribute(ATTR_KEY_CLIENTID);
-        return "session [clientID: "+ clientID +"]";
+        return "session [clientID: "+ clientID +"]" + super.toString();
     }
 }

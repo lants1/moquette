@@ -15,13 +15,14 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.PublishMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.util.AttributeMap;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.PublishMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

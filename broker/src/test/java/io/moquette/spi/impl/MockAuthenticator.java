@@ -24,15 +24,15 @@ import io.moquette.spi.impl.security.IAuthenticator;
  * 
  * @author andrea
  */
-class MockAuthenticator implements IAuthenticator {
+public class MockAuthenticator implements IAuthenticator {
     
     private Map<String, byte[]> m_userPwds;
     
-    MockAuthenticator(Map<String, byte[]> userPwds) {
+    public MockAuthenticator(Map<String, byte[]> userPwds) {
         m_userPwds = userPwds;
     }
 
-    public boolean checkValid(String username, byte[] password) {
+    public boolean checkValid(String username, byte[] password, String clientId) {
         if (!m_userPwds.containsKey(username)) {
             return false;
         }

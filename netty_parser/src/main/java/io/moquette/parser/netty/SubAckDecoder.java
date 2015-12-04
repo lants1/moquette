@@ -15,11 +15,11 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.AbstractMessage;
+import io.moquette.proto.messages.SubAckMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.AttributeMap;
 import java.util.List;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.SubAckMessage;
 
 /**
  *

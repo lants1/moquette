@@ -41,7 +41,7 @@ public class ConnectMessage extends AbstractMessage {
     protected byte[] m_willMessage;
     
     public ConnectMessage() {
-        m_messageType = CONNECT;
+        m_messageType = AbstractMessage.CONNECT;
     }
 
     public boolean isCleanSession() {

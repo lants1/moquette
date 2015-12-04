@@ -15,17 +15,19 @@
  */
 package io.moquette.spi.impl.security;
 
+import java.nio.ByteBuffer;
+
 /**
  * @author andrea
  */
 public class DenyAllAuthorizator implements IAuthorizator {
     @Override
-    public boolean canWrite(String topic, String user, String client) {
+    public boolean canWrite(String topic, String user, String client, Boolean anonymous, ByteBuffer message) {
         return true;
     }
 
     @Override
-    public boolean canRead(String topic, String user, String client) {
+    public boolean canRead(String topic, String user, String client, Boolean anonymous, ByteBuffer message) {
         return true;
     }
 }

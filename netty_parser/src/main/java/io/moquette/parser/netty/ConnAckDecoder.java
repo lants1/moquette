@@ -1,9 +1,9 @@
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.ConnAckMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.AttributeMap;
 import java.util.List;
-import io.moquette.proto.messages.ConnAckMessage;
 
 /**
  *

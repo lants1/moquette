@@ -15,19 +15,22 @@
  */
 package io.moquette.spec.v3_1_1.connection;
 
+import static io.moquette.commons.Constants.DEFAULT_PERSISTENT_PATH;
+import static io.moquette.commons.Constants.PERSISTENT_STORE_PROPERTY_NAME;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
-import io.moquette.commons.Constants;
-import io.moquette.server.Server;
-import io.moquette.testclient.RawClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.moquette.server.Server;
+import io.moquette.testclient.RawClient;
 
 /**
  *
@@ -52,9 +55,9 @@ public class ConnectionIT {
     public void tearDown() throws Exception {
         m_server.stopServer();
 
-        File dbFile = new File(Constants.DEFAULT_PERSISTENT_PATH);
+        File dbFile = new File(DEFAULT_PERSISTENT_PATH);
         if (dbFile.exists()) {
-        	assertTrue("Error deleting the moquette db file " + Constants.DEFAULT_PERSISTENT_PATH, dbFile.delete());
+        	assertTrue("Error deleting the moquette db file " + DEFAULT_PERSISTENT_PATH, dbFile.delete());
         }
         assertFalse(dbFile.exists());
     }

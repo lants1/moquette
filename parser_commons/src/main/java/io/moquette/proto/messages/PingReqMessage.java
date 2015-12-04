@@ -23,6 +23,6 @@ package io.moquette.proto.messages;
 public class PingReqMessage extends ZeroLengthMessage {
     
     public PingReqMessage() {
-        m_messageType = PINGREQ;
+        m_messageType = AbstractMessage.PINGREQ;
     }
 }

@@ -2,8 +2,11 @@ package org.eclipse.moquette.fce.model.configuration;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.moquette.plugin.MqttAction;
 import org.junit.Test;
+
+import io.moquette.fce.model.configuration.FceAction;
+import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.plugin.MqttAction;
 
 public class UserConfigurationTest {
 

@@ -15,13 +15,16 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.parser.netty.PubRelEncoder;
 import io.moquette.proto.messages.PubRelMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.moquette.parser.netty.TestUtils.mockChannelHandler;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -34,7 +37,7 @@ public class PubRelEncoderTest {
     @Before
     public void setUp() {
         //mock the ChannelHandlerContext to return an UnpooledAllocator
-        m_mockedContext = TestUtils.mockChannelHandler();
+        m_mockedContext = mockChannelHandler();
     }
     
     @Test

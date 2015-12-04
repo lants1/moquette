@@ -11,21 +11,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
-import org.eclipse.moquette.fce.context.FceContext;
-import org.eclipse.moquette.fce.context.QuotaStore;
-import org.eclipse.moquette.fce.exception.FceAuthorizationException;
-import org.eclipse.moquette.fce.model.common.ManagedCycle;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
-import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.fce.service.mqtt.FceMqttClientWrapper;
-import org.eclipse.moquette.fce.service.parser.JsonParserService;
-import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
-import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
-import org.eclipse.moquette.plugin.MqttAction;
 import org.junit.Test;
+
+import io.moquette.fce.context.FceContext;
+import io.moquette.fce.context.QuotaStore;
+import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.job.QuotaUpdater;
+import io.moquette.fce.model.common.ManagedCycle;
+import io.moquette.fce.model.common.ManagedZone;
+import io.moquette.fce.model.quota.PeriodicQuota;
+import io.moquette.fce.model.quota.Quota;
+import io.moquette.fce.model.quota.TimeframeQuota;
+import io.moquette.fce.model.quota.TransmittedDataState;
+import io.moquette.fce.model.quota.UserQuota;
+import io.moquette.fce.service.FceServiceFactory;
+import io.moquette.fce.service.mqtt.FceMqttClientWrapper;
+import io.moquette.fce.service.parser.JsonParserService;
+import io.moquette.plugin.MqttAction;
 
 public class QuotaUpdaterTest {
 

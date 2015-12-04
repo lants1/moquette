@@ -2,9 +2,9 @@ package org.eclipse.moquette.fce.service.hash;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import io.moquette.fce.service.FceServiceFactory;
 
-import org.eclipse.moquette.fce.service.FceServiceFactory;
+import static org.junit.Assert.*;
 
 
 public class HashServiceTest {

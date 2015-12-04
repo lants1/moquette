@@ -5,18 +5,20 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.moquette.fce.model.common.DataUnit;
-import org.eclipse.moquette.fce.model.common.ManagedScope;
-import org.eclipse.moquette.fce.model.configuration.AdminPermission;
-import org.eclipse.moquette.fce.model.configuration.FceAction;
-import org.eclipse.moquette.fce.model.configuration.ManagedState;
-import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
-import org.eclipse.moquette.fce.model.configuration.Restriction;
-import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.UserQuota;
 import org.junit.Test;
+
+import io.moquette.fce.common.converter.QuotaConverter;
+import io.moquette.fce.model.common.DataUnit;
+import io.moquette.fce.model.common.ManagedScope;
+import io.moquette.fce.model.configuration.AdminPermission;
+import io.moquette.fce.model.configuration.FceAction;
+import io.moquette.fce.model.configuration.ManagedState;
+import io.moquette.fce.model.configuration.PeriodicRestriction;
+import io.moquette.fce.model.configuration.Restriction;
+import io.moquette.fce.model.configuration.TimeframeRestriction;
+import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.fce.model.quota.Quota;
+import io.moquette.fce.model.quota.UserQuota;
 
 public class QuotaConverterTest {
 

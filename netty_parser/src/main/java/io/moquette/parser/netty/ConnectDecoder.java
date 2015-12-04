@@ -15,16 +15,19 @@
  */
 package io.moquette.parser.netty;
 
+import io.moquette.proto.messages.AbstractMessage;
 import io.moquette.proto.messages.ConnectMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.AttributeMap;
+
+import static io.moquette.parser.netty.Utils.VERSION_3_1;
+import static io.moquette.parser.netty.Utils.VERSION_3_1_1;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-
-import io.moquette.proto.messages.AbstractMessage;
 
 /**
  *
@@ -68,7 +71,7 @@ public class ConnectDecoder extends DemuxDecoder {
                 }
                 message.setProtocolName(protoName);
                 
-                versionAttr.set((int) Utils.VERSION_3_1);
+                versionAttr.set((int) VERSION_3_1);
                 break;
             case 4:
                 //MQTT version 3.1.1 "MQTT"
@@ -85,7 +88,7 @@ public class ConnectDecoder extends DemuxDecoder {
                     throw new CorruptedFrameException("Invalid protoName: " + protoName);
                 }
                 message.setProtocolName(protoName);
-                versionAttr.set((int) Utils.VERSION_3_1_1);
+                versionAttr.set((int) VERSION_3_1_1);
                 break;
             default:
                 //protocol broken
@@ -94,7 +97,7 @@ public class ConnectDecoder extends DemuxDecoder {
         
         //ProtocolVersion 1 byte (value 0x03 for 3.1, 0x04 for 3.1.1)
         message.setProtocolVersion(in.readByte());
-        if (message.getProtocolVersion() == Utils.VERSION_3_1_1) {
+        if (message.getProtocolVersion() == VERSION_3_1_1) {
             //if 3.1.1, check the flags (dup, retain and qos == 0)
             if (message.isDupFlag() || message.isRetainFlag() || message.getQos() != AbstractMessage.QOSType.MOST_ONE) {
                 throw new CorruptedFrameException("Received a CONNECT with fixed header flags != 0");
@@ -113,7 +116,7 @@ public class ConnectDecoder extends DemuxDecoder {
 
         //Connection flag
         byte connFlags = in.readByte();
-        if (message.getProtocolVersion() == Utils.VERSION_3_1_1) {
+        if (message.getProtocolVersion() == VERSION_3_1_1) {
             if ((connFlags & 0x01) != 0) { //bit(0) of connection flags is != 0
                 throw new CorruptedFrameException("Received a CONNECT with connectionFlags[0(bit)] != 0");
             }
@@ -146,8 +149,8 @@ public class ConnectDecoder extends DemuxDecoder {
         int keepAlive = in.readUnsignedShort();
         message.setKeepAlive(keepAlive);
 
-        if ((remainingLength == 12 && message.getProtocolVersion() == Utils.VERSION_3_1) ||
-            (remainingLength == 10 && message.getProtocolVersion() == Utils.VERSION_3_1_1)) {
+        if ((remainingLength == 12 && message.getProtocolVersion() == VERSION_3_1) ||
+            (remainingLength == 10 && message.getProtocolVersion() == VERSION_3_1_1)) {
             out.add(message);
             return;
         }
