@@ -7,6 +7,8 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
+import io.moquette.fce.common.util.FceTimeUtil;
+
 public class FceTimeUtilTest {
 
 	@Test

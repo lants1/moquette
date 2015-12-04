@@ -5,14 +5,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.moquette.fce.context.FceContext;
-import org.eclipse.moquette.fce.context.HashAssignmentStore;
-import org.eclipse.moquette.fce.event.broker.ManagedStoreHandler;
-import org.eclipse.moquette.fce.model.common.ManagedTopic;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
-import org.eclipse.moquette.fce.service.FceServiceFactory;
-import org.eclipse.moquette.plugin.AuthorizationProperties;
 import org.junit.Test;
+
+import io.moquette.fce.context.FceContext;
+import io.moquette.fce.context.HashAssignmentStore;
+import io.moquette.fce.event.broker.ManagedStoreHandler;
+import io.moquette.fce.model.common.ManagedTopic;
+import io.moquette.fce.model.common.ManagedZone;
+import io.moquette.fce.service.FceServiceFactory;
+import io.moquette.plugin.AuthorizationProperties;
 
 public class ManagedStoreHandlerTest {
 

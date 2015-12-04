@@ -14,25 +14,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.moquette.fce.model.common.DataUnit;
-import org.eclipse.moquette.fce.model.common.ManagedCycle;
-import org.eclipse.moquette.fce.model.common.ManagedScope;
-import org.eclipse.moquette.fce.model.configuration.AdminPermission;
-import org.eclipse.moquette.fce.model.configuration.FceAction;
-import org.eclipse.moquette.fce.model.configuration.ManagedState;
-import org.eclipse.moquette.fce.model.configuration.PeriodicRestriction;
-import org.eclipse.moquette.fce.model.configuration.Restriction;
-import org.eclipse.moquette.fce.model.configuration.TimeframeRestriction;
-import org.eclipse.moquette.fce.model.configuration.UserConfiguration;
-import org.eclipse.moquette.fce.model.quota.PeriodicQuota;
-import org.eclipse.moquette.fce.model.quota.UserQuota;
-import org.eclipse.moquette.fce.service.parser.JsonParserService;
-import org.eclipse.moquette.plugin.MqttAction;
-import org.eclipse.moquette.fce.model.quota.Quota;
-import org.eclipse.moquette.fce.model.quota.TimeframeQuota;
-import org.eclipse.moquette.fce.model.quota.TransmittedDataState;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.moquette.fce.model.common.DataUnit;
+import io.moquette.fce.model.common.ManagedCycle;
+import io.moquette.fce.model.common.ManagedScope;
+import io.moquette.fce.model.configuration.AdminPermission;
+import io.moquette.fce.model.configuration.FceAction;
+import io.moquette.fce.model.configuration.ManagedState;
+import io.moquette.fce.model.configuration.PeriodicRestriction;
+import io.moquette.fce.model.configuration.Restriction;
+import io.moquette.fce.model.configuration.TimeframeRestriction;
+import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.fce.model.quota.PeriodicQuota;
+import io.moquette.fce.model.quota.Quota;
+import io.moquette.fce.model.quota.TimeframeQuota;
+import io.moquette.fce.model.quota.TransmittedDataState;
+import io.moquette.fce.model.quota.UserQuota;
+import io.moquette.fce.service.parser.JsonParserService;
+import io.moquette.plugin.MqttAction;
 
 public class JsonParserServiceTest {
 

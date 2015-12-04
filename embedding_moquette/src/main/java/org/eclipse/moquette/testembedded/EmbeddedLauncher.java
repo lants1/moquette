@@ -1,10 +1,10 @@
 package org.eclipse.moquette.testembedded;
 
-import org.eclipse.moquette.server.config.ClasspathConfig;
-import org.eclipse.moquette.server.config.IConfig;
-import org.eclipse.moquette.server.Server;
-
 import java.io.IOException;
+
+import io.moquette.server.Server;
+import io.moquette.server.config.ClasspathConfig;
+import io.moquette.server.config.IConfig;
 
 public class EmbeddedLauncher {
     public static void main(String[] args) throws InterruptedException, IOException {

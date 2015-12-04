@@ -10,6 +10,9 @@ import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
+import io.moquette.fce.model.quota.IQuotaState;
+import io.moquette.fce.model.quota.TimeframeQuota;
+
 public class TimeframeQuotaTest {
 
 	@Test

@@ -2,9 +2,10 @@ package org.eclipse.moquette.fce.model.common;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.moquette.fce.model.common.ManagedTopic;
-import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.junit.Test;
+
+import io.moquette.fce.model.common.ManagedTopic;
+import io.moquette.fce.model.common.ManagedZone;
 
 public class ManagedTopicTest {
 
