@@ -1,4 +1,4 @@
-package org.eclipse.moquette.fce.event;
+package org.eclipse.moquette.fce.event.broker;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

@@ -14,8 +14,8 @@ import org.eclipse.moquette.plugin.IBrokerOperator;
 import org.eclipse.moquette.plugin.MqttAction;
 
 /**
- * QuotaDbService singleton which provides storage and utility methods
- * for UserQuota a defined ManagedScope.
+ * QuotaDbService singleton which provides storage and utility methods for
+ * UserQuota a defined ManagedScope.
  * 
  * @author lants1
  *
@@ -40,14 +40,16 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 		put(topicIdentifier, quota, false);
 	}
 
-	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp)
-			throws FceAuthorizationException {
-		if (ignoreTimestamp || quota.getTimestamp().compareTo(get(topicIdentifier).getTimestamp()) >= 0) {
-			quotaStore.put(topicIdentifier, quota);
-
-		} else {
-			throw new FceAuthorizationException("outdateddata");
+	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp) throws FceAuthorizationException {
+		UserQuota alreadyStored = get(topicIdentifier);
+		if (quota != null) {
+			if (ignoreTimestamp || alreadyStored == null
+					|| quota.getTimestamp().compareTo(alreadyStored.getTimestamp()) >= 0) {
+				quotaStore.put(topicIdentifier, quota);
+				return;
+			}
 		}
+		throw new FceAuthorizationException("outdateddata");
 	}
 
 	@Override
@@ -62,11 +64,11 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 		}
 		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
 	}
-	
+
 	public List<UserQuota> getAllForTopic(ManagedTopic topic) {
 		List<UserQuota> result = new ArrayList<>();
 		for (Entry<String, UserQuota> entry : getAll()) {
-			if(entry.getKey().startsWith(topic.getIdentifier(getZone()))){
+			if (entry.getKey().startsWith(topic.getIdentifier(getZone()))) {
 				result.add(entry.getValue());
 			}
 		}

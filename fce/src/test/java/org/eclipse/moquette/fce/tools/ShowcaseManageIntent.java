@@ -33,6 +33,7 @@ public class ShowcaseManageIntent extends Showcase{
 		
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setUserName(USERNAME);
+		System.out.println(services.getHashing().generateHash(USERNAME).toCharArray());
 		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
 		options.setSocketFactory(ssf);
 

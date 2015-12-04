@@ -62,9 +62,9 @@ public abstract class FceEventHandler {
 	}
 
 	private boolean isPluginClient(AuthorizationProperties properties) {
-		if (!context.getPluginIdentifier().isEmpty()) {
+		if (!context.getPluginPw().isEmpty()) {
 			return StringUtils.equals(getContext().getHashAssignment().get(properties.getClientId()),
-					context.getPluginIdentifier());
+					context.getPluginPw());
 		}
 		return false;
 	}
