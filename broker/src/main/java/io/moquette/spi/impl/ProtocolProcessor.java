@@ -177,6 +177,9 @@ public class ProtocolProcessor {
             return;
         }
 
+		LOG.debug("anonymous flag setted to:" + !msg.isPasswordFlag());
+		session.setAttribute(NettyChannel.ATTR_KEY_ANONYMOUS_ACCESS, !msg.isPasswordFlag());
+        
         //if an old client with the same ID already exists close its session.
         if (m_clientIDs.containsKey(msg.getClientID())) {
             LOG.info("Found an existing connection with same client ID <{}>, forcing to close", msg.getClientID());
