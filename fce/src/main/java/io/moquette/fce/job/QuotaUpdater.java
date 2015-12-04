@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.exception.FceSystemException;
 import io.moquette.fce.model.common.ManagedCycle;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.model.quota.PeriodicQuota;
@@ -26,7 +27,7 @@ import io.moquette.fce.service.FceServiceFactory;
  */
 public class QuotaUpdater implements Runnable {
 
-	private final static Logger log = Logger.getLogger(QuotaUpdater.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(QuotaUpdater.class.getName());
 
 	private FceServiceFactory services;
 	private FceContext context;
@@ -42,9 +43,9 @@ public class QuotaUpdater implements Runnable {
 		try {
 			updateQuota();
 		} catch (FceAuthorizationException e) {
-			log.warning(e.getMessage());
+			throw new FceSystemException("periodic updating job has unexpected behaviour", e);
 		}
-		log.info("JOB: completed succefully");
+		LOGGER.info("JOB: completed succefully");
 	}
 
 	private void updateQuota() throws FceAuthorizationException {

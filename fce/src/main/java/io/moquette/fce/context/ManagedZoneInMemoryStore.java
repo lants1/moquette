@@ -24,7 +24,7 @@ import io.moquette.plugin.MqttAction;
  */
 public abstract class ManagedZoneInMemoryStore {
 	
-	private final static Logger log = Logger.getLogger(ManagedZoneInMemoryStore.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ManagedZoneInMemoryStore.class.getName());
 	
 	private boolean initialized;
 	private final IBrokerOperator brokerOperator;
@@ -42,7 +42,7 @@ public abstract class ManagedZoneInMemoryStore {
 			if (getStore().size() >= brokerOperator
 					.countRetainedMessages(correspondingZone.getTopicFilter())) {
 				initialized = true;
-				log.info(correspondingZone.name() + "In-Memory DB initialized");
+				LOGGER.info(correspondingZone.name() + "In-Memory DB initialized");
 			}
 		}
 		return initialized;

@@ -3,6 +3,7 @@ package io.moquette.fce.service.hash;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import io.moquette.fce.exception.FceSystemException;
 import io.moquette.plugin.AuthenticationProperties;
 
 import java.io.UnsupportedEncodingException;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class HashService {
 
-	private final static Logger log = Logger.getLogger(HashService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(HashService.class.getName());
 
 	public String generateHash(String username) {
 		return DigestUtils.sha256Hex(username);
@@ -30,10 +31,10 @@ public class HashService {
 
 			boolean result = DigestUtils.sha256Hex(props.getUsername())
 					.equals(new String(props.getPassword(), CharEncoding.UTF_8));
-			log.info("username hash validated:" + result);
+			LOGGER.info("username hash validated:" + result);
 			return result;
 		} catch (UnsupportedEncodingException e) {
-			return false;
+			throw new FceSystemException("hash validation impossible UTF_8 not supported", e);
 		}
 	}
 

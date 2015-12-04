@@ -16,7 +16,7 @@ import io.moquette.plugin.MqttAction;
  */
 public class UnmanagedTopicHandler extends FceEventHandler {
 
-	private final static Logger log = Logger.getLogger(UnmanagedTopicHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(UnmanagedTopicHandler.class.getName());
 	
 	public UnmanagedTopicHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
@@ -24,7 +24,7 @@ public class UnmanagedTopicHandler extends FceEventHandler {
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties properties, MqttAction operation) {
-		log.info("unmanaged action:"+operation +  " for topic:"+properties.getTopic()+ " received");
+		LOGGER.info("unmanaged action:"+operation +  " for topic:"+properties.getTopic()+ " received");
 		return true;
 	}
 

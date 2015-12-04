@@ -48,7 +48,7 @@ import io.moquette.plugin.MqttAction;
  */
 public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCallback {
 
-	private final static Logger log = Logger.getLogger(FcePlugin.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(FcePlugin.class.getName());
 
 	private static final String PLUGIN_IDENTIFIER = "FCE-Plugin";
 
@@ -71,7 +71,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(new QuotaUpdater(context, services), FceTimeUtil.delayTo(0, 0), 1,
 				TimeUnit.HOURS);
-		log.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
+		LOGGER.info(PLUGIN_IDENTIFIER + " loaded and scheduler started....");
 	}
 
 	private String randomString() {
@@ -83,10 +83,10 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 		try {
 			mqttClient.unregisterSubscriptions();
 		} catch (MqttException e) {
-			log.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
+			LOGGER.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
 		}
 		scheduler.shutdownNow();
-		log.info(PLUGIN_IDENTIFIER + " unloaded");
+		LOGGER.info(PLUGIN_IDENTIFIER + " unloaded");
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 
 			return handler.canDoOperation(props, action);
 		}
-		log.warning("configuration not yet fully loaded from retained messages, write not possible");
+		LOGGER.warning("configuration not yet fully loaded from retained messages, write not possible");
 		return false;
 	}
 
@@ -126,10 +126,10 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 	@Override
 	public void connectionLost(Throwable exception) {
 		try {
-			log.warning("internal plugin mqttclient conection to broker connection lost");
+			LOGGER.warning("internal plugin mqttclient conection to broker connection lost");
 			mqttClient.connect();
 		} catch (MqttException e) {
-			log.severe("internal plugin mqttclient could not reconnect to broker");
+			LOGGER.severe("internal plugin mqttclient could not reconnect to broker");
 			throw new FceSystemException(e);
 		}
 

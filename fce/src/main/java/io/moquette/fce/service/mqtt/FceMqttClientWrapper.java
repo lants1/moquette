@@ -31,7 +31,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.event.internal.IFceMqttCallback;
@@ -48,7 +47,7 @@ import io.moquette.fce.service.mqtt.websocket.MqttWebSocketAsyncClient;
  */
 public class FceMqttClientWrapper implements MqttService {
 
-	private static final Logger log = Logger.getLogger(FceMqttClientWrapper.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(FceMqttClientWrapper.class.getName());
 
 	private static final int OOS_AT_LEAST_ONCE = 1;
 
@@ -83,13 +82,13 @@ public class FceMqttClientWrapper implements MqttService {
 					for (String subscriptionTopic : initalizationSubscriptions) {
 						addNewSubscription(subscriptionTopic);
 						setInitialized();
-						log.info("client connected");
+						LOGGER.info("client connected");
 					}
 				}
 
 				@Override
 				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-					log.log(Level.WARNING, "internal mqtt client can't connect to broker", exception);
+					LOGGER.log(Level.WARNING, "internal mqtt client can't connect to broker", exception);
 				}
 			});
 
@@ -110,6 +109,7 @@ public class FceMqttClientWrapper implements MqttService {
 		addNewSubscription(topic, null);
 	}
 
+	@Override
 	public void addNewSubscription(String topic, IFceMqttCallback handler) {
 		try {
 			subscribedTopics.put(topic, handler);
@@ -117,16 +117,16 @@ public class FceMqttClientWrapper implements MqttService {
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
 					setInitialized();
-					log.info("topics registered,client initialized");
+					LOGGER.info("topics registered,client initialized");
 				}
 
 				@Override
-				public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-					log.log(Level.INFO, "user subscription could not be registered", exception);
+				public void onFailure(IMqttToken asyncActionToken, Throwable e) {
+					throw new FceSystemException("internal client can't connect to broker", e);
 				}
 			});
 		} catch (MqttException e) {
-			log.log(Level.INFO, "user subscription could not be registered", e);
+			LOGGER.log(Level.INFO, "user subscription could not be registered", e);
 		}
 	}
 
@@ -138,19 +138,20 @@ public class FceMqttClientWrapper implements MqttService {
 						try {
 							client.disconnect();
 						} catch (MqttException e) {
-							log.warning("internal client could not disconnect...");
+							LOGGER.log(Level.WARNING, "internal client could not disconnect...", e);
 						}
-						log.info("topics unregistered,client disconnected");
+						LOGGER.info("topics unregistered,client disconnected");
 					}
 
 					@Override
 					public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-						log.log(Level.WARNING, "could not unregister subscriptions", exception);
+						LOGGER.log(Level.WARNING, "could not unregister subscriptions", exception);
 					}
 				});
 		subscribedTopics.clear();
 	}
 
+	@Override
 	public void publish(String topic, String json) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
@@ -158,13 +159,15 @@ public class FceMqttClientWrapper implements MqttService {
 		message.setQos(OOS_AT_LEAST_ONCE);
 		try {
 			client.publish(topic, message);
-			log.info("mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
+			LOGGER.info(
+					"mqtt message for topic: " + topic + " with content: " + json + " published to internal broker");
 		} catch (MqttException e) {
-			log.log(Level.WARNING, "mqtt message for topic: " + topic + " with content: " + json
+			LOGGER.log(Level.WARNING, "mqtt message for topic: " + topic + " with content: " + json
 					+ " could not published to internal broker", e);
 		}
 	}
 
+	@Override
 	public void delete(String topic) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(new byte[0]);
@@ -172,15 +175,15 @@ public class FceMqttClientWrapper implements MqttService {
 		message.setQos(OOS_AT_LEAST_ONCE);
 		try {
 			client.publish(topic, message);
-			log.info("topic: " + topic + " deleted.");
+			LOGGER.info("topic: " + topic + " deleted.");
 		} catch (MqttException e) {
-			log.log(Level.WARNING, "delete retained message on topic: " + topic + " failed", e);
+			LOGGER.log(Level.WARNING, "delete retained message on topic: " + topic + " failed", e);
 		}
 	}
 
-	public void connect() throws MqttSecurityException, MqttException {
-		client.setCallback(callback);
-		client.connect(options);
+	public void connect() throws MqttException {
+			client.setCallback(callback);
+			client.connect(options);
 	}
 
 	/**
@@ -203,7 +206,7 @@ public class FceMqttClientWrapper implements MqttService {
 			UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 
-		log.info("configure PROPS_PLUGIN_JKS_PATH" + context.getJksPath());
+		LOGGER.info("configure PROPS_PLUGIN_JKS_PATH" + context.getJksPath());
 
 		InputStream jksInputStream = jksDatastore(context.getJksPath());
 		ks.load(jksInputStream, context.getKeyStorePassword().toCharArray());
@@ -218,8 +221,7 @@ public class FceMqttClientWrapper implements MqttService {
 		TrustManager[] trustManagers = tmf.getTrustManagers();
 		sc.init(kmf.getKeyManagers(), trustManagers, null);
 
-		SSLSocketFactory ssf = sc.getSocketFactory();
-		return ssf;
+		return sc.getSocketFactory();
 	}
 
 	private InputStream jksDatastore(String jksPath) throws FileNotFoundException {
@@ -244,12 +246,12 @@ public class FceMqttClientWrapper implements MqttService {
 		String connection;
 		if (context.getSecureWebsocketPort().isEmpty()) {
 			connection = "ssl://localhost:" + context.getSslPort();
-			log.info("try to connect to connection:" + connection);
+			LOGGER.info("try to connect to connection:" + connection);
 			return new MqttAsyncClient(connection, context.getPluginIdentifier());
 		}
 
 		connection = "wss://localhost:" + context.getSecureWebsocketPort();
-		log.info("try to connect to connection:" + connection);
+		LOGGER.info("try to connect to connection:" + connection);
 		return new MqttWebSocketAsyncClient(connection, context.getPluginIdentifier());
 	}
 

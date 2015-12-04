@@ -23,7 +23,8 @@ import io.moquette.fce.common.io.ByteBufferInputStream;
  */
 public final class JsonSchemaValidationService implements ISchemaValidationService {
 	
-	private final static Logger log = Logger.getLogger(JsonSchemaValidationService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(JsonSchemaValidationService.class.getName());
+	
 	private ByteBuffer schema;
 	
 	public JsonSchemaValidationService(ByteBuffer schema){
@@ -43,7 +44,7 @@ public final class JsonSchemaValidationService implements ISchemaValidationServi
 
 			return schema.validate(jsonToVavlidate).isSuccess();
 		} catch (ProcessingException | IOException e) {
-			log.log(Level.INFO, "json schema validation failed: ", e);
+			LOGGER.log(Level.INFO, "json schema validation failed: ", e);
 			return false;
 		}
 	}

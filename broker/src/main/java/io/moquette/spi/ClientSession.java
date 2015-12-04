@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public class ClientSession {
 
-    private final static Logger LOG = LoggerFactory.getLogger(ClientSession.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(ClientSession.class);
 
     public final String clientID;
 
@@ -91,7 +91,7 @@ public class ClientSession {
     }
 
     public boolean subscribe(String topicFilter, Subscription newSubscription) {
-        LOG.info("<{}> subscribed to topicFilter <{}> with QoS {}",
+    	LOGGER.info("<{}> subscribed to topicFilter <{}> with QoS {}",
                 newSubscription.getClientId(), topicFilter,
                 AbstractMessage.QOSType.formatQoS(newSubscription.getRequestedQos()));
         boolean validTopic = SubscriptionsStore.validate(newSubscription.getTopicFilter());
@@ -126,7 +126,7 @@ public class ClientSession {
     }
 
     public void cleanSession() {
-        LOG.info("cleaning old saved subscriptions for client <{}>", this.clientID);
+    	LOGGER.info("cleaning old saved subscriptions for client <{}>", this.clientID);
         m_sessionsStore.wipeSubscriptions(this.clientID);
 
         //remove also the messages stored of type QoS1/2

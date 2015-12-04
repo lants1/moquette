@@ -27,7 +27,7 @@ import io.moquette.plugin.MqttAction;
  */
 public class ManagedIntentHandler extends FceEventHandler {
 
-	private final static Logger log = Logger.getLogger(ManagedIntentHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ManagedIntentHandler.class.getName());
 
 	public ManagedIntentHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
@@ -35,7 +35,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
-		log.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		LOGGER.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
@@ -51,7 +51,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 			if (getContext().getConfigurationStore(ManagedScope.GLOBAL).isManaged(topic)) {
 				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
 					if (getContext().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash())) {
-						log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
+						LOGGER.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
 								+ " and action:" + action);
 						storeUserConfiguration(topic, newConfig);
 						return true;
@@ -77,13 +77,13 @@ public class ManagedIntentHandler extends FceEventHandler {
 			}
 			storeUserConfiguration(topic, newConfig);
 
-			log.info("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId()
+			LOGGER.info("accepted Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId()
 					+ " and action:" + action);
 
 			return true;
 
 		} catch (FceAuthorizationException e) {
-			log.log(Level.WARNING, "could not authorize request", e);
+			LOGGER.log(Level.WARNING, "could not authorize request", e);
 			return false;
 		}
 	}

@@ -18,14 +18,14 @@ import io.moquette.plugin.MqttAction;
  */
 public class ManagedStoreHandler extends FceEventHandler {
 
-	private final static Logger log = Logger.getLogger(ManagedStoreHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ManagedStoreHandler.class.getName());
 
 	public ManagedStoreHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
 	}
 
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		log.info("store-event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:" + action);
+		LOGGER.info("store-event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:" + action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
 
@@ -36,7 +36,7 @@ public class ManagedStoreHandler extends FceEventHandler {
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(props.getTopic()));
 		boolean result = topic.isAllowedForUser(getContext().getHashAssignment().get(props.getClientId()));
 
-		log.info("store-event result on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		LOGGER.info("store-event result on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action + " is:" + result);
 		return result;
 	}

@@ -1,6 +1,8 @@
 package io.moquette.fce.service.parser;
 
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.GsonBuilder;
 
@@ -20,6 +22,8 @@ import io.moquette.fce.model.quota.UserQuota;
  */
 public class JsonParserService {
 
+	private static final Logger LOGGER = Logger.getLogger(JsonParserService.class.getName());
+	
 	public String serialize(UserConfiguration userConfig) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(Restriction.class, new RestrictionAdapter());
@@ -47,6 +51,7 @@ public class JsonParserService {
 		} catch (Exception e) {
 			// could happen because the UserConfiguration comes from the user
 			// itself...
+			LOGGER.log(Level.FINE, "user sent invalid userconfiguration", e);
 		}
 		return userConfigObject;
 	}

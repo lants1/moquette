@@ -14,7 +14,7 @@ import io.moquette.plugin.MqttAction;
 
 public class MqttSchemaHandler extends FceEventHandler implements IFceMqttCallback {
 
-	private final static Logger log = Logger.getLogger(MqttSchemaHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MqttSchemaHandler.class.getName());
 
 	public MqttSchemaHandler() {
 		super(null, null);
@@ -26,7 +26,7 @@ public class MqttSchemaHandler extends FceEventHandler implements IFceMqttCallba
 
 	@Override
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
-		log.info("received internal message for topic:" + topicIdentifier);
+		LOGGER.info("received internal message for topic:" + topicIdentifier);
 		getContext().getSchemaAssignment().put(topicIdentifier, ByteBuffer.wrap(message.getPayload()));
 	}
 

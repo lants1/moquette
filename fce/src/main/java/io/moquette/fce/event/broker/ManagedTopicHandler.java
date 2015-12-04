@@ -24,7 +24,7 @@ import io.moquette.plugin.MqttAction;
  */
 public class ManagedTopicHandler extends FceEventHandler {
 
-	private final static Logger log = Logger.getLogger(ManagedTopicHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(ManagedTopicHandler.class.getName());
 
 	public ManagedTopicHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
@@ -34,7 +34,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
 		
 		
-		log.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+		LOGGER.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
 		Boolean preCheckState = preCheckManagedZone(props, action);
@@ -81,7 +81,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 			}
 
 			substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, quotasGlobal);
-			log.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
+			LOGGER.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 					+ action);
 			return true;
 		} catch (FceAuthorizationException e) {

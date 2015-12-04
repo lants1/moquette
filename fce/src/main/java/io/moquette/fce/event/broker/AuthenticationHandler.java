@@ -17,7 +17,7 @@ import io.moquette.plugin.AuthenticationProperties;
  */
 public class AuthenticationHandler {
 
-	private final static Logger log = Logger.getLogger(FceEventHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(FceEventHandler.class.getName());
 
 	final FceContext context;
 	final FceServiceFactory services;
@@ -28,7 +28,7 @@ public class AuthenticationHandler {
 	}
 
 	public boolean checkValid(AuthenticationProperties props) {
-		log.info("recieved checkValid Event for " + props.getUsername());
+		LOGGER.info("recieved checkValid Event for " + props.getUsername());
 
 		// Allow anonymous access / anonymous flag is setted...
 		if (StringUtils.isEmpty(props.getUsername()) && props.getPassword() == null) {

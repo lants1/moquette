@@ -24,7 +24,7 @@ import io.moquette.fce.common.io.ByteBufferInputStream;
  */
 public final class XmlSchemaValidationService implements ISchemaValidationService {
 
-	private final static Logger log = Logger.getLogger(XmlSchemaValidationService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(XmlSchemaValidationService.class.getName());
 	
 	private ByteBuffer schema;
 	
@@ -42,7 +42,7 @@ public final class XmlSchemaValidationService implements ISchemaValidationServic
 			Validator validator = schema.newValidator();
 			validator.validate(xmlToValidate);
 		} catch (SAXException | IOException e) {
-			log.log(Level.INFO, "xml schema validation failed", e);
+			LOGGER.log(Level.INFO, "xml schema validation failed", e);
 			return false;
 		}
 

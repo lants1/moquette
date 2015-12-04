@@ -18,7 +18,7 @@ import io.moquette.plugin.MqttAction;
 
 public class MqttManageHandler extends FceEventHandler implements IFceMqttCallback {
 
-	private final static Logger log = Logger.getLogger(MqttManageHandler.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MqttManageHandler.class.getName());
 
 	public MqttManageHandler(){
 		super(null, null);
@@ -30,7 +30,7 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 
 	@Override
 	public void messageArrived(String topicIdentifier, MqttMessage message) throws Exception {
-		log.info("received internal message for topic:" + topicIdentifier);
+		LOGGER.info("received internal message for topic:" + topicIdentifier);
 		ManagedZone zone = ManagedZoneUtil.getZoneForTopic(topicIdentifier);
 		String msgPayload = message.toString();
 		ManagedTopic topic = new ManagedTopic(topicIdentifier);
@@ -42,13 +42,13 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 			for(String schemaTopic : msgConfig.getSchemaTopics()){
 				getServices().getMqtt().addNewSubscription(schemaTopic, new MqttSchemaHandler());
 			}
-			log.info("received configuration message for topic: " + topicIdentifier);
+			LOGGER.info("received configuration message for topic: " + topicIdentifier);
 			break;
 		case QUOTA_PRIVATE:
 		case QUOTA_GLOBAL:
 			UserQuota msgQuota = getServices().getJsonParser().deserializeQuota(msgPayload);
 			getContext().getQuotaStore(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
-			log.info("received quota message for topic: " + topicIdentifier);
+			LOGGER.info("received quota message for topic: " + topicIdentifier);
 			break;
 		default:
 			break;

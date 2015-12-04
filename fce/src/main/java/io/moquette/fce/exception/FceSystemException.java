@@ -18,4 +18,8 @@ public class FceSystemException extends RuntimeException {
 	public FceSystemException(Exception e) {
 		super(e);
 	}
+	
+	public FceSystemException(String msg, Throwable e) {
+		super(e);
+	}
 }
