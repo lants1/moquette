@@ -17,7 +17,7 @@
       }
     }
   ],
-  "userName": "user",
-  "userIdentifier": "616104ebd93e67ae20bac90c86483da3cae1ee5b1c1483f739372a88ff1e79f9",
+  "alias": "user",
+  "userHash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
   "timestamp": "Nov 23, 2015 5:27:54 PM"
 }

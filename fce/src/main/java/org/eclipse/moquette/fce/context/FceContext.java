@@ -6,15 +6,12 @@ import org.eclipse.moquette.fce.model.common.ManagedZone;
 import org.eclipse.moquette.plugin.IBrokerConfig;
 import org.eclipse.moquette.plugin.IBrokerOperator;
 
-public class FceContext {
+public class FceContext extends BrokerContext{
 
-	private static final String PROPS_PLUGIN_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
-	private static final String PROPS_PLUGIN_KEY_STORE_PASSWORD = "plugin_key_store_password";
-	private static final String PROPS_PLUGIN_JKS_PATH = "plugin_jks_path";
-	
-	private final IBrokerConfig pluginConfig;
-	private final IBrokerOperator brokerOperator;
-	
+	private static final String PROP_JKS_PATH = "plugin_jks_path";
+	private static final String PROP_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
+	private static final String PROP_KEY_STORE_PASSWORD = "plugin_key_store_password";
+
 	private QuotaStore quotaDbServiceGlobal;
 	private QuotaStore quotaDbServicePrivate;
 	private ConfigurationStore configDbServiceGlobal;
@@ -26,29 +23,23 @@ public class FceContext {
 	private String pluginPw;
 	private String pluginIdentifier;
 
-	public FceContext(IBrokerConfig pluginConfig, IBrokerOperator brokerOperator) {
-		super();
-		this.pluginConfig = pluginConfig;
-		this.brokerOperator = brokerOperator;
-	}
-
-	public IBrokerConfig getPluginConfig() {
-		return pluginConfig;
-	}
-
-	public IBrokerOperator getBrokerOperator() {
-		return brokerOperator;
+	public FceContext(IBrokerConfig config, IBrokerOperator brokerOperator) {
+		super(config, brokerOperator);
+		
+		if(config.getProperty(PROP_JKS_PATH) == null || config.getProperty(PROP_KEY_MANAGER_PASSWORD) == null || config.getProperty(PROP_KEY_STORE_PASSWORD) == null){
+			throw new FceSystemException("Missing properties for Plugin startup at least ssl_port or secure_websocket_port should be configured in the .conf file");
+		}
 	}
 
 	public QuotaStore getQuotaStore(ManagedZone zone) {
 		if (ManagedZone.QUOTA_GLOBAL.equals(zone)) {
 			if (quotaDbServiceGlobal == null) {
-				quotaDbServiceGlobal = new QuotaStore(brokerOperator, zone);
+				quotaDbServiceGlobal = new QuotaStore(getBrokerOperator(), zone);
 			}
 			return quotaDbServiceGlobal;
 		} else if (ManagedZone.QUOTA_PRIVATE.equals(zone)) {
 			if (quotaDbServicePrivate == null) {
-				quotaDbServicePrivate = new QuotaStore(brokerOperator, zone);
+				quotaDbServicePrivate = new QuotaStore(getBrokerOperator(), zone);
 			}
 			return quotaDbServicePrivate;
 		}
@@ -58,12 +49,12 @@ public class FceContext {
 	public ConfigurationStore getConfigurationStore(ManagedZone zone) {
 		if (ManagedZone.CONFIG_GLOBAL.equals(zone)) {
 			if (configDbServiceGlobal == null) {
-				configDbServiceGlobal = new ConfigurationStore(brokerOperator, zone);
+				configDbServiceGlobal = new ConfigurationStore(getBrokerOperator(), zone);
 			}
 			return configDbServiceGlobal;
 		} else if (ManagedZone.CONFIG_PRIVATE.equals(zone)) {
 			if (configDbServicePrivate == null) {
-				configDbServicePrivate = new ConfigurationStore(brokerOperator, zone);
+				configDbServicePrivate = new ConfigurationStore(getBrokerOperator(), zone);
 			}
 			return configDbServicePrivate;
 		}
@@ -126,16 +117,16 @@ public class FceContext {
 		this.pluginIdentifier = pluginIdentifier;
 	}
 	
-	public String getPluginKeyManagerPassword(){
-		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_KEY_MANAGER_PASSWORD);
+	public String getKeyManagerPassword(){
+		return getConfig().getProperty(PROP_KEY_MANAGER_PASSWORD,"");
 	}
 	
-	public String getPluginKeyStorePassword(){
-		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_KEY_STORE_PASSWORD);
+	public String getKeyStorePassword(){
+		return getConfig().getProperty(PROP_KEY_STORE_PASSWORD,"");
 	}
 	
-	public String getPluginJksPath(){
-		return getPluginConfig().getProperty(FceContext.PROPS_PLUGIN_JKS_PATH);
+	public String getJksPath(){
+		return getConfig().getProperty(PROP_JKS_PATH,"");
 	}
 	
 	public boolean isInitialized() {

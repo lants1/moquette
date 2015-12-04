@@ -21,7 +21,7 @@ public class FceEventHandlerTest {
 	public void testWhenPluginClient() {
 		FceServiceFactory sf = mock(FceServiceFactory.class);
 		FceContext context = mock(FceContext.class);
-		when(context.getPluginIdentifier()).thenReturn(PLUGIN_USER_HASH);
+		when(context.getPluginPw()).thenReturn(PLUGIN_USER_HASH);
 		when(context.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
 		when(context.getHashAssignment().get(any(String.class))).thenReturn(PLUGIN_USER_HASH);
 		ManagedStoreHandler handler = new ManagedStoreHandler(context, sf);

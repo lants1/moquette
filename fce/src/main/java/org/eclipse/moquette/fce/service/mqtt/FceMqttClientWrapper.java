@@ -28,6 +28,7 @@ import org.eclipse.moquette.fce.context.FceContext;
 import org.eclipse.moquette.fce.event.internal.IFceMqttCallback;
 import org.eclipse.moquette.fce.event.internal.MqttManageHandler;
 import org.eclipse.moquette.fce.exception.FceSystemException;
+import org.eclipse.moquette.fce.service.mqtt.websocket.MqttWebSocketAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -44,18 +45,18 @@ import org.eclipse.paho.client.mqttv3.MqttSecurityException;
  * @author lants1
  *
  */
-public class FceMqttClientWrapper implements MqttService{
+public class FceMqttClientWrapper implements MqttService {
 
 	private static final Logger log = Logger.getLogger(FceMqttClientWrapper.class.getName());
-	
+
 	private static final int OOS_AT_LEAST_ONCE = 1;
 
 	private MqttAsyncClient client;
 	private MqttCallback callback;
 	private MqttConnectOptions options = new MqttConnectOptions();
-	
+
 	private Map<String, IFceMqttCallback> subscribedTopics = new HashMap<>();
-	
+
 	private FceContext context;
 	private boolean initialized = false;
 
@@ -65,11 +66,8 @@ public class FceMqttClientWrapper implements MqttService{
 	}
 
 	public void initializeInternalMqttClient(final List<String> initalizationSubscriptions) {
-		String ssl_port = context.getPluginConfig().getProperty("ssl_port");
-		log.info("try to connect to ssl://localhost:" + ssl_port);
-
 		try {
-			client = new MqttAsyncClient("ssl://localhost:" + ssl_port, context.getPluginIdentifier());
+			client = getMqttClient();
 
 			SSLSocketFactory ssf = configureSSLSocketFactory();
 
@@ -77,14 +75,14 @@ public class FceMqttClientWrapper implements MqttService{
 			options.setPassword(context.getPluginPw().toCharArray());
 			options.setSocketFactory(ssf);
 			client.setCallback(callback);
-			
+
 			client.connect(options, null, new IMqttActionListener() {
 				@Override
 				public void onSuccess(IMqttToken asyncActionToken) {
-					for(String subscriptionTopic : initalizationSubscriptions){
-					addNewSubscription(subscriptionTopic);
-					setInitialized();
-					log.info("client connected");
+					for (String subscriptionTopic : initalizationSubscriptions) {
+						addNewSubscription(subscriptionTopic);
+						setInitialized();
+						log.info("client connected");
 					}
 				}
 
@@ -102,15 +100,15 @@ public class FceMqttClientWrapper implements MqttService{
 	public boolean isInitialized() {
 		return this.initialized;
 	}
-	
-	public IFceMqttCallback getCallback(String topic){
+
+	public IFceMqttCallback getCallback(String topic) {
 		return subscribedTopics.getOrDefault(topic, new MqttManageHandler());
 	}
-	
+
 	public void addNewSubscription(String topic) {
 		addNewSubscription(topic, null);
 	}
-	
+
 	public void addNewSubscription(String topic, IFceMqttCallback handler) {
 		try {
 			subscribedTopics.put(topic, handler);
@@ -204,13 +202,13 @@ public class FceMqttClientWrapper implements MqttService{
 			UnrecoverableKeyException, IOException, CertificateException, KeyStoreException {
 		KeyStore ks = KeyStore.getInstance("JKS");
 
-		log.info("configure PROPS_PLUGIN_JKS_PATH" + context.getPluginJksPath());
+		log.info("configure PROPS_PLUGIN_JKS_PATH" + context.getJksPath());
 
-		InputStream jksInputStream = jksDatastore(context.getPluginJksPath());
-		ks.load(jksInputStream, context.getPluginKeyStorePassword().toCharArray());
+		InputStream jksInputStream = jksDatastore(context.getJksPath());
+		ks.load(jksInputStream, context.getKeyStorePassword().toCharArray());
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(ks, context.getPluginKeyManagerPassword().toCharArray());
+		kmf.init(ks, context.getKeyManagerPassword().toCharArray());
 
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		tmf.init(ks);
@@ -236,8 +234,22 @@ public class FceMqttClientWrapper implements MqttService{
 
 		throw new FceSystemException("JKS is not found on path:" + jksPath);
 	}
-	
+
 	private void setInitialized() {
 		this.initialized = true;
 	}
+
+	private MqttAsyncClient getMqttClient() throws MqttException {
+		String connection;
+		if (context.getSecureWebsocketPort().isEmpty()) {
+			connection = "ssl://localhost:" + context.getSslPort();
+			log.info("try to connect to connection:" + connection);
+			return new MqttAsyncClient(connection, context.getPluginIdentifier());
+		}
+
+		connection = "wss://localhost:" + context.getSecureWebsocketPort();
+		log.info("try to connect to connection:" + connection);
+		return new MqttWebSocketAsyncClient(connection, context.getPluginIdentifier());
+	}
+
 }
