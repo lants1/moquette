@@ -3,6 +3,7 @@ package io.moquette.fce.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -22,31 +23,31 @@ import io.moquette.plugin.MqttAction;
  */
 public class ConfigurationStore extends ManagedZoneInMemoryStore {
 
-	private HashMap<String, UserConfiguration> configStore = new HashMap<>();
+	private Map<String, UserConfiguration> configs = new HashMap<>();
 
 	public ConfigurationStore(IBrokerOperator brokerOperator, ManagedZone zone) {
 		super(brokerOperator, zone);
 	}
 
 	public Set<Entry<String, UserConfiguration>> getAll() {
-		return configStore.entrySet();
+		return configs.entrySet();
 	}
 
 	@Override
 	protected UserConfiguration get(ManagedTopic topic, String usernameHash, MqttAction operation) {
-		if (configStore.get(topic.getIdentifier(usernameHash, getZone())) != null) {
-			return configStore.get(topic.getIdentifier(usernameHash, getZone()));
+		if (configs.get(topic.getIdentifier(usernameHash, getZone())) != null) {
+			return configs.get(topic.getIdentifier(usernameHash, getZone()));
 		}
-		return configStore.get(topic.getAllIdentifier(getZone()));
+		return configs.get(topic.getAllIdentifier(getZone()));
 	}
 
 	public void put(String topicIdentifier, UserConfiguration userConfig) {
-		configStore.put(topicIdentifier, userConfig);
+		configs.put(topicIdentifier, userConfig);
 	}
 
 	@Override
-	protected HashMap<String, ?> getStore() {
-		return configStore;
+	protected Map<String, ?> getStore() {
+		return configs;
 	}
 
 	public UserConfiguration getConfiguration(String topicStr, String usernameHash) throws FceAuthorizationException {

@@ -33,7 +33,7 @@ public enum ManagedCycle {
 
     public String getValue()
     {
-        return(value);
+        return value;
     }
     
     public int getCalendarReference(){

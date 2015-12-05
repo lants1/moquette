@@ -3,7 +3,6 @@ import io.moquette.fce.model.common.DataUnit;
 import io.moquette.fce.model.common.IValid;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.plugin.AuthorizationProperties;
-import io.moquette.plugin.MqttAction;
 
 /**
  * Abstract class for all publish or subscribe restrictions with common methods.
@@ -60,7 +59,7 @@ public abstract class Restriction implements IValid {
 		return sizeUnit;
 	}
 
-	public boolean isValidCommon(FceServiceFactory services, AuthorizationProperties props, MqttAction operation){
+	public boolean isValidCommon(FceServiceFactory services, AuthorizationProperties props){
 		if(getMaxMessageSize() > 0){
 			if(!(props.getMessage().position() < (getMaxMessageSize() * getSizeUnit().getMultiplier()))){
 				return false;
@@ -72,6 +71,5 @@ public abstract class Restriction implements IValid {
 		}
 		
 		return true;
-		
 	}
 }

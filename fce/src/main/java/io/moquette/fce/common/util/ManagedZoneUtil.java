@@ -1,8 +1,6 @@
 package io.moquette.fce.common.util;
 
 import java.util.EnumSet;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 
 import io.moquette.fce.model.common.ManagedTopic;
@@ -18,8 +16,7 @@ import io.moquette.plugin.MqttAction;
 public final class ManagedZoneUtil {
 
 	public static boolean isInManagedStore(String topic) {
-		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
-		for (ManagedZone zone : zones) {
+		for (ManagedZone zone :  EnumSet.allOf(ManagedZone.class)) {
 			if (topic.startsWith(zone.getTopicPrefix())) {
 				return true;
 			}
@@ -28,8 +25,7 @@ public final class ManagedZoneUtil {
 	}
 
 	public static boolean isInManagedReadableStore(String topic) {
-		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
-		for (ManagedZone zone : zones) {
+		for (ManagedZone zone : EnumSet.allOf(ManagedZone.class)) {
 			if (topic.startsWith(zone.getTopicPrefix()) && zone.getPermission().isReadable()) {
 				return true;
 			}
@@ -38,8 +34,7 @@ public final class ManagedZoneUtil {
 	}
 
 	public static ManagedZone getZoneForTopic(String topic) {
-		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
-		for (ManagedZone zone : zones) {
+		for (ManagedZone zone : EnumSet.allOf(ManagedZone.class)) {
 			if (topic.startsWith(zone.getTopicPrefix())) {
 				return zone;
 			}
@@ -52,34 +47,34 @@ public final class ManagedZoneUtil {
 	}
 
 	public static String moveTopicToZone(String topic, String user, ManagedZone topicZone) {
-
-		topic = removeZoneAndUserIdentifier(topic, topicZone);
-		return topicZone.getTopicPrefix() + topic + user;
+		String tWithoutZoneAndUser = removeZoneAndUserIdentifier(topic, topicZone);
+		return topicZone.getTopicPrefix() + tWithoutZoneAndUser + user;
 	}
 
 	public static String moveTopicToZone(String topic, String user, MqttAction action, ManagedZone topicZone) {
+		String tWithoutZoneAndUser = removeZoneAndUserIdentifier(topic, topicZone);
 
-		topic = removeZoneAndUserIdentifier(topic, topicZone);
+		final String publishTopicLevel = ManagedTopic.LEVEL_CHAR + MqttAction.PUBLISH.getValue();
+		final String subscribeTopicLevel = ManagedTopic.LEVEL_CHAR + MqttAction.SUBSCRIBE.getValue();
 
-		if (StringUtils.endsWith(topic, ManagedTopic.LEVEL_CHAR + MqttAction.PUBLISH.getValue())
-				|| StringUtils.endsWith(topic, ManagedTopic.LEVEL_CHAR + MqttAction.SUBSCRIBE.getValue())) {
-			topic = topic.substring(0, topic.lastIndexOf(ManagedTopic.LEVEL_CHAR));
+		String pureTopic = tWithoutZoneAndUser;
+		if (StringUtils.endsWithAny(tWithoutZoneAndUser, publishTopicLevel, subscribeTopicLevel)) {
+			pureTopic = tWithoutZoneAndUser.substring(0, tWithoutZoneAndUser.lastIndexOf(ManagedTopic.LEVEL_CHAR));
 		}
-		return topicZone.getTopicPrefix() + topic + ManagedTopic.LEVEL_CHAR + action.getValue() + user;
+		return topicZone.getTopicPrefix() + pureTopic + ManagedTopic.LEVEL_CHAR + action.getValue() + user;
 	}
 
 	private static String removeZoneAndUserIdentifier(String topic, ManagedZone topicZone) {
-		topic = removeZoneIdentifier(topic);
+		String tWithoutZone = removeZoneIdentifier(topic);
 
-		if (StringUtils.contains(topic, ManagedTopic.USER_PREFIX)) {
-			topic = topic.substring(0, topic.lastIndexOf(ManagedTopic.USER_PREFIX));
+		if (StringUtils.contains(tWithoutZone, ManagedTopic.USER_PREFIX)) {
+			tWithoutZone = tWithoutZone.substring(0, tWithoutZone.lastIndexOf(ManagedTopic.USER_PREFIX));
 		}
-		return topic;
+		return tWithoutZone;
 	}
 
 	public static String removeZoneIdentifier(String topic) {
-		Set<ManagedZone> zones = EnumSet.allOf(ManagedZone.class);
-		for (ManagedZone zone : zones) {
+		for (ManagedZone zone : EnumSet.allOf(ManagedZone.class)) {
 			if (topic.startsWith(zone.getTopicPrefix())) {
 				return StringUtils.removeStart(topic, zone.getTopicPrefix());
 			}

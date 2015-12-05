@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.StringUtils;
 import io.moquette.fce.common.converter.QuotaConverter;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.model.common.TopicPermission;
@@ -44,22 +45,22 @@ public abstract class FceEventHandler {
 		return services;
 	}
 
-	public Boolean preCheckManagedZone(AuthorizationProperties properties, MqttAction action) {
+	public CheckResult preCheckManagedZone(AuthorizationProperties properties, MqttAction action) {
 		if (properties.getAnonymous()) {
 			LOGGER.info("anonymous login, authorization rejected");
-			return Boolean.FALSE;
+			return CheckResult.INVALID;
 		}
 
 		if (isPluginClient(properties)) {
 			LOGGER.info("can do operation:" + action + " for topic:" + properties.getTopic()
 					+ " because it's plugin client: " + properties.getUser());
-			return Boolean.TRUE;
+			return CheckResult.VALID;
 		}
 		if (!TopicPermission.getBasicPermission(properties.getTopic()).isAllowed(action)) {
 			LOGGER.info("no permission to " + action + " topic" + properties.getTopic());
-			return Boolean.FALSE;
+			return CheckResult.INVALID;
 		}
-		return null;
+		return CheckResult.NO_RESULT;
 	}
 
 	private boolean isPluginClient(AuthorizationProperties properties) {
@@ -70,8 +71,7 @@ public abstract class FceEventHandler {
 		return false;
 	}
 
-	protected void logAndSendInfoMsg(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
-		LOGGER.info(msgType + " for topic:" + props.getTopic() + " user: " + props.getUser() + " action:" + action);
+	protected void sendInfoMessage(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
 		InfoMessage infoMsg = new InfoMessage(props.getClientId(), getContext().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
 		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));

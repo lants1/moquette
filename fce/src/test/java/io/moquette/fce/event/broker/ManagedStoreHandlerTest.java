@@ -10,6 +10,7 @@ import org.junit.Test;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.context.HashAssignmentStore;
 import io.moquette.fce.event.broker.ManagedStoreHandler;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.service.FceServiceFactory;
@@ -34,7 +35,7 @@ public class ManagedStoreHandlerTest {
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house"+ManagedTopic.USER_PREFIX + USER_HASH, null, USER_HASH,
 				false, null);
 		
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
+		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(CheckResult.NO_RESULT);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
 		assertTrue(handler.canDoOperation(authPropsPlugin, null));
 	}

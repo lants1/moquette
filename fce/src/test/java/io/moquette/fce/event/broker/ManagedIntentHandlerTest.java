@@ -19,6 +19,7 @@ import io.moquette.fce.context.FceContext;
 import io.moquette.fce.context.HashAssignmentStore;
 import io.moquette.fce.event.broker.ManagedIntentHandler;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
@@ -72,7 +73,7 @@ public class ManagedIntentHandlerTest {
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, USER_HASH, false,
 				str_to_bb(sf.getJsonParser().serialize(userConfig)));
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
+		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(CheckResult.NO_RESULT);
 		when(handler.getServices()).thenReturn(sf);
 		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
@@ -95,7 +96,7 @@ public class ManagedIntentHandlerTest {
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(sf.getJsonParser().serialize(userConfig)));
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
+		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(CheckResult.NO_RESULT);
 		when(handler.getServices()).thenReturn(sf);
 		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();
@@ -119,7 +120,7 @@ public class ManagedIntentHandlerTest {
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
 				str_to_bb(sf.getJsonParser().serialize(userConfig)));
-		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(null);
+		when(handler.preCheckManagedZone(authPropsPlugin, null)).thenReturn(CheckResult.NO_RESULT);
 		when(handler.getServices()).thenReturn(sf);
 		when(handler.getContext()).thenReturn(contextMock);
 		when(handler.canDoOperation(authPropsPlugin, null)).thenCallRealMethod();

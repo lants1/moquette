@@ -14,9 +14,9 @@ public enum DataUnit {
 	@SerializedName("kB")
 	kB("kB", 1024),
 	@SerializedName("MB")
-	MB("MB", (1024*1024)),
+	MB("MB", 1024*1024),
 	@SerializedName("GB")
-	GB("GB", (1024*1024*1024));
+	GB("GB", 1024*1024*1024);
 	
 	private String value;
 	private int multiplikator;
@@ -29,7 +29,7 @@ public enum DataUnit {
 
     public String getValue()
     {
-        return(value);
+        return value;
     }
     
     public int getMultiplier(){

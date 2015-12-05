@@ -8,6 +8,7 @@ import io.moquette.fce.common.util.ManagedZoneUtil;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.event.FceEventHandler;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
@@ -33,14 +34,16 @@ public class ManagedIntentHandler extends FceEventHandler {
 		super(context, services);
 	}
 
+	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
 		LOGGER.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
-		Boolean preCheckState = preCheckManagedZone(props, action);
-		if (preCheckState != null) {
-			return preCheckState;
+		CheckResult preCheckState = preCheckManagedZone(props, action);
+
+		if(!CheckResult.NO_RESULT.equals(preCheckState)){
+			return preCheckState.getValue();
 		}
 
 		try {
@@ -64,7 +67,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 					return false;
 				}
 				if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
-					logAndSendInfoMsg(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
+					sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
 					return false;
 				}
 				if (userConfig.isValidForEveryone()) {

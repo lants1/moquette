@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import io.moquette.fce.common.util.ManagedZoneUtil;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.event.FceEventHandler;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.plugin.AuthorizationProperties;
@@ -24,13 +25,14 @@ public class ManagedStoreHandler extends FceEventHandler {
 		super(context, services);
 	}
 
+	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		LOGGER.info("store-event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:" + action);
 
-		Boolean preCheckState = preCheckManagedZone(props, action);
+		CheckResult preCheckState = preCheckManagedZone(props, action);
 
-		if (preCheckState != null) {
-			return preCheckState;
+		if(!CheckResult.NO_RESULT.equals(preCheckState)){
+			return preCheckState.getValue();
 		}
 
 		ManagedTopic topic = new ManagedTopic(ManagedZoneUtil.removeZoneIdentifier(props.getTopic()));

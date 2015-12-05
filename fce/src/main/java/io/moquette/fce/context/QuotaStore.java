@@ -3,6 +3,7 @@ package io.moquette.fce.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -22,18 +23,18 @@ import io.moquette.plugin.MqttAction;
  */
 public class QuotaStore extends ManagedZoneInMemoryStore {
 
-	private HashMap<String, UserQuota> quotaStore = new HashMap<>();
+	private Map<String, UserQuota> quotas = new HashMap<>();
 
 	public QuotaStore(IBrokerOperator brokerOperator, ManagedZone zone) {
 		super(brokerOperator, zone);
 	}
 
 	public UserQuota get(String topicIdentifier) {
-		return quotaStore.get(topicIdentifier);
+		return quotas.get(topicIdentifier);
 	}
 
 	public Set<Entry<String, UserQuota>> getAll() {
-		return quotaStore.entrySet();
+		return quotas.entrySet();
 	}
 
 	public void put(String topicIdentifier, UserQuota quota) throws FceAuthorizationException {
@@ -45,7 +46,7 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 		if (quota != null) {
 			if (ignoreTimestamp || alreadyStored == null
 					|| quota.getTimestamp().compareTo(alreadyStored.getTimestamp()) >= 0) {
-				quotaStore.put(topicIdentifier, quota);
+				quotas.put(topicIdentifier, quota);
 				return;
 			}
 		}
@@ -53,16 +54,16 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 	}
 
 	@Override
-	protected HashMap<String, ?> getStore() {
-		return quotaStore;
+	protected Map<String, ?> getStore() {
+		return quotas;
 	}
 
 	@Override
 	protected UserQuota get(ManagedTopic topic, String userHash, MqttAction operation) {
-		if (quotaStore.get(topic.getIdentifier(userHash, getZone(), operation)) != null) {
-			return quotaStore.get(topic.getIdentifier(userHash, getZone(), operation));
+		if (quotas.get(topic.getIdentifier(userHash, getZone(), operation)) != null) {
+			return quotas.get(topic.getIdentifier(userHash, getZone(), operation));
 		}
-		return quotaStore.get(topic.getAllIdentifier(getZone(), operation));
+		return quotas.get(topic.getAllIdentifier(getZone(), operation));
 	}
 
 	public List<UserQuota> getAllForTopic(ManagedTopic topic) {

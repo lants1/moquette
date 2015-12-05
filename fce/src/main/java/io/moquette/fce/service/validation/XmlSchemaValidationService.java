@@ -36,10 +36,10 @@ public final class XmlSchemaValidationService implements ISchemaValidationServic
 	public boolean isSchemaValid(ByteBuffer xmlToValidateBfr) {
 		try {
 			Source xmlToValidate = new StreamSource(new ByteBufferInputStream(xmlToValidateBfr));
-			Source schemaToValidate = new StreamSource(new ByteBufferInputStream(schema));
+			Source schemaSource = new StreamSource(new ByteBufferInputStream(schema));
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(schemaToValidate);
-			Validator validator = schema.newValidator();
+			Schema schemaToValidate = schemaFactory.newSchema(schemaSource);
+			Validator validator = schemaToValidate.newValidator();
 			validator.validate(xmlToValidate);
 		} catch (SAXException | IOException e) {
 			LOGGER.log(Level.INFO, "xml schema validation failed", e);

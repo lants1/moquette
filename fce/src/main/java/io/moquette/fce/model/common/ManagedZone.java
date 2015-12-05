@@ -20,11 +20,11 @@ public enum ManagedZone {
 	}
 
 	public String getTopicPrefix() {
-		return (topicPrefix);
+		return topicPrefix;
 	}
 	
 	public String getTopicFilter() {
-		return (topicPrefix+"/#");
+		return topicPrefix+"/#";
 	}
 	
 	public TopicPermission getPermission(){

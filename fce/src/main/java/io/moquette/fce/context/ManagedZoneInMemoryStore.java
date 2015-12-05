@@ -1,7 +1,6 @@
 package io.moquette.fce.context;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -17,33 +16,32 @@ import io.moquette.plugin.IBrokerOperator;
 import io.moquette.plugin.MqttAction;
 
 /**
- * Abstract class which implements common operations for InMemory Mqtt datastores...
+ * Abstract class which implements common operations for InMemory Mqtt
+ * datastores...
  * 
  * @author lants1
  *
  */
 public abstract class ManagedZoneInMemoryStore {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(ManagedZoneInMemoryStore.class.getName());
-	
+
 	private boolean initialized;
 	private final IBrokerOperator brokerOperator;
 	private final ManagedZone correspondingZone;
-	
+
 	public ManagedZoneInMemoryStore(IBrokerOperator brokerOperator, ManagedZone correspondingZone) {
 		super();
 		this.initialized = false;
 		this.brokerOperator = brokerOperator;
 		this.correspondingZone = correspondingZone;
 	}
-	
+
 	public boolean isInitialized() {
-		if (!initialized) {
-			if (getStore().size() >= brokerOperator
-					.countRetainedMessages(correspondingZone.getTopicFilter())) {
-				initialized = true;
-				LOGGER.info(correspondingZone.name() + "In-Memory DB initialized");
-			}
+		if (!initialized
+				&& getStore().size() >= brokerOperator.countRetainedMessages(correspondingZone.getTopicFilter())) {
+			initialized = true;
+			LOGGER.info(correspondingZone.name() + "In-Memory DB initialized");
 		}
 		return initialized;
 	}
@@ -51,7 +49,7 @@ public abstract class ManagedZoneInMemoryStore {
 	public ManagedZone getZone() {
 		return correspondingZone;
 	}
-	
+
 	protected ManagedInformation getManagedInformation(String topicStr, String usernameHash, MqttAction operation)
 			throws FceAuthorizationException {
 		ManagedTopic topic = new ManagedTopic(topicStr);
@@ -91,7 +89,7 @@ public abstract class ManagedZoneInMemoryStore {
 		return tokens;
 	}
 
-	abstract protected HashMap<String, ?> getStore();
+	protected abstract Map<String, ?> getStore();
 
-	abstract protected ManagedInformation get(ManagedTopic topic, String usernameHash, MqttAction operation);
+	protected abstract ManagedInformation get(ManagedTopic topic, String usernameHash, MqttAction operation);
 }

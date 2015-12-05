@@ -1,11 +1,13 @@
 package io.moquette.fce.event.broker;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.moquette.fce.common.converter.QuotaConverter;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.event.FceEventHandler;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
@@ -30,51 +32,53 @@ public class ManagedTopicHandler extends FceEventHandler {
 		super(context, services);
 	}
 
+	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
-		
-		
+
 		LOGGER.info("recieved Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 				+ action);
 
-		Boolean preCheckState = preCheckManagedZone(props, action);
+		CheckResult preCheckState = preCheckManagedZone(props, action);
 
-		if (preCheckState != null) {
-			return preCheckState;
+		if(!CheckResult.NO_RESULT.equals(preCheckState)){
+			return preCheckState.getValue();
 		}
 
 		try {
-			UserConfiguration configGlobal = getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
-			UserQuota quotasGlobal = getContext().getQuotaStore(ManagedScope.GLOBAL).getQuota(props.getTopic(), usernameHashFromRequest, action);
+			UserConfiguration configGlobal = getContext().getConfigurationStore(ManagedScope.GLOBAL)
+					.getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasGlobal = getContext().getQuotaStore(ManagedScope.GLOBAL).getQuota(props.getTopic(),
+					usernameHashFromRequest, action);
 
-			if (configGlobal.isValidForEveryone()) {
-				if (quotasGlobal == null) {
-					quotasGlobal = new UserQuota(props.getUser(), props.getUser(), action,
-							QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
-				}
+			if (configGlobal.isValidForEveryone() && quotasGlobal == null) {
+				quotasGlobal = new UserQuota(props.getUser(), props.getUser(), action,
+						QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
 			}
 
 			if (!configGlobal.isValid(getServices(), props, action)) {
-				logAndSendInfoMsg(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
+				sendInfoMessage(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
 				return false;
 			}
 
 			if (!quotasGlobal.isValid(getServices(), props, action)) {
-				logAndSendInfoMsg(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
+				sendInfoMessage(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
 				return false;
 			}
 
-			UserConfiguration configPrivate = getContext().getConfigurationStore(ManagedScope.PRIVATE).getConfiguration(props.getTopic(), usernameHashFromRequest);
-			UserQuota quotasPrivate = getContext().getQuotaStore(ManagedScope.PRIVATE).getQuota(props.getTopic(), usernameHashFromRequest, action);
+			UserConfiguration configPrivate = getContext().getConfigurationStore(ManagedScope.PRIVATE)
+					.getConfiguration(props.getTopic(), usernameHashFromRequest);
+			UserQuota quotasPrivate = getContext().getQuotaStore(ManagedScope.PRIVATE).getQuota(props.getTopic(),
+					usernameHashFromRequest, action);
 
 			if (configPrivate != null) {
 				if (!configPrivate.isValid(getServices(), props, action)) {
-					logAndSendInfoMsg(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
+					sendInfoMessage(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
 					return false;
 				}
 
 				if (!quotasPrivate.isValid(getServices(), props, action)) {
-					logAndSendInfoMsg(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
+					sendInfoMessage(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
 					return false;
 				}
 				substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate);
@@ -85,7 +89,8 @@ public class ManagedTopicHandler extends FceEventHandler {
 					+ action);
 			return true;
 		} catch (FceAuthorizationException e) {
-			logAndSendInfoMsg(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
+			sendInfoMessage(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
+			LOGGER.log(Level.INFO, InfoMessageType.AUTHORIZATION_EXCEPTION + " for topic:" + props.getTopic() + " user: " + props.getUser() + " action:" + action, e);
 			return false;
 		}
 	}
@@ -93,11 +98,12 @@ public class ManagedTopicHandler extends FceEventHandler {
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
 			UserQuota userQuotas) throws FceAuthorizationException {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(properties.getClientId());
-		
+
 		userQuotas.substractRequestFromQuota(properties, operation);
 		String quotaJson = getServices().getJsonParser().serialize(userQuotas);
 
-		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(usernameHashFromRequest, zone, operation);
+		String userTopicIdentifier = new ManagedTopic(properties.getTopic()).getIdentifier(usernameHashFromRequest,
+				zone, operation);
 
 		getContext().getQuotaStore(zone.getScope()).put(userTopicIdentifier, userQuotas);
 		getServices().getMqtt().publish(userTopicIdentifier, quotaJson);

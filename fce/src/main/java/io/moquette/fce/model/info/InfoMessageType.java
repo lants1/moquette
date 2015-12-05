@@ -36,6 +36,6 @@ public enum InfoMessageType {
 
     public String getValue()
     {
-        return(value);
+        return value;
     }
 }

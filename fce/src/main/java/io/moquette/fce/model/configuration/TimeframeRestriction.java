@@ -44,7 +44,7 @@ public class TimeframeRestriction extends Restriction {
 	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
 		Date now = new Date();
 		if (now.after(from) && now.before(to)) {
-			return isValidCommon(services, props, operation);
+			return isValidCommon(services, props);
 		}
 
 		return false;

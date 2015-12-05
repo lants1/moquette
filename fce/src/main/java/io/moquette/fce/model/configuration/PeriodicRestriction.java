@@ -31,6 +31,6 @@ public class PeriodicRestriction extends Restriction{
 	
 	@Override
 	public boolean isValid(FceServiceFactory services, AuthorizationProperties props, MqttAction operation) {
-		return isValidCommon(services, props, operation);
+		return isValidCommon(services, props);
 	}
 }

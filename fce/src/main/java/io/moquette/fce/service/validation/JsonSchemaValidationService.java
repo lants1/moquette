@@ -40,9 +40,9 @@ public final class JsonSchemaValidationService implements ISchemaValidationServi
 			final JsonNode jsonToVavlidate = JsonLoader
 					.fromReader(new StreamSource(new ByteBufferInputStream(msgToValidate)).getReader());
 			factory.getJsonSchema(schemaJson);
-			final JsonSchema schema = factory.getJsonSchema(schemaJson);
+			final JsonSchema validationSchema = factory.getJsonSchema(schemaJson);
 
-			return schema.validate(jsonToVavlidate).isSuccess();
+			return validationSchema.validate(jsonToVavlidate).isSuccess();
 		} catch (ProcessingException | IOException e) {
 			LOGGER.log(Level.INFO, "json schema validation failed: ", e);
 			return false;

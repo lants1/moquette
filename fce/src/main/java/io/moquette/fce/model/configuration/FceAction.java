@@ -31,7 +31,7 @@ public enum FceAction {
 
     public String getValue()
     {
-        return(value);
+        return value;
     }
     
     public boolean canDoOperation(MqttAction operation){

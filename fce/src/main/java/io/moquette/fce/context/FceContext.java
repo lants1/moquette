@@ -130,9 +130,9 @@ public class FceContext extends BrokerContext{
 	}
 	
 	public boolean isInitialized() {
-		return (getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
+		return getConfigurationStore(ManagedZone.CONFIG_GLOBAL).isInitialized()
 				&& getQuotaStore(ManagedZone.QUOTA_GLOBAL).isInitialized()
 				&& getConfigurationStore(ManagedZone.CONFIG_PRIVATE).isInitialized()
-				&& getQuotaStore(ManagedZone.QUOTA_PRIVATE).isInitialized());
+				&& getQuotaStore(ManagedZone.QUOTA_PRIVATE).isInitialized();
 	}
 }
