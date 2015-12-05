@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc xmlns="http://de.wikipedia.org/wiki/XML_Schema#Beispiel">
+  <head>
+    <title>
+      Dies ist der Titel
+    </title>
+  </head>
+  <body>
+    Dies ist der Text.
+  </body>
+</doc>

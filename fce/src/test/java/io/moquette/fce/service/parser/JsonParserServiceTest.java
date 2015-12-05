@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +14,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.moquette.fce.common.ReadFileUtil;
 import io.moquette.fce.model.common.DataUnit;
 import io.moquette.fce.model.common.ManagedCycle;
 import io.moquette.fce.model.common.ManagedScope;
@@ -104,7 +102,7 @@ public class JsonParserServiceTest {
 	@Test
 	public void testDeserializationFromSample() throws IOException, URISyntaxException {
 		JsonParserService mJsonParser = new JsonParserService();
-		String inputJson = readFile("/sample_manage.json");
+		String inputJson = ReadFileUtil.readFileString("/fce/sample_manage.json");
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration(inputJson);
 		assertTrue(sampleUserConfig.getUserHash().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfig.getActionPermission() == FceAction.ALL);
@@ -119,10 +117,5 @@ public class JsonParserServiceTest {
 		JsonParserService mJsonParser = new JsonParserService();
 		UserConfiguration sampleUserConfig = mJsonParser.deserializeUserConfiguration("asfdasdfsa");
 		assertNull(sampleUserConfig);
-	}
-
-	static String readFile(String path) throws IOException, URISyntaxException {
-		byte[] encoded = Files.readAllBytes(Paths.get(JsonParserServiceTest.class.getResource(path).toURI()));
-		return new String(encoded, StandardCharsets.UTF_8);
 	}
 }
