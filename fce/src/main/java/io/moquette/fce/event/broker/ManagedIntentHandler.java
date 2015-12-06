@@ -59,11 +59,14 @@ public class ManagedIntentHandler extends FceEventHandler {
 						storeUserConfiguration(topic, newConfig);
 						return true;
 					}
+					sendInfoMessage(InfoMessageType.PRIVATE_QUOTA_CHANGE_ONLY_ALLOWED_FOR_OWN_USER, props, action);
 					return false;
 				}
 
-				UserConfiguration userConfig = getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest);
+				UserConfiguration userConfig = (UserConfiguration) getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest).getData();
 				if (userConfig == null) {
+					// is managed but no matching configuration for user found....
+					sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
 					return false;
 				}
 				if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
@@ -87,6 +90,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 		} catch (FceAuthorizationException e) {
 			LOGGER.log(Level.WARNING, "could not authorize request", e);
+			sendInfoMessage(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
 			return false;
 		}
 	}

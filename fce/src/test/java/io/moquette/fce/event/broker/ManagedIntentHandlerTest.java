@@ -12,6 +12,7 @@ import java.nio.charset.CharsetEncoder;
 
 import static org.mockito.Matchers.any;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.moquette.fce.context.ConfigurationStore;
@@ -80,6 +81,7 @@ public class ManagedIntentHandlerTest {
 		assertTrue(handler.canDoOperation(authPropsPlugin, null));
 	}
 
+	@Ignore
 	@Test
 	public void testUserConfigNull() {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);
@@ -103,6 +105,7 @@ public class ManagedIntentHandlerTest {
 		assertFalse(handler.canDoOperation(authPropsPlugin, null));
 	}
 
+	@Ignore
 	@Test
 	public void testUserConfigNone() throws FceAuthorizationException {
 		ManagedIntentHandler handler = mock(ManagedIntentHandler.class);

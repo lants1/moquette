@@ -50,14 +50,15 @@ public class ConfigurationStore extends ManagedZoneInMemoryStore {
 		return configs;
 	}
 
-	public UserConfiguration getConfiguration(String topicStr, String usernameHash) throws FceAuthorizationException {
-		return (UserConfiguration) getManagedInformation(topicStr, usernameHash, null);
+	public ManagedStorageSearchResult getConfiguration(String topicStr, String usernameHash) throws FceAuthorizationException {
+		return getManagedInformation(topicStr, usernameHash, null);
 	}
 
 	public List<UserConfiguration> getAllForTopic(ManagedTopic topic) {
 		List<UserConfiguration> result = new ArrayList<>();
 		for (Entry<String, UserConfiguration> entry : getAll()) {
-			if (entry.getKey().startsWith(topic.getIdentifier(getZone()))) {
+			ManagedTopic topicStore = new ManagedTopic(entry.getKey());
+			if(topicStore.getIdentifier(getZone()).equals(topic.getIdentifier(getZone()))){
 				result.add(entry.getValue());
 			}
 		}

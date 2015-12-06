@@ -50,18 +50,18 @@ public abstract class ManagedZoneInMemoryStore {
 		return correspondingZone;
 	}
 
-	protected ManagedInformation getManagedInformation(String topicStr, String usernameHash, MqttAction operation)
+	protected ManagedStorageSearchResult getManagedInformation(String topicStr, String usernameHash, MqttAction operation)
 			throws FceAuthorizationException {
 		ManagedTopic topic = new ManagedTopic(topicStr);
 		String reducedTopicFilter = topic.getIdentifer();
 		while (!reducedTopicFilter.isEmpty()) {
 			ManagedInformation userConfig = get(new ManagedTopic(reducedTopicFilter), usernameHash, operation);
 			if (userConfig != null) {
-				return userConfig;
+				return new ManagedStorageSearchResult(reducedTopicFilter, userConfig);
 			}
 			reducedTopicFilter = StringUtils.substringBeforeLast(reducedTopicFilter, "/");
 		}
-		return null;
+		return new ManagedStorageSearchResult(ManagedTopic.LEVEL_CHAR, null);
 	}
 
 	public boolean isManaged(ManagedTopic topic) {

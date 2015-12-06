@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Set;
 
 import io.moquette.fce.exception.FceAuthorizationException;
@@ -40,11 +43,10 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 	public void put(String topicIdentifier, UserQuota quota) throws FceAuthorizationException {
 		put(topicIdentifier, quota, false);
 	}
-	
+
 	public void remove(String topicIdentifier) {
 		quotas.remove(topicIdentifier);
 	}
-
 
 	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp) throws FceAuthorizationException {
 		UserQuota alreadyStored = get(topicIdentifier);
@@ -53,13 +55,13 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 					|| quota.getTimestamp().compareTo(alreadyStored.getTimestamp()) >= 0) {
 				quotas.put(topicIdentifier, quota);
 				return;
+			} else {
+				throw new FceAuthorizationException("outdateddata");
 			}
-		}
-		else {
+		} else {
 			// in case of a quota removal...
 			quotas.remove(topicIdentifier);
 		}
-		throw new FceAuthorizationException("outdateddata");
 	}
 
 	@Override
@@ -75,20 +77,21 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 		return quotas.get(topic.getAllIdentifier(getZone(), operation));
 	}
 
-	//TODO lants1 hier muss eine hashmap zurück mit identifier für die löschung
 	public List<UserQuota> getAllForTopic(ManagedTopic topic) {
 		List<UserQuota> result = new ArrayList<>();
 		for (Entry<String, UserQuota> entry : getAll()) {
-			if (entry.getKey().startsWith(topic.getIdentifier(getZone()))) {
+			ManagedTopic topicStore = new ManagedTopic(
+					StringUtils.remove(StringUtils.remove(entry.getKey(), "/publish"), "/subscribe"));
+			if (topicStore.getIdentifier(getZone()).equals(topic.getIdentifier(getZone()))) {
 				result.add(entry.getValue());
 			}
 		}
 		return result;
 	}
 
-	public UserQuota getQuota(String topicStr, String usernameHash, MqttAction operation)
+	public ManagedStorageSearchResult getQuota(String topicStr, String usernameHash, MqttAction operation)
 			throws FceAuthorizationException {
-		return (UserQuota) getManagedInformation(topicStr, usernameHash, operation);
+		return getManagedInformation(topicStr, usernameHash, operation);
 	}
 
 }

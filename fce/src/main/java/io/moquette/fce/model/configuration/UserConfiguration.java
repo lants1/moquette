@@ -113,4 +113,11 @@ public class UserConfiguration extends ManagedInformation implements IValid {
 	public boolean isValidForEveryone() {
 		return StringUtils.isEmpty(getUserHash());
 	}
+	
+	public boolean hasQuota(){
+		if(this.getRestrictions().isEmpty()){
+			return false;
+		}
+		return true;
+	}
 }

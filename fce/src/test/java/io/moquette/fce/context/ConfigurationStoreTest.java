@@ -34,11 +34,11 @@ public class ConfigurationStoreTest {
 		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == USERHASH);
 
 		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == USERHASH);
 	}
 
 	@Test
@@ -63,20 +63,20 @@ public class ConfigurationStoreTest {
 		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getAllIdentifier(ManagedZone.CONFIG_GLOBAL), everyoneConfig);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == ALL_ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == ALL_ID);
 
 		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == ALL_ID);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == ALL_ID);
 
 		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
 		props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == USERHASH);
 
 		props = new AuthorizationProperties(CONFIG_SUBTOPIC.getIdentifer(), null, USERHASH, null, null);
 
-		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getUserHash() == USERHASH);
+		assertTrue(configService.getConfiguration(props.getTopic(), USERHASH).getData().getUserHash() == USERHASH);
 	}
 }

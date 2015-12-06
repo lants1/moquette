@@ -10,24 +10,24 @@ import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.fce.tools.callback.SampleFceClientCallback;
 
-public class ShowcaseInheritance extends Showcase{
+public class ShowcaseNoPermissionsInheritance extends Showcase{
 
 	private static final String SUBTOPIC = "/test4/bla";
 	private static final String TOPIC = "/test4";
-	private static String USERNAME = "user";
+	private static String USERNAME_WRONG = "dfasfsdf";
 
 	public static void main(String[] args) throws Exception {
-		initializeInternalMqttClient(USERNAME);
+		initializeInternalMqttClient(USERNAME_WRONG);
 		Thread.sleep(2000);
-		bookTopicQuota(USERNAME);
+		bookTopicQuota(USERNAME_WRONG);
 		Thread.sleep(2000);
-		bookSubtopicQuota(USERNAME);
+		bookSubtopicQuota(USERNAME_WRONG);
 		Thread.sleep(2000);
-		bookTopicQuota(USERNAME);
+		bookTopicQuota(USERNAME_WRONG);
 		Thread.sleep(2000);
-		bookSubtopicQuota(USERNAME); // quota depleted*/
+		bookSubtopicQuota(USERNAME_WRONG); // quota depleted*/
 		Thread.sleep(2000);
-		bookTopicQuota(USERNAME); //  quota depleted*/
+		bookTopicQuota(USERNAME_WRONG); //  quota depleted*/
 	}
 
 	public static void initializeInternalMqttClient(String user) throws Exception {
