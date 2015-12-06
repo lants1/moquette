@@ -1,5 +1,6 @@
 package io.moquette.fce.service.validation;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
@@ -13,8 +14,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
-
-import io.moquette.fce.common.io.ByteBufferInputStream;
 
 /**
  * Utility class for xml schema validation.
@@ -35,8 +34,8 @@ public final class XmlSchemaValidationService implements ISchemaValidationServic
 	@Override
 	public boolean isSchemaValid(ByteBuffer xmlToValidateBfr) {
 		try {
-			Source xmlToValidate = new StreamSource(new ByteBufferInputStream(xmlToValidateBfr));
-			Source schemaSource = new StreamSource(new ByteBufferInputStream(schema));
+			Source xmlToValidate = new StreamSource(new ByteArrayInputStream(xmlToValidateBfr.array()));
+			Source schemaSource = new StreamSource(new ByteArrayInputStream(schema.array()));
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schemaToValidate = schemaFactory.newSchema(schemaSource);
 			Validator validator = schemaToValidate.newValidator();

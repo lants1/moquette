@@ -1,0 +1,23 @@
+{
+  "managedState": "ACTIVE",
+  "managedScope": "PRIVATE",
+  "adminPermission": "ALL",
+  "actionPermission": "ALL",
+  "restrictions": [
+    {
+      "type": "PeriodicRestriction",
+      "properties": {
+        "cyle": "DAILY",
+        "mqttAction": "ALL",
+        "messageCount": 2,
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB",
+        "wsdlUrl": ""
+      }
+    }
+  ],
+  "alias": "user",
+  "userHash": "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb",
+  "timestamp": "Nov 23, 2015 5:27:54 PM"
+}

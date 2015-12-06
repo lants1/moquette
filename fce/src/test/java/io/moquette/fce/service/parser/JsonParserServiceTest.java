@@ -19,10 +19,12 @@ import io.moquette.fce.model.common.DataUnit;
 import io.moquette.fce.model.common.ManagedCycle;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.configuration.AdminPermission;
+import io.moquette.fce.model.configuration.DataSchema;
 import io.moquette.fce.model.configuration.FceAction;
 import io.moquette.fce.model.configuration.ManagedState;
 import io.moquette.fce.model.configuration.PeriodicRestriction;
 import io.moquette.fce.model.configuration.Restriction;
+import io.moquette.fce.model.configuration.SchemaType;
 import io.moquette.fce.model.configuration.TimeframeRestriction;
 import io.moquette.fce.model.configuration.UserConfiguration;
 import io.moquette.fce.model.quota.PeriodicQuota;
@@ -52,8 +54,9 @@ public class JsonParserServiceTest {
 	
 	@Test
 	public void testSerializationAndDeserializationRestriction() throws IOException, URISyntaxException {
+		DataSchema schema = new DataSchema(SchemaType.JSON_SCHEMA, "/json/schema");
 		TimeframeRestriction specificRestriction = new TimeframeRestriction(FceAction.ALL, sampleDate, sampleDate, 11, 1024, 2048, DataUnit.kB, null);
-		PeriodicRestriction periodicRestriction = new PeriodicRestriction(FceAction.ALL, ManagedCycle.DAILY, 11, 1024, 2048, DataUnit.kB, null);
+		PeriodicRestriction periodicRestriction = new PeriodicRestriction(FceAction.ALL, ManagedCycle.DAILY, 11, 1024, 2048, DataUnit.kB, schema);
 
 		List<Restriction> restrictions = new ArrayList<Restriction>();
 

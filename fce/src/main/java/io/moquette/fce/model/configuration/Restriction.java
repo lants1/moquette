@@ -67,7 +67,7 @@ public abstract class Restriction implements IValid {
 		}
 		
 		if (getDataSchema() != null) {
-			services.getSchemaValidationService(getDataSchema()).isSchemaValid(props.getMessage());
+			return services.getSchemaValidationService(getDataSchema()).isSchemaValid(props.getMessage());
 		}
 		
 		return true;
