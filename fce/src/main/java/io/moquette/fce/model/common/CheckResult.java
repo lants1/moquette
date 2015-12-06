@@ -21,6 +21,6 @@ public enum CheckResult {
 	}
 
 	public Boolean getValue() {
-		return (value);
+		return value;
 	}
 }

@@ -36,7 +36,8 @@ public class ShowcaseAnonymousLogin extends Showcase {
 
 		client.connect(options);
 		client.setCallback(new SampleFceClientCallback());
-		client.publish("/test1", "test".getBytes(), 0, false);
+		client.setTimeToWait(1000);
+		client.publish("/test1", "test".getBytes(), Showcase.FIRE_AND_FORGET, false);
 		client.disconnect();
 		client.close();
 

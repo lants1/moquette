@@ -10,66 +10,66 @@ import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.fce.tools.callback.SampleFceClientCallback;
 
-public class ShowcaseManageIntent extends Showcase{
+public class ShowcaseManageIntentAll extends Showcase{
 
-	private static String USERNAME = "user";
+	private static String USER1 = "1fdd324asf";
+	private static String USER2 = "2b43dasfss";
 
 	public static void main(String[] args) throws Exception {
-		initializeInternalMqttClient();
+		initializeInternalMqttClient(USER2);
 		Thread.sleep(2000);
-		bookQuota();
+		bookQuota(USER1);
 		Thread.sleep(2000);
-		bookQuota();
+		bookQuota(USER1);
 		Thread.sleep(2000);
-		bookQuota();
+		bookQuota(USER1);
 		Thread.sleep(2000);
-		bookQuota(); // quota depleted
+		bookQuota(USER1); // quota depleted*/
+		Thread.sleep(2000);
+		bookQuota(USER2); // should work...*/*/
 	}
 
-	public static void initializeInternalMqttClient() throws Exception {
+	public static void initializeInternalMqttClient(String user) throws Exception {
 		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", "client");
+		client = new MqttClient("ssl://localhost:8883", "clientid"+user);
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 		FceServiceFactory services = new FceServiceFactory(null, null);
 		
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setUserName(USERNAME);
-		System.out.println(services.getHashing().generateHash(USERNAME).toCharArray());
-		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
+		options.setUserName(user);
+		System.out.println(services.getHashing().generateHash(user).toCharArray());
+		options.setPassword(services.getHashing().generateHash(user).toCharArray());
 		options.setSocketFactory(ssf);
 
 		client.connect(options);
 		client.setCallback(new SampleFceClientCallback());
-		client.setTimeToWait(1000);
 		
-		String inputJson = ReadFileUtil.readFileString("/fce/showcase_manage.json");
+		String inputJson = ReadFileUtil.readFileString("/fce/showcase_manage_all.json");
 		
 		System.out.println("send intent");
-		client.publish(ManagedZone.INTENT.getTopicPrefix()+"/test2", inputJson.getBytes(), Showcase.FIRE_AND_FORGET, true);
+		client.publish(ManagedZone.INTENT.getTopicPrefix()+"/test4", inputJson.getBytes(), Showcase.FIRE_AND_FORGET, true);
 		client.disconnect();
 		client.close();
 	}
 
-	public static void bookQuota() throws Exception {
+	public static void bookQuota(String user) throws Exception {
 
 		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", "client");
+		client = new MqttClient("ssl://localhost:8883", "clientid"+user);
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 		FceServiceFactory services = new FceServiceFactory(null, null);
 		
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setUserName(USERNAME);
-		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
+		options.setUserName(user);
+		options.setPassword(services.getHashing().generateHash(user).toCharArray());
 		options.setSocketFactory(ssf);
 
 		client.connect(options);
-		client.setTimeToWait(1000);
 		client.setCallback(new SampleFceClientCallback());
-		
 		System.out.println("send msg");
-		client.publish("/test2", "test".getBytes(), Showcase.FIRE_AND_FORGET, true);
+		client.publish("/test4", "test".getBytes(), Showcase.FIRE_AND_FORGET, true);
 		client.disconnect();
 		client.close();
 	}

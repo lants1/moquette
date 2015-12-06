@@ -30,10 +30,10 @@ public class ShowcaseManageStore extends Showcase{
 		options.setSocketFactory(ssf);
 
 		client.connect(options);
+		client.setTimeToWait(1000);
 		client.setCallback(new SampleFceClientCallback());
 		
-		
-		client.publish(ManagedZone.CONFIG_GLOBAL.getTopicPrefix()+"/test1", "asfd".getBytes(), 1, true);
+		client.publish(ManagedZone.CONFIG_GLOBAL.getTopicPrefix()+"/test1", "asfd".getBytes(), Showcase.FIRE_AND_FORGET, true);
 		client.disconnect();
 		client.close();
 	}

@@ -20,10 +20,10 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 
 	private static final Logger LOGGER = Logger.getLogger(MqttManageHandler.class.getName());
 
-	public MqttManageHandler(){
+	public MqttManageHandler() {
 		super(null, null);
 	}
-	
+
 	public MqttManageHandler(FceContext context, FceServiceFactory services) {
 		super(context, services);
 	}
@@ -39,7 +39,7 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 		case CONFIG_GLOBAL:
 			UserConfiguration msgConfig = getServices().getJsonParser().deserializeUserConfiguration(msgPayload);
 			getContext().getConfigurationStore(zone).put(topic.getIdentifier(msgConfig, zone), msgConfig);
-			for(String schemaTopic : msgConfig.getSchemaTopics()){
+			for (String schemaTopic : msgConfig.getSchemaTopics()) {
 				getServices().getMqtt().addNewSubscription(schemaTopic, new MqttSchemaHandler());
 			}
 			LOGGER.info("received configuration message for topic: " + topicIdentifier);
@@ -47,6 +47,12 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 		case QUOTA_PRIVATE:
 		case QUOTA_GLOBAL:
 			UserQuota msgQuota = getServices().getJsonParser().deserializeQuota(msgPayload);
+			if (msgQuota == null) {
+				// could happen in case of a removal, put empty thing in quota
+				// store to let the store correctly initialize and avoid
+				// nullpointer exception
+				getContext().getQuotaStore(zone).put(topicIdentifier, null);
+			}
 			getContext().getQuotaStore(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
 			LOGGER.info("received quota message for topic: " + topicIdentifier);
 			break;

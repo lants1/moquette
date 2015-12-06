@@ -13,6 +13,9 @@ import java.time.ZonedDateTime;
  */
 public final class FceTimeUtil {
 	
+	private FceTimeUtil() {
+	}
+	
 	public static long delayTo(int targetMin, int targetSec) {
 		LocalDateTime localNow = LocalDateTime.now();
 		ZoneId currentZone = ZoneId.systemDefault();

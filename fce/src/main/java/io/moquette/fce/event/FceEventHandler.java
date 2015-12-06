@@ -36,7 +36,7 @@ public abstract class FceEventHandler {
 		this.services = services;
 		this.context = context;
 	}
-	
+
 	public FceContext getContext() {
 		return context;
 	}
@@ -72,23 +72,29 @@ public abstract class FceEventHandler {
 	}
 
 	protected void sendInfoMessage(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
-		InfoMessage infoMsg = new InfoMessage(props.getClientId(), getContext().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
-		getServices().getMqtt().publish(new ManagedTopic(props.getTopic()).getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
+		InfoMessage infoMsg = new InfoMessage(props.getClientId(),
+				getContext().getHashAssignment().get(props.getClientId()), msgType, "mqttaction: " + action);
+		getServices().getMqtt().publish(
+				new ManagedTopic(props.getTopic())
+						.getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
 	}
 
 	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig,
 			ManagedZone quotaZone) throws FceAuthorizationException {
-		UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
-		UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
+		// store the quota only when its has a userHash "not everyone config"
+		if (usrConfig.getUserHash() != null) {
+			UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
+			UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
 
-		String subQuotaTopic = topic.getIdentifier(subQuota, quotaZone, MqttAction.SUBSCRIBE);
-		String pubQuotaTopic = topic.getIdentifier(pubQuota, quotaZone, MqttAction.PUBLISH);
+			String subQuotaTopic = topic.getIdentifier(subQuota, quotaZone, MqttAction.SUBSCRIBE);
+			String pubQuotaTopic = topic.getIdentifier(pubQuota, quotaZone, MqttAction.PUBLISH);
 
-		getContext().getQuotaStore(usrConfig.getManagedScope()).put(subQuotaTopic, subQuota, true);
-		getContext().getQuotaStore(usrConfig.getManagedScope()).put(pubQuotaTopic, pubQuota, true);
-		getServices().getMqtt().publish(subQuotaTopic, getServices().getJsonParser().serialize(subQuota));
-		getServices().getMqtt().publish(pubQuotaTopic, getServices().getJsonParser().serialize(pubQuota));
+			getContext().getQuotaStore(usrConfig.getManagedScope()).put(subQuotaTopic, subQuota, true);
+			getContext().getQuotaStore(usrConfig.getManagedScope()).put(pubQuotaTopic, pubQuota, true);
+			getServices().getMqtt().publish(subQuotaTopic, getServices().getJsonParser().serialize(subQuota));
+			getServices().getMqtt().publish(pubQuotaTopic, getServices().getJsonParser().serialize(pubQuota));
+		}
 	}
 
 	public void injectFceEnvironment(FceContext context, FceServiceFactory services) {
@@ -96,6 +102,5 @@ public abstract class FceEventHandler {
 		this.services = services;
 	}
 
-	
 	public abstract boolean canDoOperation(AuthorizationProperties properties, MqttAction operation);
 }

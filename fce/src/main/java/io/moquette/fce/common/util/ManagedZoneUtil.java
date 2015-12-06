@@ -15,6 +15,9 @@ import io.moquette.plugin.MqttAction;
  */
 public final class ManagedZoneUtil {
 
+	private ManagedZoneUtil() {
+	}
+	
 	public static boolean isInManagedStore(String topic) {
 		for (ManagedZone zone :  EnumSet.allOf(ManagedZone.class)) {
 			if (topic.startsWith(zone.getTopicPrefix())) {

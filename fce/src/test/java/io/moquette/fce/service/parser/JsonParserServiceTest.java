@@ -98,7 +98,6 @@ public class JsonParserServiceTest {
 		assertTrue(((PeriodicQuota) deserializedQuota.getQuotas().get(1)).getCycle() == ManagedCycle.DAILY);
 	}
 	
-	
 	@Test
 	public void testDeserializationFromSample() throws IOException, URISyntaxException {
 		JsonParserService mJsonParser = new JsonParserService();

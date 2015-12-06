@@ -20,6 +20,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 public abstract class Showcase {
+	
+	public static final int FIRE_AND_FORGET = 0;
+	
 	/**
 	 * keystore generated into test/resources with command:
 	 * 

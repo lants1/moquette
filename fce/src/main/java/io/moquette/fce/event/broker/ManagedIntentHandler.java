@@ -119,7 +119,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 		for (UserQuota quota : quotasToRemove) {
 			String quotaIdentifier = quota.getUserHash();
 			for (UserConfiguration config : configs) {
-				if (config.getUserHash().equals(quotaIdentifier)) {
+				if (quotaIdentifier.equals(config.getUserHash())) {
 					quotasToRemove.remove(quota);
 				}
 			}
@@ -132,7 +132,7 @@ public class ManagedIntentHandler extends FceEventHandler {
 		String userTopicIdentifier = topic.getIdentifier(quotaToRemove.getUserHash(), ManagedZone.QUOTA_GLOBAL,
 				quotaToRemove.getAction());
 
-		getContext().getQuotaStore(ManagedScope.GLOBAL).put(userTopicIdentifier, quotaToRemove);
+		getContext().getQuotaStore(ManagedScope.GLOBAL).remove(userTopicIdentifier);
 		getServices().getMqtt().delete(userTopicIdentifier);
 	}
 

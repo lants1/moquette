@@ -40,6 +40,11 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 	public void put(String topicIdentifier, UserQuota quota) throws FceAuthorizationException {
 		put(topicIdentifier, quota, false);
 	}
+	
+	public void remove(String topicIdentifier) {
+		quotas.remove(topicIdentifier);
+	}
+
 
 	public void put(String topicIdentifier, UserQuota quota, boolean ignoreTimestamp) throws FceAuthorizationException {
 		UserQuota alreadyStored = get(topicIdentifier);
@@ -49,6 +54,10 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 				quotas.put(topicIdentifier, quota);
 				return;
 			}
+		}
+		else {
+			// in case of a quota removal...
+			quotas.remove(topicIdentifier);
 		}
 		throw new FceAuthorizationException("outdateddata");
 	}
@@ -66,6 +75,7 @@ public class QuotaStore extends ManagedZoneInMemoryStore {
 		return quotas.get(topic.getAllIdentifier(getZone(), operation));
 	}
 
+	//TODO lants1 hier muss eine hashmap zurück mit identifier für die löschung
 	public List<UserQuota> getAllForTopic(ManagedTopic topic) {
 		List<UserQuota> result = new ArrayList<>();
 		for (Entry<String, UserQuota> entry : getAll()) {

@@ -1,0 +1,21 @@
+{
+  "managedState": "ACTIVE",
+  "managedScope": "GLOBAL",
+  "adminPermission": "ALL",
+  "actionPermission": "ALL",
+  "restrictions": [
+    {
+      "type": "PeriodicRestriction",
+      "properties": {
+        "cyle": "DAILY",
+        "mqttAction": "ALL",
+        "messageCount": 3,
+        "maxMessageSize": 1024,
+        "totalMessageSize": 2048,
+        "sizeUnit": "kB",
+        "wsdlUrl": ""
+      }
+    }
+  ],
+  "timestamp": "Nov 23, 2015 5:27:54 PM"
+}

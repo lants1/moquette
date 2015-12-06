@@ -24,6 +24,9 @@ import io.moquette.plugin.MqttAction;
  */
 public final class QuotaConverter {
 
+	private QuotaConverter() {
+	}
+
 	public static UserQuota convertSubscribeConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.SUBSCRIBE));
 		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.SUBSCRIBE, subscribeState);

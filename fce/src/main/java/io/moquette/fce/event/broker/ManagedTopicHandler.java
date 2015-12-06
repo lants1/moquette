@@ -7,6 +7,7 @@ import io.moquette.fce.common.converter.QuotaConverter;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.event.FceEventHandler;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.exception.FceSystemException;
 import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.common.ManagedTopic;
@@ -52,13 +53,17 @@ public class ManagedTopicHandler extends FceEventHandler {
 					usernameHashFromRequest, action);
 
 			if (configGlobal.isValidForEveryone() && quotasGlobal == null) {
-				quotasGlobal = new UserQuota(props.getUser(), props.getUser(), action,
+				quotasGlobal = new UserQuota("generated", usernameHashFromRequest, action,
 						QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
 			}
 
 			if (!configGlobal.isValid(getServices(), props, action)) {
 				sendInfoMessage(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
 				return false;
+			}
+			
+			if(quotasGlobal == null){
+				throw new FceSystemException("illegal quota state null, something internal is wrong....");
 			}
 
 			if (!quotasGlobal.isValid(getServices(), props, action)) {
