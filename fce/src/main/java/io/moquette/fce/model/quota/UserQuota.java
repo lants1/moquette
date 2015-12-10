@@ -27,6 +27,9 @@ public class UserQuota extends ManagedInformation implements IValid{
 		this.action = action;
 	}
 
+	/**
+	 * @return List<Quota> (returns empty list instead of null)
+	 */
 	public List<Quota> getQuotas() {
 		if(quotas == null || quotas.isEmpty()){
 			return new ArrayList<>();
