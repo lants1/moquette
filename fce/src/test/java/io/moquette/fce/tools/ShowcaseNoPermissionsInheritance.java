@@ -12,7 +12,7 @@ public class ShowcaseNoPermissionsInheritance extends Showcase{
 	public static void main(String[] args) throws Exception {
 		client1 = initializeInternalMqttClient(USERNAME_WRONG);
 		
-		client1.subscribe(TOPIC+"/#");
+		client1.subscribe(TOPIC);
 		client1.subscribe(ManagedZone.INFO.getTopicPrefix()+TOPIC+"/#");
 		
 		String inputJson = ReadFileUtil.readFileString("/fce/showcase_manage.json");

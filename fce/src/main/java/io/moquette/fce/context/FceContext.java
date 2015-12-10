@@ -6,6 +6,12 @@ import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.plugin.IBrokerConfig;
 import io.moquette.plugin.IBrokerOperator;
 
+/**
+ * Context class which stores overall plugin data.
+ * 
+ * @author lants1
+ *
+ */
 public class FceContext extends BrokerContext{
 
 	private static final String PROP_JKS_PATH = "plugin_jks_path";

@@ -12,6 +12,12 @@ import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.plugin.AuthorizationProperties;
 import io.moquette.plugin.MqttAction;
 
+/**
+ * Handler for schema topics. (Needed for schema validation) 
+ * 
+ * @author lants1
+ *
+ */
 public class MqttSchemaHandler extends FceEventHandler implements IFceMqttCallback {
 
 	private static final Logger LOGGER = Logger.getLogger(MqttSchemaHandler.class.getName());

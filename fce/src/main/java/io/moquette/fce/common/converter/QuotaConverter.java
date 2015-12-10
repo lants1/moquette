@@ -27,16 +27,34 @@ public final class QuotaConverter {
 	private QuotaConverter() {
 	}
 
+	/**
+	 * Converts UserConfiguration to UserQuota for subscribe Restrictions.
+	 * 
+	 * @param config UserConfig
+	 * @return UserQuota
+	 */
 	public static UserQuota convertSubscribeConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.SUBSCRIBE));
 		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.SUBSCRIBE, subscribeState);
 	}
 
+	/**
+	 * Converts UserConfiguration to UserQuota for publish Restrictions.
+	 * 
+	 * @param config UserConfig
+	 * @return UserQuota
+	 */
 	public static UserQuota convertPublishConfiguration(UserConfiguration config) {
 		List<Quota> subscribeState = convertRestrictions(config.getRestrictions(MqttAction.PUBLISH));
 		return new UserQuota(config.getAlias(), config.getUserHash(), MqttAction.PUBLISH, subscribeState);
 	}
 
+	/**
+	 * Converts a List<Restrictions> to a List<Quota> with zero initalization values.
+	 * 
+	 * @param restrictions List<Restriction>
+	 * @return quotas List<Quota> if no restrictions present return a empty List<Quota>
+	 */
 	public static List<Quota> convertRestrictions(List<Restriction> restrictions) {
 		List<Quota> resultRestrictions = new ArrayList<>();
 		if (restrictions != null && !restrictions.isEmpty()) {

@@ -13,7 +13,7 @@ public class ShowcaseManageStore extends Showcase{
 
 	public static void publishToManageStore() throws Exception {
 		client1 = initializeInternalMqttClient(USERNAME);
-		
+
 		client1.publish(ManagedZone.CONFIG_GLOBAL.getTopicPrefix()+"/test1", "asfd".getBytes(), Showcase.FIRE_AND_FORGET, true);
 	
 		disconnectClients();

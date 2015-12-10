@@ -16,6 +16,12 @@ import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.plugin.AuthorizationProperties;
 import io.moquette.plugin.MqttAction;
 
+/**
+ * Handler for mqtt events on managed zones.
+ * 
+ * @author lants1
+ *
+ */
 public class MqttManageHandler extends FceEventHandler implements IFceMqttCallback {
 
 	private static final Logger LOGGER = Logger.getLogger(MqttManageHandler.class.getName());

@@ -10,15 +10,15 @@ public class ShowcaseManageIntentAll extends Showcase{
 	private static String USER1 = "1fdd324asf";
 	private static String USER2 = "2b43dasfss";
 	
-	private static String TOPIC = "/test4";
+	private static String TOPIC = "/test56";
 	private static String INTENT_TOPIC = ManagedZone.INTENT.getTopicPrefix()+TOPIC;
 	private static String INFO_TOPIC = ManagedZone.INFO.getTopicPrefix()+TOPIC+"/#";
 
 	public static void main(String[] args) throws Exception {
-		client1 = initializeInternalMqttClient(USER1);
+		client1 = initializeInternalMqttClient(USER2);
 		client1.subscribe(INFO_TOPIC);
 		client1.subscribe(TOPIC);
-		client2 = initializeInternalMqttClient(USER2);
+		client2 = initializeInternalMqttClient(USER1);
 		client2.subscribe(INFO_TOPIC);
 		client2.subscribe(TOPIC);
 		
@@ -26,15 +26,15 @@ public class ShowcaseManageIntentAll extends Showcase{
 		client2.publish(INTENT_TOPIC, inputJson.getBytes(), Showcase.FIRE_AND_FORGET, true);
 		
 		Thread.sleep(2000);
-		bookQuota(client1);
+		bookQuota(client2);
 		Thread.sleep(2000);
-		bookQuota(client1);
+		bookQuota(client2);
 		Thread.sleep(2000);
-		bookQuota(client1);
+		bookQuota(client2);
 		Thread.sleep(2000);
-		bookQuota(client1); // quota depleted*/
+		bookQuota(client2); // quota depleted*/
 		Thread.sleep(2000);
-		bookQuota(client2); // should work...*/*/
+		bookQuota(client1); // should work...*/*/
 		
 		disconnectClients();
 	}

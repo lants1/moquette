@@ -4,6 +4,12 @@ import io.moquette.fce.exception.FceSystemException;
 import io.moquette.plugin.IBrokerConfig;
 import io.moquette.plugin.IBrokerOperator;
 
+/**
+ * Class for broker relevant context information.
+ * 
+ * @author lants1
+ *
+ */
 public abstract class BrokerContext {
 
 	private static final String PROP_SSL_PORT = "ssl_port";

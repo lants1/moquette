@@ -1,44 +1,37 @@
 package io.moquette.fce.tools;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-
 import javax.net.ssl.SSLSocketFactory;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 import io.moquette.fce.tools.callback.SampleFceClientCallback;
 
 public class ShowcaseAnonymousLogin extends Showcase {
 
-	public static void main(String[] args) throws KeyManagementException, UnrecoverableKeyException,
-			NoSuchAlgorithmException, CertificateException, KeyStoreException, MqttException, IOException {
+	public static void main(String[] args) throws Exception {
 		loginAnonymouslyAndPublishToTopic();
 
 	}
 
-	public static void loginAnonymouslyAndPublishToTopic() throws MqttException, KeyManagementException,
-			UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
+	public static void loginAnonymouslyAndPublishToTopic() throws Exception {
 
-		client1 = new MqttClient("ssl://localhost:8883", "test");
+		MqttClient client;
+		client = new MqttClient("ssl://localhost:8883", "test");
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setSocketFactory(ssf);
 
-		client1.connect(options);
-		client1.setCallback(new SampleFceClientCallback("anonymous"));
-		client1.setTimeToWait(1000);
-		client1.publish("/test1", "test".getBytes(), Showcase.FIRE_AND_FORGET, false);
-		
-		disconnectClients();
+		client.connect(options);
+		client.setCallback(new SampleFceClientCallback("anonymous"));
+		client.subscribe("/test1");
+		client.publish("/test1", "test".getBytes(), Showcase.FIRE_AND_FORGET, false);
+		Thread.sleep(3000);
+		client.disconnect();
+		client.close();
+
 	}
 
 }
