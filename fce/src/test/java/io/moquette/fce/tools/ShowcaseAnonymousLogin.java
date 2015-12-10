@@ -26,21 +26,19 @@ public class ShowcaseAnonymousLogin extends Showcase {
 	public static void loginAnonymouslyAndPublishToTopic() throws MqttException, KeyManagementException,
 			UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
 
-		MqttClient client;
-		client = new MqttClient("ssl://localhost:8883", "test");
+		client1 = new MqttClient("ssl://localhost:8883", "test");
 
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
 		options.setSocketFactory(ssf);
 
-		client.connect(options);
-		client.setCallback(new SampleFceClientCallback());
-		client.setTimeToWait(1000);
-		client.publish("/test1", "test".getBytes(), Showcase.FIRE_AND_FORGET, false);
-		client.disconnect();
-		client.close();
-
+		client1.connect(options);
+		client1.setCallback(new SampleFceClientCallback("anonymous"));
+		client1.setTimeToWait(1000);
+		client1.publish("/test1", "test".getBytes(), Showcase.FIRE_AND_FORGET, false);
+		
+		disconnectClients();
 	}
 
 }

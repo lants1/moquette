@@ -19,9 +19,34 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
+import io.moquette.fce.service.FceServiceFactory;
+import io.moquette.fce.tools.callback.SampleFceClientCallback;
+
 public abstract class Showcase {
-	
+
 	public static final int FIRE_AND_FORGET = 0;
+	public static MqttClient client1;
+	public static MqttClient client2;
+
+	public static MqttClient initializeInternalMqttClient(String user) throws Exception {
+		MqttClient client = new MqttClient("ssl://localhost:8883", "clientid"+user);
+
+		SSLSocketFactory ssf = configureSSLSocketFactory();
+		FceServiceFactory services = new FceServiceFactory(null, null);
+		
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(user);
+		System.out.println(services.getHashing().generateHash(user).toCharArray());
+		options.setPassword(services.getHashing().generateHash(user).toCharArray());
+		options.setSocketFactory(ssf);
+
+		client.connect(options);
+		client.setCallback(new SampleFceClientCallback(user));
+		return client;
+	}
 	
 	/**
 	 * keystore generated into test/resources with command:
@@ -71,5 +96,22 @@ public abstract class Showcase {
 			return ShowcaseInvalidLogin.class.getClassLoader().getResourceAsStream(jksPath);
 		}
 		throw new RuntimeException();
+	}
+
+	public static void disconnectClients() {
+		try {
+			Thread.sleep(3000);
+			if (client1 != null && client1.isConnected()) {
+				client1.disconnect();
+				client1.close();
+			}
+
+			if (client2 != null && client2.isConnected()) {
+				client2.disconnect();
+				client2.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
