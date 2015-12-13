@@ -82,6 +82,7 @@ public class FcePlugin implements IAuthenticationAndAuthorizationPlugin, MqttCal
 	public void unload() {
 		try {
 			mqttClient.unregisterSubscriptions();
+			mqttClient.disconnect();
 		} catch (MqttException e) {
 			LOGGER.log(Level.WARNING, "unload not possible could not unregister subscriptions", e);
 		}

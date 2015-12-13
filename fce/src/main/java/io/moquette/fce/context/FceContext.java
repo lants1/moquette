@@ -14,9 +14,9 @@ import io.moquette.plugin.IBrokerOperator;
  */
 public class FceContext extends BrokerContext{
 
-	private static final String PROP_JKS_PATH = "plugin_jks_path";
-	private static final String PROP_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
-	private static final String PROP_KEY_STORE_PASSWORD = "plugin_key_store_password";
+	public static final String PROP_JKS_PATH = "plugin_jks_path";
+	public static final String PROP_KEY_MANAGER_PASSWORD = "plugin_key_manager_password";
+	public static final String PROP_KEY_STORE_PASSWORD = "plugin_key_store_password";
 
 	private QuotaStore quotaDbServiceGlobal;
 	private QuotaStore quotaDbServicePrivate;
@@ -33,7 +33,7 @@ public class FceContext extends BrokerContext{
 		super(config, brokerOperator);
 		
 		if(config.getProperty(PROP_JKS_PATH) == null || config.getProperty(PROP_KEY_MANAGER_PASSWORD) == null || config.getProperty(PROP_KEY_STORE_PASSWORD) == null){
-			throw new FceSystemException("Missing properties for Plugin startup at least ssl_port or secure_websocket_port should be configured in the .conf file");
+			throw new FceSystemException("Missing properties for Plugin startup, internal plugin_jks_path, plugin_key_store_password, plugin_key_manager_password are not correct configured in the moquette .conf file");
 		}
 	}
 

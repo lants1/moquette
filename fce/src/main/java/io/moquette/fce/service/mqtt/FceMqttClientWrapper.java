@@ -134,23 +134,7 @@ public class FceMqttClientWrapper implements MqttService {
 	}
 
 	public void unregisterSubscriptions() throws MqttException {
-		client.unsubscribe(subscribedTopics.keySet().toArray(new String[subscribedTopics.size()]), null,
-				new IMqttActionListener() {
-					@Override
-					public void onSuccess(IMqttToken asyncActionToken) {
-						try {
-							client.disconnect();
-						} catch (MqttException e) {
-							LOGGER.log(Level.WARNING, "internal client could not disconnect...", e);
-						}
-						LOGGER.info("topics unregistered,client disconnected");
-					}
-
-					@Override
-					public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-						LOGGER.log(Level.WARNING, "could not unregister subscriptions", exception);
-					}
-				});
+		client.unsubscribe(subscribedTopics.keySet().toArray(new String[subscribedTopics.size()]));
 		subscribedTopics.clear();
 	}
 
@@ -215,6 +199,15 @@ public class FceMqttClientWrapper implements MqttService {
 				LOGGER.log(Level.WARNING, "internal mqtt client can't connect to broker", exception);
 			}
 		});
+	}
+	
+	/**
+	 * Disconnects the mqtt client.
+	 *
+	 * @throws MqttException
+	 */
+	public void disconnect() throws MqttException{
+		client.disconnect();
 	}
 
 	/**

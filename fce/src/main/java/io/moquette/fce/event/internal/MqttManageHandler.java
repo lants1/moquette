@@ -12,6 +12,7 @@ import io.moquette.fce.exception.FceSystemException;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.fce.model.info.InfoMessageType;
 import io.moquette.fce.model.quota.UserQuota;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.plugin.AuthorizationProperties;
@@ -79,6 +80,7 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 		for (String schemaTopic : msgConfig.getSchemaTopics()) {
 			getServices().getMqtt().addNewSubscription(schemaTopic, new MqttSchemaHandler());
 		}
+		sendInfoMessage(InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED, msgConfig, topicIdentifier);
 		LOGGER.info("received configuration message for topic: " + topicIdentifier);
 	}
 }

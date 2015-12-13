@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.StringUtils;
 import io.moquette.fce.common.converter.QuotaConverter;
 import io.moquette.fce.context.FceContext;
 import io.moquette.fce.exception.FceAuthorizationException;
+import io.moquette.fce.model.ManagedInformation;
 import io.moquette.fce.model.common.CheckResult;
 import io.moquette.fce.model.common.ManagedTopic;
 import io.moquette.fce.model.common.ManagedZone;
@@ -76,6 +77,16 @@ public abstract class FceEventHandler {
 		getServices().getMqtt().publish(
 				new ManagedTopic(props.getTopic())
 						.getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
+				getServices().getJsonParser().serialize(infoMsg));
+		LOGGER.info(infoMsg.toString());
+	}
+	
+	protected void sendInfoMessage(InfoMessageType msgType, ManagedInformation info, String topic) {
+		InfoMessage infoMsg = new InfoMessage(info.getAlias(),
+				info.getUserHash(), msgType, "");
+		getServices().getMqtt().publish(
+				new ManagedTopic(topic)
+						.getIdentifier(info.getUserHash(), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
 		LOGGER.info(infoMsg.toString());
 	}
