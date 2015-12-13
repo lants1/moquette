@@ -12,7 +12,6 @@ import io.moquette.fce.model.common.DataUnit;
 import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.configuration.AdminPermission;
 import io.moquette.fce.model.configuration.FceAction;
-import io.moquette.fce.model.configuration.ManagedState;
 import io.moquette.fce.model.configuration.PeriodicRestriction;
 import io.moquette.fce.model.configuration.Restriction;
 import io.moquette.fce.model.configuration.TimeframeRestriction;
@@ -29,7 +28,7 @@ public class QuotaConverterTest {
 		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, 1, 1, 1, DataUnit.B, null);
 		restrictions.add(tfRest);
 		restrictions.add(perRest);
-		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,restrictions);
+		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedScope.GLOBAL,restrictions);
 		List<Quota> quotas = QuotaConverter.convertRestrictions(restrictions);
 		assertTrue(quotas.size()==4);
 		UserQuota usrQuota = QuotaConverter.convertPublishConfiguration(userConfig);
@@ -40,7 +39,7 @@ public class QuotaConverterTest {
 	
 	@Test
 	public void testWithoutRestriction() {
-		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,null);
+		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedScope.GLOBAL,null);
 		List<Quota> quotas = QuotaConverter.convertRestrictions(null);
 		assertTrue(quotas.size()==0);
 		UserQuota usrQuota = QuotaConverter.convertPublishConfiguration(userConfig);
@@ -56,7 +55,7 @@ public class QuotaConverterTest {
 		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, 0, 0, 0, DataUnit.B, null);
 		restrictions.add(tfRest);
 		restrictions.add(perRest);
-		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,restrictions);
+		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedScope.GLOBAL,restrictions);
 		List<Quota> quotas = QuotaConverter.convertRestrictions(restrictions);
 		assertTrue(quotas.size()==0);
 		UserQuota usrQuota = QuotaConverter.convertPublishConfiguration(userConfig);
@@ -72,7 +71,7 @@ public class QuotaConverterTest {
 		PeriodicRestriction perRest = new PeriodicRestriction(FceAction.SUBSCRIBE, null, -1, -1, -1, DataUnit.B, null);
 		restrictions.add(tfRest);
 		restrictions.add(perRest);
-		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL,restrictions);
+		UserConfiguration userConfig = new UserConfiguration("alias","userhash",FceAction.ALL, AdminPermission.ALL, ManagedScope.GLOBAL,restrictions);
 		List<Quota> quotas = QuotaConverter.convertRestrictions(restrictions);
 		assertTrue(quotas.size()==4);
 		UserQuota usrQuota = QuotaConverter.convertPublishConfiguration(userConfig);

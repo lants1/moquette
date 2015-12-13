@@ -21,7 +21,6 @@ import io.moquette.fce.model.common.ManagedScope;
 import io.moquette.fce.model.configuration.AdminPermission;
 import io.moquette.fce.model.configuration.DataSchema;
 import io.moquette.fce.model.configuration.FceAction;
-import io.moquette.fce.model.configuration.ManagedState;
 import io.moquette.fce.model.configuration.PeriodicRestriction;
 import io.moquette.fce.model.configuration.Restriction;
 import io.moquette.fce.model.configuration.SchemaType;
@@ -63,7 +62,7 @@ public class JsonParserServiceTest {
 		restrictions.add(specificRestriction);
 		restrictions.add(periodicRestriction);
 
-		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, FceAction.ALL, AdminPermission.ALL, ManagedState.ACTIVE, ManagedScope.GLOBAL, restrictions);
+		UserConfiguration sampleUserConfig = new UserConfiguration(TESTUSER, TESTIDENTIFIER, FceAction.ALL, AdminPermission.ALL, ManagedScope.GLOBAL, restrictions);
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String json = mJsonParser.serialize(sampleUserConfig);

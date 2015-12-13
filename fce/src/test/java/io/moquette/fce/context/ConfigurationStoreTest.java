@@ -27,7 +27,7 @@ public class ConfigurationStoreTest {
 
 	@Test
 	public void testPutGet() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);
 
@@ -43,7 +43,7 @@ public class ConfigurationStoreTest {
 
 	@Test
 	public void testIsManaged() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null);
 		ConfigurationStore configService = new ConfigurationStore(null, ManagedZone.CONFIG_GLOBAL);
 		configService.put(TOPIC.getIdentifier(USERHASH, ManagedZone.CONFIG_GLOBAL), userConfig);
 
@@ -53,9 +53,9 @@ public class ConfigurationStoreTest {
 
 	@Test
 	public void testPutGetEveryone() throws FceAuthorizationException {
-		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null, null);
+		UserConfiguration userConfig = new UserConfiguration(USER, USERHASH, FceAction.ALL, null, null, null);
 
-		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, FceAction.ALL, null,
+		UserConfiguration everyoneConfig = new UserConfiguration(ALL_USER, ALL_ID, FceAction.ALL,
 				null, null, null);
 
 		AuthorizationProperties props = new AuthorizationProperties(TOPIC.getIdentifer(), null, USERHASH, null, null);

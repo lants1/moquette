@@ -22,25 +22,19 @@ import io.moquette.plugin.MqttAction;
  */
 public class UserConfiguration extends ManagedInformation implements IValid {
 
-	private final ManagedState managedState;
 	private final ManagedScope managedScope;
 	private final AdminPermission adminPermission;
 	private final FceAction actionPermission;
 	private final List<Restriction> restrictions;
 
 	public UserConfiguration(String alias, String usernameHash, FceAction actionPermission,
-			AdminPermission adminPermission, ManagedState managedState, ManagedScope scope,
+			AdminPermission adminPermission, ManagedScope scope,
 			List<Restriction> restrictions) {
 		super(alias, usernameHash);
 		this.actionPermission = actionPermission;
 		this.restrictions = restrictions;
-		this.managedState = managedState;
 		this.managedScope = scope;
 		this.adminPermission = adminPermission;
-	}
-
-	public ManagedState getManagedState() {
-		return managedState;
 	}
 
 	public List<Restriction> getRestrictions() {

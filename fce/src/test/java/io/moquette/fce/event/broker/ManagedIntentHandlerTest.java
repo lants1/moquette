@@ -68,7 +68,7 @@ public class ManagedIntentHandlerTest {
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 		when(contextMock.getHashAssignment()).thenReturn(mock(HashAssignmentStore.class));
 		when(contextMock.getHashAssignment().get(any(String.class))).thenReturn(USER_HASH);
-		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, null, ManagedScope.PRIVATE,
+		UserConfiguration userConfig = new UserConfiguration(null, USER_HASH, null, null, ManagedScope.PRIVATE,
 				null);
 
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
@@ -93,7 +93,7 @@ public class ManagedIntentHandlerTest {
 
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 
-		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
+		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, ManagedScope.GLOBAL, null);
 
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,
@@ -118,7 +118,7 @@ public class ManagedIntentHandlerTest {
 
 		when(configDbService.isManaged(any(ManagedTopic.class))).thenReturn(true);
 
-		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, null, ManagedScope.GLOBAL, null);
+		UserConfiguration userConfig = new UserConfiguration(null, null, null, null, ManagedScope.GLOBAL, null);
 
 		AuthorizationProperties authPropsPlugin = new AuthorizationProperties(
 				ManagedZone.CONFIG_GLOBAL.getTopicPrefix() + "/house/_" + USER_HASH, null, null, false,

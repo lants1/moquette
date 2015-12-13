@@ -140,9 +140,13 @@ public class FceMqttClientWrapper implements MqttService {
 
 	@Override
 	public void publish(String topic, String json) {
+		publish(topic, json, true);
+	}
+	
+	private void publish(String topic, String json, boolean retained) {
 		MqttMessage message = new MqttMessage();
 		message.setPayload(json.getBytes());
-		message.setRetained(true);
+		message.setRetained(retained);
 		message.setQos(OOS_AT_LEAST_ONCE);
 		try {
 			client.publish(topic, message, null, new IMqttActionListener() {
