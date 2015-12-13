@@ -36,13 +36,13 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
-		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
-		LOGGER.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
-				+ action);
+		String userHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
+		LOGGER.info("recieved Intent-Event on:" + props.getTopic() + "from client:" + props.getClientId()
+				+ " and action:" + action);
 
 		CheckResult preCheckState = preCheckManagedZone(props, action);
 
-		if(!CheckResult.NO_RESULT.equals(preCheckState)){
+		if (!CheckResult.NO_RESULT.equals(preCheckState)) {
 			return preCheckState.getValue();
 		}
 
@@ -51,34 +51,26 @@ public class ManagedIntentHandler extends FceEventHandler {
 			UserConfiguration newConfig = getServices().getJsonParser()
 					.deserializeUserConfiguration(props.getMessage());
 
-			if (getContext().getConfigurationStore(ManagedScope.GLOBAL).isManaged(topic)) {
-				if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
-					if (getContext().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash())) {
-						LOGGER.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId()
-								+ " and action:" + action);
-						storeUserConfiguration(topic, newConfig);
-						return true;
+			// Handle private manage intent
+			if (ManagedScope.PRIVATE.equals(newConfig.getManagedScope())) {
+				if (!isConfigHashEqualsUserHash(props, newConfig)) {
+					sendInfoMessage(InfoMessageType.PRIVATE_CONFIG_CHANGE_ONLY_ALLOWED_FOR_OWN_USER, props, action);
+					return false;
+				}
+			} else if (getContext().getConfigurationStore(ManagedScope.GLOBAL).isManaged(topic)) {
+				{
+					// Handle Global manage Intent
+					UserConfiguration userConfig = (UserConfiguration) getContext()
+							.getConfigurationStore(ManagedScope.GLOBAL)
+							.getConfiguration(props.getTopic(), userHashFromRequest).getData();
+					if (userConfig == null || AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
+						// is managed but no matching configuration for user
+						// found....
+						sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
+						return false;
 					}
-					sendInfoMessage(InfoMessageType.PRIVATE_QUOTA_CHANGE_ONLY_ALLOWED_FOR_OWN_USER, props, action);
-					return false;
-				}
 
-				UserConfiguration userConfig = (UserConfiguration) getContext().getConfigurationStore(ManagedScope.GLOBAL).getConfiguration(props.getTopic(), usernameHashFromRequest).getData();
-				if (userConfig == null) {
-					// is managed but no matching configuration for user found....
-					sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
-					return false;
-				}
-				if (AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
-					sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
-					return false;
-				}
-				if (userConfig.isValidForEveryone()) {
-					List<UserQuota> quotasToRemove = getUnneededGlobalQuotas(topic);
-
-					for (UserQuota quotaToRemove : quotasToRemove) {
-						deleteQuota(topic, quotaToRemove);
-					}
+					removeQuotasForConfiguration(topic, userConfig);
 				}
 			}
 			storeUserConfiguration(topic, newConfig);
@@ -88,10 +80,25 @@ public class ManagedIntentHandler extends FceEventHandler {
 
 			return true;
 
-		} catch (FceAuthorizationException e) {
+		} catch (FceAuthorizationException | NullPointerException e) {
 			LOGGER.log(Level.WARNING, "could not authorize request", e);
 			sendInfoMessage(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
 			return false;
+		}
+	}
+
+	private boolean isConfigHashEqualsUserHash(AuthorizationProperties props, UserConfiguration newConfig) {
+		return getContext().getHashAssignment().get(props.getClientId()).equals(newConfig.getUserHash());
+	}
+
+	private void removeQuotasForConfiguration(ManagedTopic topic, UserConfiguration userConfig)
+			throws FceAuthorizationException {
+		if (userConfig.isValidForEveryone()) {
+			List<UserQuota> quotasToRemove = getUnneededGlobalQuotas(topic);
+
+			for (UserQuota quotaToRemove : quotasToRemove) {
+				deleteQuota(topic, quotaToRemove);
+			}
 		}
 	}
 
@@ -109,8 +116,8 @@ public class ManagedIntentHandler extends FceEventHandler {
 			throw new FceAuthorizationException("invalid managed scope");
 		}
 
-		getContext().getConfigurationStore(newConfig.getManagedScope()).put(topic.getIdentifier(newConfig, configurationZone),
-				newConfig);
+		getContext().getConfigurationStore(newConfig.getManagedScope())
+				.put(topic.getIdentifier(newConfig, configurationZone), newConfig);
 		getServices().getMqtt().publish(topic.getIdentifier(newConfig, configurationZone),
 				getServices().getJsonParser().serialize(newConfig));
 
@@ -139,5 +146,4 @@ public class ManagedIntentHandler extends FceEventHandler {
 		getContext().getQuotaStore(ManagedScope.GLOBAL).remove(userTopicIdentifier);
 		getServices().getMqtt().delete(userTopicIdentifier);
 	}
-
 }

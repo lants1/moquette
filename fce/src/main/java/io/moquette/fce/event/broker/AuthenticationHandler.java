@@ -36,13 +36,13 @@ public class AuthenticationHandler {
 			return true;
 		}
 
-		boolean usernameHashValidation = services.getHashing().validateUsernameHash(props);
-		if (usernameHashValidation) {
+		boolean isUserHashValid = services.getHashing().validateUserHash(props);
+		if (isUserHashValid) {
 			// if a user with a valid hash login and a user with the same clientid already exists the other session is dropped by the broker...
 			context.getHashAssignment().put(props.getClientId(), services.getHashing().generateHash(props.getUsername()));
 		}
 		
 		// if the plugin is active only users with usr:username, pw:hash(username) could login to the broker
-		return usernameHashValidation;
+		return isUserHashValid;
 	}
 }

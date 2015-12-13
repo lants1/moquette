@@ -33,7 +33,6 @@ public class ManagedTopicHandler extends FceEventHandler {
 		super(context, services);
 	}
 
-	// TODO lants1 evviil method, refactoring needed
 	@Override
 	public boolean canDoOperation(AuthorizationProperties props, MqttAction action) {
 		String usernameHashFromRequest = getContext().getHashAssignment().get(props.getClientId());
@@ -56,32 +55,22 @@ public class ManagedTopicHandler extends FceEventHandler {
 			UserQuota quotasGlobal = (UserQuota) getContext().getQuotaStore(ManagedScope.GLOBAL)
 					.getQuota(deductionTopicGlobal.getIdentifer(), usernameHashFromRequest, action).getData();
 
-			if (configGlobal != null) {
-				if (configGlobal.hasQuota()) {
-					if (configGlobal.isValidForEveryone() && quotasGlobal == null) {
-						quotasGlobal = new UserQuota("generated", usernameHashFromRequest, action,
-								QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
-					}
-
-					if (!configGlobal.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
-						return false;
-					}
-
-					if (!quotasGlobal.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
-						return false;
-					}
-				} else {
-					if (!configGlobal.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
-						return false;
-					}
-				}
-			} else {
-				// no config found for user
+			if (configGlobal == null || !configGlobal.isValid(getServices(), props, action)) {
+				// no config found for user / or global config invalid
 				sendInfoMessage(InfoMessageType.GLOBAL_CONFIG_REJECTED, props, action);
 				return false;
+			}
+
+			if (configGlobal.hasQuota()) {
+				if (configGlobal.isValidForEveryone() && quotasGlobal == null) {
+					quotasGlobal = new UserQuota("generated", usernameHashFromRequest, action,
+							QuotaConverter.convertRestrictions(configGlobal.getRestrictions(action)));
+				}
+
+				if (!quotasGlobal.isValid(getServices(), props, action)) {
+					sendInfoMessage(InfoMessageType.GLOBAL_QUOTA_DEPLETED, props, action);
+					return false;
+				}
 			}
 
 			ManagedStorageSearchResult configurationResultPrivate = getContext()
@@ -93,34 +82,26 @@ public class ManagedTopicHandler extends FceEventHandler {
 					.getQuota(deductionTopicPrivate.getIdentifer(), usernameHashFromRequest, action).getData();
 
 			if (configPrivate != null) {
-				if (configPrivate.hasQuota()) {
-					if (!configPrivate.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
-						return false;
-					}
-
-					if (!quotasPrivate.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
-						return false;
-					}
-					substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, quotasPrivate,
-							deductionTopicPrivate.getIdentifier(ManagedZone.QUOTA_PRIVATE));
-				} else {
-					if (!configPrivate.isValid(getServices(), props, action)) {
-						sendInfoMessage(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
-						return false;
-					}
+				if (!configPrivate.isValid(getServices(), props, action)) {
+					sendInfoMessage(InfoMessageType.PRIVATE_CONFIG_REJECTED, props, action);
+					return false;
 				}
+
+				if (configPrivate.hasQuota() && !quotasPrivate.isValid(getServices(), props, action)) {
+					sendInfoMessage(InfoMessageType.PRIVATE_QUOTA_DEPLETED, props, action);
+					return false;
+				}
+				substractQuota(props, action, ManagedZone.QUOTA_PRIVATE, configPrivate, quotasPrivate,
+						deductionTopicPrivate.getIdentifier(ManagedZone.QUOTA_PRIVATE));
 			}
 
-			if (configGlobal.hasQuota()) {
-				substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, quotasGlobal,
-						deductionTopicGlobal.getIdentifier(ManagedZone.QUOTA_GLOBAL));
-			}
+			substractQuota(props, action, ManagedZone.QUOTA_GLOBAL, configGlobal, quotasGlobal,
+					deductionTopicGlobal.getIdentifier(ManagedZone.QUOTA_GLOBAL));
+
 			LOGGER.info("accepted Event on:" + props.getTopic() + "from client:" + props.getClientId() + " and action:"
 					+ action);
 			return true;
-		} catch (FceAuthorizationException e) {
+		} catch (FceAuthorizationException | NullPointerException e) {
 			sendInfoMessage(InfoMessageType.AUTHORIZATION_EXCEPTION, props, action);
 			LOGGER.log(Level.INFO, InfoMessageType.AUTHORIZATION_EXCEPTION + " for topic:" + props.getTopic()
 					+ " user: " + props.getUser() + " action:" + action, e);
@@ -129,17 +110,20 @@ public class ManagedTopicHandler extends FceEventHandler {
 	}
 
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
-			UserQuota userQuotas, String topicIdentifierToUpdate) throws FceAuthorizationException {
-		String usernameHashFromRequest = getContext().getHashAssignment().get(properties.getClientId());
+			UserConfiguration usrConfig, UserQuota userQuotas, String topicIdentifierToUpdate)
+					throws FceAuthorizationException, NullPointerException{
+		if (usrConfig.hasQuota()) {
+			String usernameHashFromRequest = getContext().getHashAssignment().get(properties.getClientId());
 
-		userQuotas.substractRequestFromQuota(properties, operation);
-		String quotaJson = getServices().getJsonParser().serialize(userQuotas);
+			userQuotas.substractRequestFromQuota(properties, operation);
+			String quotaJson = getServices().getJsonParser().serialize(userQuotas);
 
-		String userTopicIdentifier = new ManagedTopic(topicIdentifierToUpdate).getIdentifier(usernameHashFromRequest,
-				zone, operation);
+			String userTopicIdentifier = new ManagedTopic(topicIdentifierToUpdate)
+					.getIdentifier(usernameHashFromRequest, zone, operation);
 
-		getContext().getQuotaStore(zone.getScope()).put(userTopicIdentifier, userQuotas);
-		getServices().getMqtt().publish(userTopicIdentifier, quotaJson);
+			getContext().getQuotaStore(zone.getScope()).put(userTopicIdentifier, userQuotas);
+			getServices().getMqtt().publish(userTopicIdentifier, quotaJson);
+		}
 	}
 
 }

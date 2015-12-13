@@ -62,14 +62,13 @@ public abstract class FceEventHandler {
 		}
 		return CheckResult.NO_RESULT;
 	}
-
-	private boolean isPluginClient(AuthorizationProperties properties) {
-		if (!context.getPluginPw().isEmpty()) {
-			return StringUtils.equals(getContext().getHashAssignment().get(properties.getClientId()),
-					context.getPluginPw());
-		}
-		return false;
+	
+	public void injectFceEnvironment(FceContext context, FceServiceFactory services) {
+		this.context = context;
+		this.services = services;
 	}
+
+	public abstract boolean canDoOperation(AuthorizationProperties properties, MqttAction operation);
 
 	protected void sendInfoMessage(InfoMessageType msgType, AuthorizationProperties props, MqttAction action) {
 		InfoMessage infoMsg = new InfoMessage(props.getClientId(),
@@ -78,6 +77,7 @@ public abstract class FceEventHandler {
 				new ManagedTopic(props.getTopic())
 						.getIdentifier(getContext().getHashAssignment().get(props.getClientId()), ManagedZone.INFO),
 				getServices().getJsonParser().serialize(infoMsg));
+		LOGGER.info(infoMsg.toString());
 	}
 
 	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig,
@@ -96,11 +96,13 @@ public abstract class FceEventHandler {
 			getServices().getMqtt().publish(pubQuotaTopic, getServices().getJsonParser().serialize(pubQuota));
 		}
 	}
-
-	public void injectFceEnvironment(FceContext context, FceServiceFactory services) {
-		this.context = context;
-		this.services = services;
+	
+	private boolean isPluginClient(AuthorizationProperties properties) {
+		if (!context.getPluginPw().isEmpty()) {
+			return StringUtils.equals(getContext().getHashAssignment().get(properties.getClientId()),
+					context.getPluginPw());
+		}
+		return false;
 	}
 
-	public abstract boolean canDoOperation(AuthorizationProperties properties, MqttAction operation);
 }

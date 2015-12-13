@@ -23,7 +23,7 @@ public class HashService {
 		return DigestUtils.sha256Hex(username);
 	}
 
-	public boolean validateUsernameHash(AuthenticationProperties props) {
+	public boolean validateUserHash(AuthenticationProperties props) {
 		try {
 			if (props.getUsername() == null || props.getPassword() == null) {
 				return false;

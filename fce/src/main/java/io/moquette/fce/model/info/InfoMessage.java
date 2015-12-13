@@ -22,15 +22,21 @@ public class InfoMessage extends ManagedInformation{
 	public InfoMessageType getMessageType() {
 		return messageType;
 	}
+	
 	public void setMessageType(InfoMessageType messageType) {
 		this.messageType = messageType;
 	}
+	
 	public String getMessageText() {
 		return messageText;
 	}
+	
 	public void setMessageText(String messageText) {
 		this.messageText = messageText;
 	}
 	
-	
+	@Override
+	public String toString(){
+		return messageType.getValue() +"::"+ messageText;
+	}
 }
