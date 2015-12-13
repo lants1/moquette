@@ -111,7 +111,7 @@ public class ManagedTopicHandler extends FceEventHandler {
 
 	private void substractQuota(AuthorizationProperties properties, MqttAction operation, ManagedZone zone,
 			UserConfiguration usrConfig, UserQuota userQuotas, String topicIdentifierToUpdate)
-					throws FceAuthorizationException, NullPointerException{
+					throws FceAuthorizationException{
 		if (usrConfig.hasQuota()) {
 			String usernameHashFromRequest = getContext().getHashAssignment().get(properties.getClientId());
 

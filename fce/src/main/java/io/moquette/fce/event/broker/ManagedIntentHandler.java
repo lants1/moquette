@@ -58,20 +58,18 @@ public class ManagedIntentHandler extends FceEventHandler {
 					return false;
 				}
 			} else if (getContext().getConfigurationStore(ManagedScope.GLOBAL).isManaged(topic)) {
-				{
-					// Handle Global manage Intent
-					UserConfiguration userConfig = (UserConfiguration) getContext()
-							.getConfigurationStore(ManagedScope.GLOBAL)
-							.getConfiguration(props.getTopic(), userHashFromRequest).getData();
-					if (userConfig == null || AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
-						// is managed but no matching configuration for user
-						// found....
-						sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
-						return false;
-					}
-
-					removeQuotasForConfiguration(topic, userConfig);
+				// Handle Global manage Intent
+				UserConfiguration userConfig = (UserConfiguration) getContext()
+						.getConfigurationStore(ManagedScope.GLOBAL)
+						.getConfiguration(props.getTopic(), userHashFromRequest).getData();
+				if (userConfig == null || AdminPermission.NONE.equals(userConfig.getAdminPermission())) {
+					// is managed but no matching configuration for user
+					// found....
+					sendInfoMessage(InfoMessageType.MISSING_ADMIN_RIGHTS, props, action);
+					return false;
 				}
+
+				removeQuotasForConfiguration(topic, userConfig);
 			}
 			storeUserConfiguration(topic, newConfig);
 

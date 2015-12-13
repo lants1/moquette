@@ -63,11 +63,7 @@ public class QuotaUpdater implements Runnable {
 
 			for (Quota state : quotaIn.getQuotas()) {
 				if (state instanceof PeriodicQuota) {
-					PeriodicQuota newPeriodicState = (PeriodicQuota) state;
-					if (isCycleExpired(newPeriodicState.getCycle(), newPeriodicState.getLastManagedTimestamp())) {
-						newPeriodicState.flush();
-						newPeriodicState.setLastManagedTimestamp(new Date());
-					}
+					PeriodicQuota newPeriodicState = updatePeriodicState(state);
 					statesOut.add(newPeriodicState);
 				} else {
 					statesOut.add(state);
@@ -78,6 +74,15 @@ public class QuotaUpdater implements Runnable {
 			context.getQuotaStore(zone).put(key, quotaOut, true);
 			services.getMqtt().publish(key, services.getJsonParser().serialize(quotaOut));
 		}
+	}
+
+	private PeriodicQuota updatePeriodicState(Quota state) {
+		PeriodicQuota newPeriodicState = (PeriodicQuota) state;
+		if (isCycleExpired(newPeriodicState.getCycle(), newPeriodicState.getLastManagedTimestamp())) {
+			newPeriodicState.flush();
+			newPeriodicState.setLastManagedTimestamp(new Date());
+		}
+		return newPeriodicState;
 	}
 
 	private boolean isCycleExpired(ManagedCycle cycle, Date lastManagedTimestamp) {

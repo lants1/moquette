@@ -50,7 +50,7 @@ public final class QuotaConverter {
 	}
 
 	/**
-	 * Converts a List<Restrictions> to a List<Quota> with zero initalization values.
+	 * Converts a List<Restrictions> to a List<Quota> with zero initialization values.
 	 * 
 	 * @param restrictions List<Restriction>
 	 * @return quotas List<Quota> if no restrictions present return a empty List<Quota>
@@ -69,20 +69,28 @@ public final class QuotaConverter {
 							restriction.getTotalMessageSize() * restriction.getDataUnit().getMultiplier(), 0));
 				}
 
-				if (restriction instanceof PeriodicRestriction) {
-					for (IQuotaState state : quotaStates) {
-						resultRestrictions.add(new PeriodicQuota(((PeriodicRestriction) restriction).getCyle(), state));
-					}
-				}
-
-				if (restriction instanceof TimeframeRestriction) {
-					for (IQuotaState state : quotaStates) {
-						resultRestrictions.add(new TimeframeQuota(((TimeframeRestriction) restriction).getFrom(),
-								((TimeframeRestriction) restriction).getTo(), state));
-					}
-				}
+				resultRestrictions.addAll(getQuotas(restriction, quotaStates));
 			}
 		}
+		return resultRestrictions;
+	}
+
+	private static List<Quota> getQuotas(Restriction restriction,
+			List<IQuotaState> quotaStates) {
+		List<Quota> resultRestrictions = new ArrayList<>();
+		if (restriction instanceof PeriodicRestriction) {
+			for (IQuotaState state : quotaStates) {
+				resultRestrictions.add(new PeriodicQuota(((PeriodicRestriction) restriction).getCyle(), state));
+			}
+		}
+
+		if (restriction instanceof TimeframeRestriction) {
+			for (IQuotaState state : quotaStates) {
+				resultRestrictions.add(new TimeframeQuota(((TimeframeRestriction) restriction).getFrom(),
+						((TimeframeRestriction) restriction).getTo(), state));
+			}
+		}
+		
 		return resultRestrictions;
 	}
 }

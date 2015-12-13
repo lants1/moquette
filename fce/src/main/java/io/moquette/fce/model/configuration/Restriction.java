@@ -60,10 +60,8 @@ public abstract class Restriction implements IValid {
 	}
 
 	public boolean isValidCommon(FceServiceFactory services, AuthorizationProperties props){
-		if(getMaxMessageSize() > 0){
-			if(!(props.getMessage().position() < (getMaxMessageSize() * getSizeUnit().getMultiplier()))){
+		if(getMaxMessageSize() > 0 && isMessageSizeGreaterThanMaxMessageSize(props)){
 				return false;
-			}
 		}
 		
 		if (getDataSchema() != null) {
@@ -71,5 +69,9 @@ public abstract class Restriction implements IValid {
 		}
 		
 		return true;
+	}
+
+	private boolean isMessageSizeGreaterThanMaxMessageSize(AuthorizationProperties props) {
+		return props.getMessage().position() > (getMaxMessageSize() * getSizeUnit().getMultiplier());
 	}
 }
