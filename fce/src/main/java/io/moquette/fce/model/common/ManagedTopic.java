@@ -39,6 +39,9 @@ public class ManagedTopic {
 	}
 
 	public String getIdentifier(String userHash, ManagedZone zone) {
+		if (StringUtils.isEmpty(userHash)) {
+			return getAllIdentifier(zone);
+		}
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer, USER_PREFIX + userHash, zone);
 	}
 

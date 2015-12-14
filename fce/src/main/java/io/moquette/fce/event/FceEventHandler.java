@@ -57,6 +57,7 @@ public abstract class FceEventHandler {
 					+ " because it's plugin client: " + properties.getUser());
 			return CheckResult.VALID;
 		}
+	
 		if (!TopicPermission.getBasicPermission(properties.getTopic()).isAllowed(action)) {
 			LOGGER.info("no permission to " + action + " topic" + properties.getTopic());
 			return CheckResult.INVALID;
@@ -94,7 +95,7 @@ public abstract class FceEventHandler {
 	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig,
 			ManagedZone quotaZone) throws FceAuthorizationException {
 		// store the quota only when its has a userHash "not everyone config"
-		if (usrConfig.getUserHash() != null) {
+		if (usrConfig != null && !usrConfig.getUserHash().isEmpty()) {
 			UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
 			UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
 

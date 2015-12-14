@@ -49,18 +49,19 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		options.setSocketFactory(ssf);
 		m_client.connect(options);
 
-		String topic = "/FceConfigurationScopeIntegrationTest/simplemanage1";
+		String topic = "/FceConfigurationScopeIntegrationTest/lemanage";
 		String intentTopic = ManagedZone.INTENT.getTopicPrefix() + topic;
 		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
 
 		m_client.subscribe(topic, 0);
+		Thread.sleep(1000);
 		m_client.subscribe(infoTopic, 0);
 
 		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
-
+		
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
@@ -78,6 +79,70 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		m_client.disconnect();
 	}
 	
+	@Test
+	public void checkGlobalConfigAll() throws Exception {
+		SSLSocketFactory ssf = configureSSLSocketFactory();
+
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(USERNAME);
+		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
+		options.setSocketFactory(ssf);
+		m_client.connect(options);
+
+		String topic = "/FceConfigurationScopeIntegrationTest/siasdfmplemanage1all";
+		String intentTopic = ManagedZone.INTENT.getTopicPrefix() + topic;
+		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
+
+		m_client.subscribe(topic, 0);
+		m_client.subscribe(infoTopic, 0);
+
+		Thread.sleep(1000);
+		
+		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global_all.json");
+
+		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
+		assertTrue(
+				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+		m_callback.reinit();
+
+		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		m_callback.reinit();
+		
+		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		m_callback.reinit();
+		
+		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		m_callback.reinit();
+		
+		
+		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient123", new MemoryPersistence());
+		MqttConnectOptions secondClientOptions = new MqttConnectOptions();
+		secondClientOptions.setUserName(OTHER_USERNAME);
+		secondClientOptions.setPassword(services.getHashing().generateHash(OTHER_USERNAME).toCharArray());
+		secondClientOptions.setSocketFactory(ssf);
+		secondClient.connect(secondClientOptions);
+		FceTestCallback m_callback2 = new FceTestCallback();
+		secondClient.setCallback(m_callback2);
+		secondClient.subscribe(topic, 0);
+		
+		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(true).toString());
+		m_callback2.reinit();
+		
+		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(true).toString());
+		m_callback2.reinit();
+		
+		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
+		assertTrue(StringUtils.contains(m_callback2.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		m_callback2.reinit();
+		
+		secondClient.disconnect();
+		m_client.disconnect();
+	}
 	
 	@Test
 	public void checkPrivateConfig() throws Exception {
@@ -241,7 +306,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
-		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient", new MemoryPersistence());
+		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient77", new MemoryPersistence());
 		MqttConnectOptions secondClientOptions = new MqttConnectOptions();
 		secondClientOptions.setUserName(OTHER_USERNAME);
 		secondClientOptions.setPassword(services.getHashing().generateHash(OTHER_USERNAME).toCharArray());
