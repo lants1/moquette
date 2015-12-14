@@ -47,8 +47,8 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		options.setSocketFactory(ssf);
 		m_client.connect(options);
 
-		String topic = "/FceInheritanceIntegrationTest/simplemanage1";
-		String subTopic = "/FceInheritanceIntegrationTest/simplemanage1/bla";
+		String topic = "/FceInheritanceIntegrationTest/ewrasdfas";
+		String subTopic = "/FceInheritanceIntegrationTest/ewrasdfas/bla";
 		String intentTopic = ManagedZone.INTENT.getTopicPrefix() + topic;
 		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
 
@@ -57,6 +57,7 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 
 		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
 
+		m_callback.reinit();
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
@@ -99,6 +100,7 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		String inputJsonGlobal = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
 		String inputJsonPrivate = ReadFileUtil.readFileString("/integration/restriction_manage_private.json");
 		
+		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
@@ -141,6 +143,7 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		String inputJsonGlobal = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
 		String inputJsonPrivate = ReadFileUtil.readFileString("/integration/restriction_manage_private.json");
 		
+		m_callback.reinit();
 		// global config
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(

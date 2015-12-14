@@ -54,7 +54,6 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
 
 		m_client.subscribe(topic, 0);
-		Thread.sleep(1000);
 		m_client.subscribe(infoTopic, 0);
 
 		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
@@ -96,7 +95,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		m_client.subscribe(topic, 0);
 		m_client.subscribe(infoTopic, 0);
 
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		
 		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global_all.json");
 
@@ -126,8 +125,10 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		secondClient.connect(secondClientOptions);
 		FceTestCallback m_callback2 = new FceTestCallback();
 		secondClient.setCallback(m_callback2);
+		secondClient.subscribe(infoTopic, 0);
 		secondClient.subscribe(topic, 0);
 		
+		m_callback2.reinit();
 		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
 		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(true).toString());
 		m_callback2.reinit();
@@ -164,6 +165,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		String inputJsonGlobal = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
 		String inputJsonPrivate = ReadFileUtil.readFileString("/integration/restriction_manage_private.json");
 		
+		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
@@ -206,6 +208,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		String inputJsonPrivate = ReadFileUtil.readFileString("/integration/restriction_manage_private.json");
 		
 		// global config
+		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
@@ -217,7 +220,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
@@ -230,7 +233,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
@@ -243,7 +246,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
@@ -256,7 +259,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
-		Thread.sleep(1000);
+		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);

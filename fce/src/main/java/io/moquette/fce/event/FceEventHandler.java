@@ -2,7 +2,7 @@ package io.moquette.fce.event;
 
 import java.util.logging.Logger;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import io.moquette.fce.common.converter.QuotaConverter;
 import io.moquette.fce.context.FceContext;
@@ -95,7 +95,7 @@ public abstract class FceEventHandler {
 	protected void storeNewQuotaForUserConfiguration(ManagedTopic topic, UserConfiguration usrConfig,
 			ManagedZone quotaZone) throws FceAuthorizationException {
 		// store the quota only when its has a userHash "not everyone config"
-		if (usrConfig != null && !usrConfig.getUserHash().isEmpty()) {
+		if (usrConfig != null && StringUtils.isNotEmpty(usrConfig.getUserHash())) {
 			UserQuota subQuota = QuotaConverter.convertSubscribeConfiguration(usrConfig);
 			UserQuota pubQuota = QuotaConverter.convertPublishConfiguration(usrConfig);
 
