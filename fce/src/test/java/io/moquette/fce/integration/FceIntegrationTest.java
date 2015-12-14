@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import io.moquette.commons.Constants;
 import io.moquette.fce.context.FceContext;
+import io.moquette.fce.integration.util.FceIntegrationUtils;
+import io.moquette.fce.integration.util.FceTestCallback;
 import io.moquette.fce.service.FceServiceFactory;
 import io.moquette.server.Server;
 
@@ -40,7 +42,7 @@ public abstract class FceIntegrationTest {
 
 	protected static String USERNAME = "user";
 	protected static String OTHER_USERNAME = "otheruser";
-	protected static final Logger LOG = LoggerFactory.getLogger(FceEnhancedServerIntegrationTest.class);
+	protected static final Logger LOG = LoggerFactory.getLogger(ServerIntegrationTest.class);
 
 	protected FceServiceFactory services;
 

@@ -38,7 +38,7 @@ import org.junit.Test;
  * @author lants1
  *
  */
-public class FceEnhancedServerIntegrationTest extends FceIntegrationTest {
+public class ServerIntegrationTest extends FceIntegrationTest {
 
 	@Test
 	public void checkFceLoadedAndSimpleManageWork() throws Exception {
@@ -62,11 +62,11 @@ public class FceEnhancedServerIntegrationTest extends FceIntegrationTest {
 
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 
 		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient", new MemoryPersistence());
@@ -86,7 +86,6 @@ public class FceEnhancedServerIntegrationTest extends FceIntegrationTest {
 			// nice if we are here;)
 		}
 
-		m_client.disconnect();
 		secondClient.disconnect();
 	}
 
@@ -107,9 +106,7 @@ public class FceEnhancedServerIntegrationTest extends FceIntegrationTest {
 		secondClient.publish("/FceEnhancedServerIntegrationTest/topic", new MqttMessage(SAMPLE_MESSAGE.getBytes()));
 		secondClient.disconnect();
 
-		MqttMessage message = m_callback.getMessage(true);
+		MqttMessage message = m_callback.getMessage(false);
 		assertEquals(SAMPLE_MESSAGE, message.toString());
-
-		m_client.disconnect();
 	}
 }

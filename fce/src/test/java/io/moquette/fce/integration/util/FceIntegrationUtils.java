@@ -13,7 +13,7 @@
  *
  * You may elect to redistribute this code under either of these licenses.
  */
-package io.moquette.fce.integration;
+package io.moquette.fce.integration.util;
 
 import io.moquette.server.config.IConfig;
 

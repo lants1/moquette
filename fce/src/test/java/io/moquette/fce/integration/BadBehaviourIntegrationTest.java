@@ -15,10 +15,12 @@
  */
 package io.moquette.fce.integration;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.net.ssl.SSLSocketFactory;
 import io.moquette.fce.common.ReadFileUtil;
+import io.moquette.fce.integration.util.FceTestCallback;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.model.info.InfoMessageType;
 
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.Test;
 
@@ -36,7 +39,7 @@ import org.junit.Test;
  * @author lants1
  *
  */
-public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
+public class BadBehaviourIntegrationTest extends FceIntegrationTest {
 
 	@Test
 	public void corruptConfig() throws Exception {
@@ -59,7 +62,7 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.AUTHORIZATION_EXCEPTION.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.AUTHORIZATION_EXCEPTION.getValue()));
 		m_callback.reinit();
 
 		m_client.disconnect();
@@ -67,7 +70,6 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 	
 	@Test
 	public void noManagePermission() throws Exception {
-		LOG.info("*** checkSupportSSL ***");
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
@@ -87,7 +89,7 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient", new MemoryPersistence());
@@ -106,14 +108,58 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 		assertTrue(
 				StringUtils.contains(m_callback2.getMessage(true).toString(), InfoMessageType.MISSING_ADMIN_RIGHTS.getValue()));
 		m_callback2.reinit();
+		
+		secondClient.disconnect();
+	}
+	
+	@Test
+	public void anonymous() throws Exception {
+		SSLSocketFactory ssf = configureSSLSocketFactory();
 
-		m_client.disconnect();
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(USERNAME);
+		options.setPassword(services.getHashing().generateHash(USERNAME).toCharArray());
+		options.setSocketFactory(ssf);
+		m_client.connect(options);
+
+		String topic = "/FceEnhancedServerIntegrationTest/anonymoudfdfstest";
+		String intentTopic = ManagedZone.INTENT.getTopicPrefix() + topic;
+		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
+
+		m_client.subscribe(topic, 0);
+		m_client.subscribe(infoTopic, 0);
+
+		String inputJson = ReadFileUtil.readFileString("/integration/minimal_manage.json");
+
+		m_callback.reinit();
+		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
+		assertTrue(
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+		m_callback.reinit();
+
+		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "fdsasdf25sfd", new MemoryPersistence());
+		MqttConnectOptions secondClientOptions = new MqttConnectOptions();
+		secondClientOptions.setSocketFactory(ssf);
+		secondClient.connect(secondClientOptions);
+		FceTestCallback m_callback2 = new FceTestCallback();
+		secondClient.setCallback(m_callback2);
+		secondClient.subscribe(topic, 0);
+		
+		
+		try {
+			MqttMessage hopfullyNoMessage = m_callback2.getMessage(true);
+			// message should not be sent to the main client on topic
+			// simplemanage
+			assertNull(hopfullyNoMessage);
+		} catch (IllegalStateException e) {
+			// nice if we are here;)
+		}
+
 		secondClient.disconnect();
 	}
 	
 	@Test
 	public void changePrivateConfigFromOtherUser() throws Exception {
-		LOG.info("*** checkSupportSSL ***");
 		SSLSocketFactory ssf = configureSSLSocketFactory();
 
 		MqttConnectOptions options = new MqttConnectOptions();
@@ -135,7 +181,7 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 		// public
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
@@ -143,7 +189,7 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 		// private
 		m_client.publish(intentTopic, inputPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
@@ -152,10 +198,8 @@ public class FceEnhancedServerBadIntegrationTest extends FceIntegrationTest {
 		
 		m_client.publish(intentTopic, inputJsonOtheruser.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.PRIVATE_CONFIG_CHANGE_ONLY_ALLOWED_FOR_OWN_USER.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.PRIVATE_CONFIG_CHANGE_ONLY_ALLOWED_FOR_OWN_USER.getValue()));
 		m_callback.reinit();
-
-		m_client.disconnect();
 	}
 	
 	@Test(expected=MqttException.class)

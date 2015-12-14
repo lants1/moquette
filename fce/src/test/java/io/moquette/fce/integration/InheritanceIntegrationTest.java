@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author lants1
  *
  */
-public class FceInheritanceIntegrationTest extends FceIntegrationTest {
+public class InheritanceIntegrationTest extends FceIntegrationTest {
 
 	@Test
 	public void checkGlobalConfig() throws Exception {
@@ -60,22 +60,20 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		m_callback.reinit();
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(subTopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(subTopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(subTopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
-
-		m_client.disconnect();
 	}
 	
 	
@@ -103,23 +101,21 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		m_client.publish(subTopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(subTopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
-
-		m_client.disconnect();
 	}
 	
 	@Test
@@ -147,66 +143,64 @@ public class FceInheritanceIntegrationTest extends FceIntegrationTest {
 		// global config
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		// private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
 		
 		// publish
 		m_client.publish(subtopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// new global config
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		Thread.sleep(1000);
 		
 		// publish
 		m_client.publish(subtopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
 
 		// new private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
 		
 		// publish
 		m_client.publish(subtopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// new private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
 		
 		// publish
 		m_client.publish(subtopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// publish
 		m_client.publish(subtopic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
-		
-		m_client.disconnect();
 	}
 }

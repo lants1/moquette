@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import javax.net.ssl.SSLSocketFactory;
 import io.moquette.fce.common.ReadFileUtil;
+import io.moquette.fce.integration.util.FceTestCallback;
 import io.moquette.fce.model.common.ManagedZone;
 import io.moquette.fce.model.info.InfoMessageType;
 
@@ -37,7 +38,7 @@ import org.junit.Test;
  * @author lants1
  *
  */
-public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
+public class ConfigurationScopeIntegrationTest extends FceIntegrationTest {
 
 	@Test
 	public void checkGlobalConfig() throws Exception {
@@ -58,13 +59,14 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 
 		String inputJson = ReadFileUtil.readFileString("/integration/restriction_manage_global.json");
 		
+		m_callback.reinit();
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
@@ -88,7 +90,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		options.setSocketFactory(ssf);
 		m_client.connect(options);
 
-		String topic = "/FceConfigurationScopeIntegrationTest/siasdfmplemanage1all";
+		String topic = "/FceConfigurationScopeIntegrationTest/f342lemanage1all";
 		String intentTopic = ManagedZone.INTENT.getTopicPrefix() + topic;
 		String infoTopic = ManagedZone.INFO.getTopicPrefix() + topic + "/#";
 
@@ -101,23 +103,23 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
 		
 		
-		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient123", new MemoryPersistence());
+		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestdfasClient123", new MemoryPersistence());
 		MqttConnectOptions secondClientOptions = new MqttConnectOptions();
 		secondClientOptions.setUserName(OTHER_USERNAME);
 		secondClientOptions.setPassword(services.getHashing().generateHash(OTHER_USERNAME).toCharArray());
@@ -130,19 +132,18 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		
 		m_callback2.reinit();
 		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(false).toString());
 		m_callback2.reinit();
 		
 		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback2.getMessage(false).toString());
 		m_callback2.reinit();
 		
 		secondClient.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback2.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback2.getMessage(false).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
 		m_callback2.reinit();
 		
 		secondClient.disconnect();
-		m_client.disconnect();
 	}
 	
 	@Test
@@ -168,23 +169,21 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
-
-		m_client.disconnect();
 	}
 	
 	@Test
@@ -211,67 +210,65 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		m_callback.reinit();
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		// private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// new global config
 		m_client.publish(intentTopic, inputJsonGlobal.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.PRIVATE_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
 
 		// new private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// new private config
 		m_client.publish(intentTopic, inputJsonPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(500);
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(true).toString());
+		assertEquals(SAMPLE_MESSAGE, m_callback.getMessage(false).toString());
 		m_callback.reinit();
 		
 		// publish
 		m_client.publish(topic, SAMPLE_MESSAGE.getBytes(), 0, true);
-		assertTrue(StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
+		assertTrue(StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.GLOBAL_QUOTA_DEPLETED.getValue()));
 		m_callback.reinit();
-		
-		m_client.disconnect();
 	}
 	
 	@Test
@@ -298,7 +295,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		// public
 		m_client.publish(intentTopic, inputJson.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 		
 		Thread.sleep(1000);
@@ -306,7 +303,7 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		// private
 		m_client.publish(intentTopic, inputPrivate.getBytes(), 0, true);
 		assertTrue(
-				StringUtils.contains(m_callback.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
+				StringUtils.contains(m_callback.getMessage(false).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback.reinit();
 
 		MqttClient secondClient = new MqttClient("ssl://localhost:8883", "secondTestClient77", new MemoryPersistence());
@@ -325,8 +322,6 @@ public class FceConfigurationScopeIntegrationTest extends FceIntegrationTest {
 		assertTrue(
 				StringUtils.contains(m_callback2.getMessage(true).toString(), InfoMessageType.TOPIC_CONFIGURATION_ACCEPTED.getValue()));
 		m_callback2.reinit();
-
-		m_client.disconnect();
 		secondClient.disconnect();
 	}
 }
