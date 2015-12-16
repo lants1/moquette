@@ -16,6 +16,13 @@ public final class FceTimeUtil {
 	private FceTimeUtil() {
 	}
 	
+	/**
+	 * Calculates delay in seconds to the next target timevalue according to given parameters.s
+	 * 
+	 * @param targetMin int
+	 * @param targetSec int
+	 * @return delay in seconds as long
+	 */
 	public static long delayTo(int targetMin, int targetSec) {
 		LocalDateTime localNow = LocalDateTime.now();
 		ZoneId currentZone = ZoneId.systemDefault();
