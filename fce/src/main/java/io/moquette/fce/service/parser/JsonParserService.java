@@ -24,12 +24,24 @@ public class JsonParserService {
 
 	private static final Logger LOGGER = Logger.getLogger(JsonParserService.class.getName());
 	
+	/**
+	 * Serialize UserConfiguration to JSON
+	 * 
+	 * @param userConfig UserConfiguration
+	 * @return serialized UserConfiguration as String
+	 */
 	public String serialize(UserConfiguration userConfig) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(Restriction.class, new RestrictionAdapter());
 		return gson.create().toJson(userConfig);
 	}
 
+	/**
+	 * Serialize UserQuota to JSON
+	 * 
+	 * @param quota UserQuota
+	 * @return String serialized UserQuota
+	 */
 	public String serialize(UserQuota quota) {
 		GsonBuilder gson = new GsonBuilder();
 		gson.registerTypeAdapter(Quota.class, new QuotaAdapter());
@@ -37,6 +49,11 @@ public class JsonParserService {
 		return gson.create().toJson(quota);
 	}
 
+	/**
+	 * 
+	 * @param infoMessage
+	 * @return 
+	 */
 	public String serialize(InfoMessage infoMessage) {
 		GsonBuilder gson = new GsonBuilder();
 		return gson.create().toJson(infoMessage);

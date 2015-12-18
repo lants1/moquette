@@ -19,10 +19,22 @@ public class HashService {
 
 	private static final Logger LOGGER = Logger.getLogger(HashService.class.getName());
 
+	/**
+	 * Generates a hash from username.
+	 * 
+	 * @param username String
+	 * @return hash(username) String
+	 */
 	public String generateHash(String username) {
 		return DigestUtils.sha256Hex(username);
 	}
 
+	/**
+	 * Check validity of user hash.
+	 * 
+	 * @param props AuthenticationProperties
+	 * @return true if userhash is valid
+	 */
 	public boolean validateUserHash(AuthenticationProperties props) {
 		try {
 			if (props.getUsername() == null || props.getPassword() == null) {

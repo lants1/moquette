@@ -66,6 +66,11 @@ public class FceMqttClientWrapper implements MqttService {
 		this.callback = callback;
 	}
 
+	/**
+	 * Connects internal mqttclient to the broker and init subscriptions.
+	 * 
+	 * @param initalizationSubscriptions List<String>
+	 */
 	public void initializeInternalMqttClient(final List<String> initalizationSubscriptions) {
 		try {
 			client = getMqttClient();

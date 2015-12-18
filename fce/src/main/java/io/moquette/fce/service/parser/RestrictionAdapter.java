@@ -29,8 +29,7 @@ public class RestrictionAdapter implements JsonSerializer<Restriction>, JsonDese
 	}
 
 	@Override
-	public Restriction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
+	public Restriction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 		JsonObject jsonObject = json.getAsJsonObject();
 		String type = jsonObject.get("type").getAsString();
 		JsonElement element = jsonObject.get("properties");

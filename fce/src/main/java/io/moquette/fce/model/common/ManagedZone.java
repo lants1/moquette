@@ -19,18 +19,38 @@ public enum ManagedZone {
 		this.scope = scope;
 	}
 
+	/**
+	 * Gets the topic prefix of the managed zone.
+	 * 
+	 * @return String /topicPrefixForManagedZone
+	 */
 	public String getTopicPrefix() {
 		return topicPrefix;
 	}
 	
+	/**
+	 * Gets the topic filter of the managed zone.
+	 * 
+	 * @return String /topicPrefixForManagedZone/#
+	 */
 	public String getTopicFilter() {
 		return topicPrefix+"/#";
 	}
 	
+	/**
+	 * Gets the TopicPermission of the managed zone.
+	 * 
+	 * @return TopicPermission for ManagedZone
+	 */
 	public TopicPermission getPermission(){
 		return basePerm;
 	}
 	
+	/**
+	 * Gets the ManagedScope of the Managed Zone.
+	 * 
+	 * @return ManagedScope for ManagedZone
+	 */
 	public ManagedScope getScope(){
 		return scope;
 	}

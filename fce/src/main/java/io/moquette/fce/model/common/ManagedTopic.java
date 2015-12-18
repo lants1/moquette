@@ -23,10 +23,20 @@ public class ManagedTopic {
 		this.topicIdentifer = topicIdentifer;
 	}
 
+	/**
+	 * Gets the topicIdentifier of a ManagedTopic.
+	 * 
+	 * @return String topicIdentifier 
+	 */
 	public String getIdentifer() {
 		return topicIdentifer;
 	}
 
+	/**
+	 * 
+	 * @param managedZone
+	 * @return String topicIdentifier
+	 */
 	public String getIdentifier(ManagedZone managedZone) {
 		return ManagedZoneUtil.moveTopicToZone(topicIdentifer, managedZone);
 	}
@@ -75,8 +85,7 @@ public class ManagedTopic {
 	}
 
 	public boolean isAllowedForUser(String userHash) {
-		boolean result = StringUtils.endsWithAny(topicIdentifer, ALL_TOPIC, USER_PREFIX + userHash);
-		return result;
+		return StringUtils.endsWithAny(topicIdentifer, ALL_TOPIC, USER_PREFIX + userHash);
 	}
 
 	@Override

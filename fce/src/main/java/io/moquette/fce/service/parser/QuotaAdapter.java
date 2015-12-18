@@ -30,8 +30,7 @@ public class QuotaAdapter implements JsonSerializer<Quota>, JsonDeserializer<Quo
 	}
 
 	@Override
-	public Quota deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
+	public Quota deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 		JsonObject jsonObject = json.getAsJsonObject();
 		String type = jsonObject.get("type").getAsString();
 		JsonElement element = jsonObject.get("properties");

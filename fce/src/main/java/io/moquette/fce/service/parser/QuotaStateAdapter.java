@@ -30,8 +30,7 @@ public class QuotaStateAdapter implements JsonSerializer<IQuotaState>, JsonDeser
 	}
 
 	@Override
-	public IQuotaState deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-			throws JsonParseException {
+	public IQuotaState deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 		JsonObject jsonObject = json.getAsJsonObject();
 		String type = jsonObject.get("type").getAsString();
 		JsonElement element = jsonObject.get("properties");
