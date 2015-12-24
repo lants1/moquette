@@ -26,8 +26,8 @@ public class ManagedTopicTest {
 	public void testHierarchyDeep() {
 		ManagedTopic sample1 = new ManagedTopic(SAMPLE1_HOUSE_LIGHT);
 		ManagedTopic sample2 = new ManagedTopic(SAMPLE2_HOUSE_LIGHT);
-		assertSame(sample1.getHierarchyDeep(ManagedZone.QUOTA_GLOBAL), 6);
-		assertSame(sample2.getHierarchyDeep(ManagedZone.QUOTA_GLOBAL), 6);
+		assertSame(sample1.getHierarchyDeepness(ManagedZone.QUOTA_GLOBAL), 6);
+		assertSame(sample2.getHierarchyDeepness(ManagedZone.QUOTA_GLOBAL), 6);
 	}
 	
 	@Test

@@ -20,6 +20,11 @@ public enum CheckResult {
 		this.value = value;
 	}
 
+	/**
+	 * Gets the value of a CheckResult enum.
+	 * 
+	 * @return value Boolean
+	 */
 	public Boolean getValue() {
 		return value;
 	}

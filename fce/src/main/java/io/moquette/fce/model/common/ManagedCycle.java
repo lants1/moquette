@@ -31,11 +31,21 @@ public enum ManagedCycle {
         this.calendarReference=calendarReference;
     }
 
+    /**
+     * Gets the value of a ManagedCycle enum.
+     * 
+     * @return String value of an enum
+     */
     public String getValue()
     {
         return value;
     }
     
+    /**
+     * Gets the calender reference of an enum.
+     * 
+     * @return int Calendar.Reference
+     */
     public int getCalendarReference(){
     	return calendarReference;
     }

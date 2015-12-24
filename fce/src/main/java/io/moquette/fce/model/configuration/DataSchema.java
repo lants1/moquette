@@ -1,5 +1,11 @@
 package io.moquette.fce.model.configuration;
 
+/**
+ * DataSchema model for validation.
+ * 
+ * @author lants1
+ *
+ */
 public class DataSchema {
 
 	private final SchemaType schemaType;

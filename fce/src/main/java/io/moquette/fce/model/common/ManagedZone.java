@@ -1,5 +1,11 @@
 package io.moquette.fce.model.common;
 
+/**
+ * ManagedZone enum which defines all available ManagedZones.
+ * 
+ * @author lants1
+ *
+ */
 public enum ManagedZone {
 
 	CONFIG_GLOBAL("/$MANAGED/CONFIGURATION/GLOBAL", TopicPermission.READ, ManagedScope.GLOBAL),

@@ -27,11 +27,21 @@ public enum DataUnit {
         this.multiplikator=multiplikator;
     }
 
+    /**
+     * Gets the value of an DataUnit enum.
+     * 
+     * @return value String
+     */
     public String getValue()
     {
         return value;
     }
     
+    /**
+     * Gets the mulitiplier of an enum.
+     * 
+     * @return int multiplier of value to byte
+     */
     public int getMultiplier(){
     	return multiplikator;
     }
