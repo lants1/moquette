@@ -14,9 +14,9 @@ public class AuthenticationProperties {
 	/**
 	 * Constructor
 	 * 
-	 * @param String username
-	 * @param byte[] password
-	 * @param String clientId
+	 * @param username String
+	 * @param password byte[]
+	 * @param clientId String
 	 */
 	public AuthenticationProperties(String username, byte[] password, String clientId) {
 		super();

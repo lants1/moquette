@@ -8,14 +8,19 @@ package io.moquette.plugin;
  */
 public interface IBrokerPlugin {
 
+	/**
+	 * Gets the pluginIdentifier
+	 * 
+	 * @return pluginIdentifier as String
+	 */
 	public String getPluginIdentifier();
 
 	/**
 	 * Called before Broker starts operating (accept requests on initialized
 	 * ports). The plugin has the posibility to initialize itself by the use of this method.
 	 * 
-	 * @param config
-	 * @param brokerOperator
+	 * @param config IBrokerConfig
+	 * @param brokerOperator IBrokerOperator
 	 */
 	public void load(IBrokerConfig config, IBrokerOperator brokerOperator);
 	

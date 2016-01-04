@@ -11,8 +11,8 @@ public interface IAuthenticationAndAuthorizationPlugin extends IBrokerPlugin {
 	/**
 	 * Broker requests approval of action. Called on every publish or subscribe action.
 	 * 
-	 * @param AuthorizationProperties props
-	 * @param MqttAction action
+	 * @param props AuthorizationProperties
+	 * @param action MqttAction
 	 * @return boolean result of validity check
 	 */
     boolean canDoOperation(AuthorizationProperties props, MqttAction action);
@@ -20,7 +20,7 @@ public interface IAuthenticationAndAuthorizationPlugin extends IBrokerPlugin {
     /**
      * Broker requests authentication approval of user. Called on every connect to the broker. 
      * 
-     * @param AuthenticationProperties authProps
+     * @param authProps AuthenticationProperties
      * @return boolean result of validity check
      */
     boolean checkValid(AuthenticationProperties authProps);

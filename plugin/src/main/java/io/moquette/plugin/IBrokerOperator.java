@@ -12,8 +12,8 @@ public interface IBrokerOperator {
 	/** 
 	 * Counts retained messages in a area of the broker.
 	 * 
-	 * @param String topicFilter
-	 * @return int count of retained messages within the given topicFilter Parameter
+	 * @param topicFilter String
+	 * @return count of retained messages within the given topicFilter Parameter as int
 	 */
 	public int countRetainedMessages(String topicFilter);
 	

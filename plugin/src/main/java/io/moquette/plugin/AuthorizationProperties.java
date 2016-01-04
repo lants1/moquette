@@ -16,13 +16,12 @@ public class AuthorizationProperties {
 	private final ByteBuffer message;
 	
 	/**
-	 * Constructor.
 	 * 
-	 * @param String topic
-	 * @param String user
-	 * @param String clientId
-	 * @param Boolean anonymous
-	 * @param ByteBuffer message
+	 * @param topic String
+	 * @param user String
+	 * @param clientId String
+	 * @param anonymous Boolean
+	 * @param message ByteBuffer
 	 */
 	public AuthorizationProperties(String topic, String user, String clientId, Boolean anonymous, ByteBuffer message) {
 		super();

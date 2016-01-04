@@ -12,35 +12,35 @@ public interface IBrokerInterceptionPlugin extends IBrokerPlugin {
 	/**
 	 * Called on every onConnect
 	 * 
-	 * @param BrokerInterceptionMessage msg
+	 * @param msg BrokerInterceptionMessage
 	 */
     void onConnect(BrokerInterceptionMessage msg);
 
     /**
      * Called on every onDisconnect
      * 
-     * @param BrokerInterceptionMessage msg
+     * @param msg BrokerInterceptionMessage
      */
     void onDisconnect(BrokerInterceptionMessage msg);
 
     /**
      * Called on every onPublish
      * 
-     * @param BrokerInterceptionMessage msg
+     * @param msg BrokerInterceptionMessage
      */
     void onPublish(BrokerInterceptionMessage msg);
 
     /**
      * Called on every onSubscribe
      * 
-     * @param BrokerInterceptionMessage msg
+     * @param msg BrokerInterceptionMessage
      */
     void onSubscribe(BrokerInterceptionMessage msg);
 
     /**
      * Called on every onUnsubscribe
      * 
-     * @param BrokerInterceptionMessage msg
+     * @param msg BrokerInterceptionMessage
      */
     void onUnsubscribe(BrokerInterceptionMessage msg);
 }
