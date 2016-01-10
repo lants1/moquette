@@ -70,7 +70,10 @@ public class MqttManageHandler extends FceEventHandler implements IFceMqttCallba
 			// nullpointer exception
 			getContext().getQuotaStore(zone).put(topicIdentifier, null);
 		}
-		getContext().getQuotaStore(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
+		
+		if(!getContext().isInitialized()){
+			getContext().getQuotaStore(zone).put(topic.getIdentifier(msgQuota, zone), msgQuota, true);
+		}
 		LOGGER.info("received quota message for topic: " + topicIdentifier);
 	}
 
