@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">10000</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1452347515000</longProp>
+        <longProp name="ThreadGroup.end_time">1452347515000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler guiclass="org.apache.jmeter.protocol.mqtt.control.gui.MQTTPublisherGui" testclass="org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler" testname="MQTT Publisher" enabled="true">
+          <stringProp name="mqtt.provider_url">tcp://localhost:1883</stringProp>
+          <stringProp name="mqtt.topic">/$MANAGED/INTENT/bas</stringProp>
+          <stringProp name="mqtt.security_principle">user</stringProp>
+          <stringProp name="mqtt.security_credentials">04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb</stringProp>
+          <stringProp name="mqtt.text_message">{
+  &quot;managedScope&quot;: &quot;GLOBAL&quot;,
+  &quot;adminPermission&quot;: &quot;ALL&quot;,
+  &quot;actionPermission&quot;: &quot;ALL&quot;,
+  &quot;restrictions&quot;: [
+    {
+      &quot;type&quot;: &quot;PeriodicRestriction&quot;,
+      &quot;properties&quot;: {
+        &quot;cyle&quot;: &quot;DAILY&quot;,
+        &quot;mqttAction&quot;: &quot;ALL&quot;,
+        &quot;messageCount&quot;: 1000000,
+        &quot;sizeUnit&quot;: &quot;kB&quot;,
+        &quot;wsdlUrl&quot;: &quot;&quot;
+      }
+    }
+  ],
+  &quot;alias&quot;: &quot;user&quot;,
+  &quot;userHash&quot;: &quot;04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb&quot;,
+  &quot;timestamp&quot;: &quot;Nov 23, 2015 5:27:54 PM&quot;
+}</stringProp>
+          <stringProp name="mqtt.config_msg_type">mqtt_text_message</stringProp>
+          <stringProp name="mqtt.iterations">1</stringProp>
+          <boolProp name="mqtt.authenticate">true</boolProp>
+          <stringProp name="mqtt.quality">mqtt_at_most_once</stringProp>
+          <boolProp name="mqtt.retain">true</boolProp>
+          <stringProp name="mqtt.type_fixed_value">mqtt_int_value</stringProp>
+          <stringProp name="mqtt.fixed_value"></stringProp>
+          <stringProp name="mqtt.type_random_value">mqtt_pseudo_random</stringProp>
+          <stringProp name="mqtt.max_random_value"></stringProp>
+          <stringProp name="mqtt.min_random_value"></stringProp>
+          <stringProp name="mqtt.type_generated_value">mqtt_int_value</stringProp>
+          <stringProp name="mqtt.seed"></stringProp>
+          <boolProp name="mqtt.use_timestamp">false</boolProp>
+          <boolProp name="mqtt.use_number_sequence">false</boolProp>
+          <stringProp name="mqtt.clientid"></stringProp>
+          <stringProp name="mqtt.format">mqtt_no_encoding</stringProp>
+          <stringProp name="mqtt.charset">UTF-8</stringProp>
+          <stringProp name="mqtt.size_array"></stringProp>
+          <stringProp name="mqtt.strategy">mqtt_round_robin</stringProp>
+          <boolProp name="mqtt.one_connection_per_topic">false</boolProp>
+          <boolProp name="mqtt.random_suffix_client_id">true</boolProp>
+          <stringProp name="mqtt.suffix.length">5</stringProp>
+        </org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler>
+        <hashTree/>
+        <org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler guiclass="org.apache.jmeter.protocol.mqtt.control.gui.MQTTPublisherGui" testclass="org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler" testname="MQTT Publisher" enabled="true">
+          <stringProp name="mqtt.provider_url">tcp://localhost:1883</stringProp>
+          <stringProp name="mqtt.topic">/bas</stringProp>
+          <stringProp name="mqtt.security_principle">user</stringProp>
+          <stringProp name="mqtt.security_credentials">04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb</stringProp>
+          <stringProp name="mqtt.text_message">asfsf</stringProp>
+          <stringProp name="mqtt.config_msg_type">mqtt_text_message</stringProp>
+          <stringProp name="mqtt.iterations">1</stringProp>
+          <boolProp name="mqtt.authenticate">true</boolProp>
+          <stringProp name="mqtt.quality">mqtt_at_most_once</stringProp>
+          <boolProp name="mqtt.retain">true</boolProp>
+          <stringProp name="mqtt.type_fixed_value">mqtt_int_value</stringProp>
+          <stringProp name="mqtt.fixed_value"></stringProp>
+          <stringProp name="mqtt.type_random_value">mqtt_pseudo_random</stringProp>
+          <stringProp name="mqtt.max_random_value"></stringProp>
+          <stringProp name="mqtt.min_random_value"></stringProp>
+          <stringProp name="mqtt.type_generated_value">mqtt_int_value</stringProp>
+          <stringProp name="mqtt.seed"></stringProp>
+          <boolProp name="mqtt.use_timestamp">false</boolProp>
+          <boolProp name="mqtt.use_number_sequence">false</boolProp>
+          <stringProp name="mqtt.clientid"></stringProp>
+          <stringProp name="mqtt.format">mqtt_no_encoding</stringProp>
+          <stringProp name="mqtt.charset">UTF-8</stringProp>
+          <stringProp name="mqtt.size_array"></stringProp>
+          <stringProp name="mqtt.strategy">mqtt_round_robin</stringProp>
+          <boolProp name="mqtt.one_connection_per_topic">false</boolProp>
+          <boolProp name="mqtt.random_suffix_client_id">true</boolProp>
+          <stringProp name="mqtt.suffix.length">5</stringProp>
+        </org.apache.jmeter.protocol.mqtt.sampler.PublisherSampler>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
