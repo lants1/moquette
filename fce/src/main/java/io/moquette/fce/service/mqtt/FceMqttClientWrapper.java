@@ -82,6 +82,7 @@ public class FceMqttClientWrapper implements MqttService {
 			options.setSocketFactory(ssf);
 			options.setCleanSession(false);
 			options.setKeepAliveInterval(30);
+			//options.setMaxInflight(10000);
 			client.setCallback(callback);
 
 			client.connect(options, null, new IMqttActionListener() {

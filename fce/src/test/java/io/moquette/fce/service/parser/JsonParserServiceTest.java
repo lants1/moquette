@@ -26,6 +26,8 @@ import io.moquette.fce.model.configuration.Restriction;
 import io.moquette.fce.model.configuration.SchemaType;
 import io.moquette.fce.model.configuration.TimeframeRestriction;
 import io.moquette.fce.model.configuration.UserConfiguration;
+import io.moquette.fce.model.info.InfoMessage;
+import io.moquette.fce.model.info.InfoMessageType;
 import io.moquette.fce.model.quota.PeriodicQuota;
 import io.moquette.fce.model.quota.Quota;
 import io.moquette.fce.model.quota.TimeframeQuota;
@@ -67,8 +69,6 @@ public class JsonParserServiceTest {
 		JsonParserService mJsonParser = new JsonParserService();
 		String json = mJsonParser.serialize(sampleUserConfig);
 		
-		System.out.println(json);
-		
 		UserConfiguration sampleUserConfigDeserialized = mJsonParser.deserializeUserConfiguration(json);
 		assertTrue(sampleUserConfigDeserialized.getUserHash().equalsIgnoreCase(TESTIDENTIFIER));
 		assertTrue(sampleUserConfigDeserialized.getActionPermission() == FceAction.ALL);
@@ -91,13 +91,24 @@ public class JsonParserServiceTest {
 
 		JsonParserService mJsonParser = new JsonParserService();
 		String serializedQuota = mJsonParser.serialize(quota);
-		
+
 		UserQuota deserializedQuota = mJsonParser.deserializeQuota(serializedQuota);
 		
 		deserializedQuota.getUserHash().equalsIgnoreCase(TESTIDENTIFIER);
 		
 		assertTrue(((TimeframeQuota) deserializedQuota.getQuotas().get(0)).getTo().equals(sampleDate));
 		assertTrue(((PeriodicQuota) deserializedQuota.getQuotas().get(1)).getCycle() == ManagedCycle.DAILY);
+	}
+	
+	@Test
+	public void testSerializationAndDeserializationInfoMessage() throws IOException, URISyntaxException {
+		JsonParserService mJsonParser = new JsonParserService();
+		InfoMessage info = new InfoMessage(null, null, null, null);
+		info.setAlias("asf");
+		info.setMessageType(InfoMessageType.AUTHORIZATION_EXCEPTION);
+		info.setUserHash("hash");
+		info.setTimestamp(new Date());
+		mJsonParser.serialize(info);
 	}
 	
 	@Test
